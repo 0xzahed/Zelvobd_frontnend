@@ -71,14 +71,14 @@ export default function AdminSliders() {
   return (
     <div className="space-y-4">
       {/* Page title */}
-      <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
         <h1 className="text-base text-foreground">Banner List</h1>
       </div>
 
       {/* Card */}
-      <div className="rounded-lg bg-card p-5 shadow-card">
+      <div className="rounded-lg bg-card p-4 shadow-card md:p-5">
         {/* Top bar */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm text-foreground">Banner List</h2>
           <button
             onClick={openCreate}
@@ -89,8 +89,9 @@ export default function AdminSliders() {
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden">
-          <div className="grid grid-cols-[1fr_2fr_1fr] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
+        <div className="overflow-x-auto">
+          <div className="min-w-[560px]">
+          <div className="grid grid-cols-[90px_1fr_120px] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
             <div>Image</div>
             <div>Title</div>
             <div>Action</div>
@@ -103,7 +104,7 @@ export default function AdminSliders() {
             sliders.map((s) => (
               <div
                 key={s.id}
-                className="grid grid-cols-[1fr_2fr_1fr] items-center gap-3 border-b border-border py-3 text-center text-sm"
+                className="grid grid-cols-[90px_1fr_120px] items-center gap-3 border-b border-border py-3 text-center text-sm"
               >
                 <div className="flex justify-center">
                   <div className="relative h-14 w-14 overflow-hidden rounded-md bg-[#F5F6FA]">
@@ -143,6 +144,7 @@ export default function AdminSliders() {
               </div>
             ))
           )}
+          </div>
         </div>
       </div>
 

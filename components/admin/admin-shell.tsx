@@ -4,11 +4,18 @@ import { type ReactNode, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
+  Bell,
   ChevronRight,
+  CircleDollarSign,
+  CirclePlus,
   FolderTree,
   Gauge,
   LayoutDashboard,
+  LogOut,
   Menu,
+  Search,
+  Settings2,
+  ShieldAlert,
   Package,
   Settings,
   ShieldCheck,
@@ -124,6 +131,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    setOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
+  useEffect(() => {
     if (!ready) return
     if (pathname !== "/admin/login" && !isAdmin) {
       router.replace("/admin/login")
@@ -140,32 +160,43 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sections = groupBySection(MENU)
 
   return (
-    <div className="min-h-[100dvh] bg-[#F5F7FB]">
+    <div className="min-h-[100dvh] overflow-x-hidden bg-[#F5F7FB]">
+      {open && (
+        <button
+          type="button"
+          aria-label="Close menu backdrop"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-30 bg-black/35 md:hidden"
+        />
+      )}
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-border/60 bg-card transition-transform md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-[17.5rem] transform border-r border-border/60 bg-[#FAFAFB] transition-transform md:w-64 md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-16 items-center justify-between px-5">
-          <Link href="/admin" className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-[#3B6CF4] text-xs font-semibold text-white">
-              E
+        <div className="flex h-16 items-center justify-between px-4">
+          <Link href="/admin" className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#3B6CF4] text-xs font-semibold text-white shadow-sm">
+              <ShoppingBag className="h-4 w-4" />
             </span>
-            <span className="text-sm font-medium text-foreground">Admin</span>
+            <span className="text-2xl font-semibold text-[#202125]">Ecarto</span>
           </Link>
           <button onClick={() => setOpen(false)} className="md:hidden" aria-label="Close menu">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav
-          className="overflow-y-auto px-3 pb-8"
-          style={{ maxHeight: "calc(100dvh - 4rem)" }}
-        >
+        <div className="px-4 pb-2">
+          <label className="flex h-9 items-center gap-2 rounded-lg border border-border/80 bg-white px-3">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input placeholder="Search" className="w-full bg-transparent text-sm outline-none" />
+          </label>
+        </div>
+        <nav className="overflow-y-auto px-3 pb-6" style={{ maxHeight: "calc(100dvh - 15rem)" }}>
           {sections.map((group, gi) => (
             <div key={group.section} className={gi === 0 ? "" : "mt-4"}>
-              <p className="px-3 pb-2 pt-2 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground/70">
+              <p className="px-3 pb-2 pt-2 text-[11px] font-medium text-muted-foreground/80">
                 {group.section}
               </p>
               <ul className="space-y-0.5">
@@ -183,9 +214,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           href={item.href!}
                           onClick={() => setOpen(false)}
                           className={cx(
-                            "flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-normal transition",
+                            "flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-[13px] font-normal transition",
                             active
-                              ? "bg-[#EEF0FB] text-[#3B6CF4]"
+                              ? "border border-border/70 bg-white text-[#202125] shadow-sm"
                               : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
                           )}
                         >
@@ -194,7 +225,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                               "h-4 w-4 shrink-0",
                               active ? "text-[#3B6CF4]" : "text-muted-foreground",
                             )}
-                            strokeWidth={1.75}
                           />
                           <span className="flex-1">{item.label}</span>
                         </Link>
@@ -212,9 +242,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         onClick={() => toggleGroup(item.label)}
                         aria-expanded={isOpen}
                         className={cx(
-                          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-[13px] font-normal transition",
+                          "flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-[13px] font-normal transition",
                           groupActive
-                            ? "text-[#3B6CF4]"
+                            ? "border border-border/70 bg-white text-[#202125] shadow-sm"
                             : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
                         )}
                       >
@@ -223,7 +253,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                             "h-4 w-4 shrink-0",
                             groupActive ? "text-[#3B6CF4]" : "text-muted-foreground",
                           )}
-                          strokeWidth={1.75}
                         />
                         <span className="flex-1 text-left">{item.label}</span>
                         <ChevronRight
@@ -231,11 +260,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
                             "h-3.5 w-3.5 transition-transform",
                             isOpen ? "rotate-90" : "rotate-0",
                           )}
-                          strokeWidth={1.75}
                         />
                       </button>
                       {isOpen && (
-                        <ul className="mt-0.5 space-y-0.5 border-l border-border/60 pl-3 ml-[22px]">
+                        <ul className="ml-[22px] mt-0.5 space-y-0.5 border-l border-border/60 pl-3">
                           {item.children.map((child) => {
                             const active = isChildActive(pathname, child.href)
                             return (
@@ -244,9 +272,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                                   href={child.href}
                                   onClick={() => setOpen(false)}
                                   className={cx(
-                                    "flex items-center rounded-md px-3 py-1.5 text-[13px] font-normal transition",
+                                    "flex items-center rounded-[8px] px-3 py-1.5 text-[13px] font-normal transition",
                                     active
-                                      ? "bg-[#EEF0FB] text-[#3B6CF4]"
+                                      ? "bg-white text-[#202125] shadow-sm"
                                       : "text-muted-foreground hover:text-foreground",
                                   )}
                                 >
@@ -264,10 +292,30 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </div>
           ))}
         </nav>
+        <div className="px-4 pb-4">
+          <div className="rounded-2xl border border-border/70 bg-white p-3 shadow-sm">
+            <div className="flex items-center gap-2.5 rounded-xl border border-border/60 p-2">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-xs font-semibold text-[#3B6CF4]">
+                M
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-foreground">Marcus Orlando</p>
+                <p className="text-[11px] text-muted-foreground">Administrator</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <button className="mt-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-[#F5F7FB]">
+              <Settings2 className="h-4 w-4" /> Settings
+            </button>
+            <button className="mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-[#F5F7FB]">
+              <LogOut className="h-4 w-4" /> Logout
+            </button>
+          </div>
+        </div>
       </aside>
 
       {/* Top bar */}
-      <header className="sticky top-0 z-30 ml-0 flex h-16 items-center border-b border-border/60 bg-card px-4 md:ml-64 md:px-6">
+      <header className="sticky top-0 z-20 ml-0 flex h-14 items-center justify-between border-b border-border/70 bg-[#FAFAFB]/95 px-3 backdrop-blur md:ml-64 md:h-16 md:px-6">
         <button
           onClick={() => setOpen(true)}
           className="grid h-9 w-9 place-items-center rounded-md hover:bg-[#F5F7FB] md:hidden"
@@ -275,9 +323,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
         >
           <Menu className="h-5 w-5" />
         </button>
+        <p className="hidden text-sm font-semibold text-foreground md:block">Dashboard</p>
+        <div className="ml-auto hidden items-center gap-2 md:flex">
+          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
+            <CirclePlus className="h-4 w-4" />
+          </button>
+          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
+            <CircleDollarSign className="h-4 w-4" />
+          </button>
+          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
+            <Bell className="h-4 w-4" />
+          </button>
+          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
+            <ShieldAlert className="h-4 w-4" />
+          </button>
+        </div>
       </header>
 
-      <main className="ml-0 p-4 md:ml-64 md:p-6">{children}</main>
+      <main className="ml-0 p-3 sm:p-4 md:ml-64 md:p-6">{children}</main>
     </div>
   )
 }

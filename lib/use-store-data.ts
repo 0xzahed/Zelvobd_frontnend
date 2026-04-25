@@ -32,18 +32,6 @@ const categoryFromProduct = (products: Product[]): Category[] => {
   return Array.from(map.values())
 }
 
-const fallbackSliders = (): Slider[] => [
-  {
-    id: "fallback-1",
-    title: "Welcome to EcoMerce",
-    subtitle: "New arrivals are available now",
-    cta: "Shop now",
-    link: "/",
-    image: "/placeholder.svg",
-    bg: "#EAF0FF",
-  },
-]
-
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -133,10 +121,10 @@ export function useSliders() {
         } else {
           const allBannerRes = await getBanners()
           const allBanners = (allBannerRes?.data || []).map(mapBanner)
-          setSliders(allBanners.length > 0 ? allBanners : fallbackSliders())
+          setSliders(allBanners)
         }
       } catch {
-        setSliders(fallbackSliders())
+        setSliders([])
       } finally {
         setLoaded(true)
       }

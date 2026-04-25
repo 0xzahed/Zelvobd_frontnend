@@ -187,7 +187,24 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   const copyProduct = (id: string) => {
     runApiAction(async () => {
-      await copyProductApi(id)
+      try {
+        await copyProductApi(id)
+      } catch {
+        const source = products.find((item) => item.id === id)
+        if (!source) {
+          throw new Error("Product not found")
+        }
+
+        const copyName = source.name.endsWith(" (Copy)") ? source.name : `${source.name} (Copy)`
+        const fallbackCopy: Product = {
+          ...source,
+          id: `tmp-copy-${Date.now()}`,
+          name: copyName,
+        }
+
+        const formData = await buildProductFormData(fallbackCopy, categories)
+        await createProductApi(formData)
+      }
       await reloadAll()
       notify.success({ title: "Product duplicated", message: "Copied product successfully." })
     })
@@ -268,7 +285,22 @@ const toQuillDelta = (text: string) => ({
   ops: [{ insert: `${text || "N/A"}\n` }],
 })
 
+const isHtmlString = (value: string) => /<\/?[a-z][\s\S]*>/i.test(value || "")
+
+const htmlToPlainText = (html: string) =>
+  (html || "")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim()
+
 const toHtml = (text: string) => {
+  if (isHtmlString(text)) return text
   const safe = (text || "N/A")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -390,14 +422,19 @@ const buildProductFormData = async (product: Product, categories: Category[]) =>
   })
 
   const formData = new FormData()
+  const descriptionHtml = toHtml(product.description || "N/A")
+  const descriptionPlain = htmlToPlainText(descriptionHtml) || "N/A"
+
   formData.append("categoryId", category.id)
   formData.append("subCategoryId", subCategory.id)
   formData.append("title", product.name?.trim() || "Untitled Product")
-  formData.append("descriptionDelta", JSON.stringify(toQuillDelta(product.description || "N/A")))
-  formData.append("descriptionHtml", toHtml(product.description || "N/A"))
+  formData.append("descriptionDelta", JSON.stringify(toQuillDelta(descriptionPlain)))
+  formData.append("descriptionHtml", descriptionHtml)
   if (product.extraDescription?.trim()) {
-    formData.append("extraDescriptionDelta", JSON.stringify(toQuillDelta(product.extraDescription)))
-    formData.append("extraDescriptionHtml", toHtml(product.extraDescription))
+    const extraHtml = toHtml(product.extraDescription)
+    const extraPlain = htmlToPlainText(extraHtml) || "N/A"
+    formData.append("extraDescriptionDelta", JSON.stringify(toQuillDelta(extraPlain)))
+    formData.append("extraDescriptionHtml", extraHtml)
   }
   formData.append("weight", product.weight?.trim() || "N/A")
   formData.append("material", product.material?.trim() || "N/A")

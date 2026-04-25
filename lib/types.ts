@@ -11,8 +11,12 @@ export type Product = {
   id: string
   name: string
   brand: string
+  categoryId?: string
+  subCategoryId?: string
   categorySlug: string
   subCategorySlug: string
+  categoryName?: string
+  subCategoryName?: string
   price: number
   cutPrice: number
   discount: number

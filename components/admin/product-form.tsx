@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category, Product, ProductVariant } from "@/lib/types"
+import { QuillEditor } from "@/components/ui/quill-editor"
 
 type Props = {
   initial?: Product
@@ -17,6 +18,12 @@ function makeVariantId() {
 
 function emptyVariant(): ProductVariant {
   return { id: makeVariantId(), name: "", price: 0, cutPrice: 0, stock: 0, image: "" }
+}
+
+const htmlToPlainText = (html: string) => {
+  if (typeof window === "undefined") return html.trim()
+  const doc = new DOMParser().parseFromString(html || "", "text/html")
+  return (doc.body.textContent || "").replace(/\u00a0/g, " ").trim()
 }
 
 export function ProductForm({ initial, onSave, onCancel }: Props) {
@@ -93,6 +100,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!htmlToPlainText(description)) return
 
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
@@ -120,7 +128,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
       name: name.trim(),
       brand: initial?.brand ?? "",
       description: description.trim(),
-      extraDescription: extraDescription.trim() || undefined,
+      extraDescription: htmlToPlainText(extraDescription) ? extraDescription.trim() : undefined,
       categorySlug,
       subCategorySlug: subs.find((s) => s.slug === subCategorySlug)
         ? subCategorySlug
@@ -213,22 +221,20 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
           <Text label="Title" value={name} onChange={setName} required placeholder="Title" />
 
           {/* Description */}
-          <TextArea
+          <QuillEditor
             label="Description"
             required
             value={description}
             onChange={setDescription}
             placeholder="Description"
-            rows={4}
           />
 
           {/* Extra description */}
-          <TextArea
+          <QuillEditor
             label="Extra description"
             value={extraDescription}
             onChange={setExtraDescription}
             placeholder="Additional info, specs, warranty..."
-            rows={4}
           />
 
           {/* Size & Quantity */}

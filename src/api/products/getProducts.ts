@@ -5,6 +5,12 @@ export const getProducts = async (query?: Record<string, unknown>) => {
   if (query && typeof query === "object") {
     Object.entries(query).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
+        if (key === "limit") {
+          const numeric = Number(value)
+          const safeLimit = Number.isFinite(numeric) ? Math.min(Math.max(Math.floor(numeric), 1), 100) : 100
+          url.searchParams.set(key, String(safeLimit))
+          return
+        }
         url.searchParams.set(key, String(value))
       }
     })

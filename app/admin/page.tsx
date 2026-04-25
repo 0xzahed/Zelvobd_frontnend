@@ -215,7 +215,7 @@ export default function AdminOverview() {
       {/* KPI grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
         {stats.map(({ label, value, icon: Icon, tint }) => (
-          <div key={label} className="rounded-lg bg-card p-4 shadow-card">
+          <div key={label} className="rounded-[10px] border border-border/70 bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Icon className={cx("h-4 w-4", tint)} />
               <span className="truncate">{label}</span>
@@ -226,7 +226,7 @@ export default function AdminOverview() {
       </div>
 
       {/* Catalog pie */}
-      <section className="rounded-lg bg-card p-5 shadow-card">
+      <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <h2 className="mb-4 text-sm font-bold text-foreground">Catalog-wise Sales</h2>
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -252,7 +252,7 @@ export default function AdminOverview() {
       </section>
 
       {/* Weekly trend */}
-      <section className="rounded-lg bg-card p-5 shadow-card">
+      <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-bold text-foreground">Weekly Sales Trend</h2>
           <select
@@ -284,7 +284,7 @@ export default function AdminOverview() {
       </section>
 
       {/* Catalog bar chart */}
-      <section className="rounded-lg bg-card p-5 shadow-card">
+      <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <h2 className="mb-4 text-sm font-bold text-foreground">Catalog Overview</h2>
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -303,7 +303,7 @@ export default function AdminOverview() {
       </section>
 
       {/* Monthly trend */}
-      <section className="rounded-lg bg-card p-5 shadow-card">
+      <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="mb-4 flex items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-foreground">Monthly Sales Trend</h2>
           <div className="flex gap-2">
@@ -348,7 +348,7 @@ export default function AdminOverview() {
       </section>
 
       {/* Yearly trend */}
-      <section className="rounded-lg bg-card p-5 shadow-card">
+      <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-bold text-foreground">Yearly Sales Trend</h2>
           <select

@@ -15,7 +15,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     <Link
       href={`/product/${product.id}`}
       className={cx(
-        "group relative block overflow-hidden rounded-lg bg-card shadow-card transition-transform hover:-translate-y-0.5",
+        "group relative block overflow-hidden rounded-md bg-card shadow-card transition-transform hover:-translate-y-0.5",
         compact ? "w-40 shrink-0 sm:w-44" : "w-full",
       )}
     >

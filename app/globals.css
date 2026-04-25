@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'quill/dist/quill.snow.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -136,4 +137,15 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.ql-toolbar.ql-snow {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ql-container.ql-snow {
+  border: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
 }

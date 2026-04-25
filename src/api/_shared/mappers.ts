@@ -12,6 +12,9 @@ const toAbsoluteUploadUrl = (path: string | null | undefined): string => {
   return `${root}${path}`
 }
 
+const uniqueNonEmpty = (values: Array<string | null | undefined>) =>
+  Array.from(new Set(values.map((v) => (v || "").trim()).filter(Boolean)))
+
 export const mapCategory = (category: any): Category => ({
   id: category.id,
   name: category.title,
@@ -30,20 +33,30 @@ export const mapProduct = (product: any): Product => {
   const price = Number(firstVariant?.discountedPrice || 0)
   const cutPrice = Number(firstVariant?.actualPrice || 0)
 
+  const imageCandidates = uniqueNonEmpty([
+    ...(product.variants || []).map((v: any) => toAbsoluteUploadUrl(v.imageUrl)),
+    toAbsoluteUploadUrl(firstVariant?.imageUrl),
+    toAbsoluteUploadUrl(product.imageUrl),
+    toAbsoluteUploadUrl(product.thumbnailUrl),
+    toAbsoluteUploadUrl(product.coverImageUrl),
+  ])
+
   return {
     id: product.id,
     name: product.title,
     brand: "",
+    categoryId: product.category?.id || undefined,
+    subCategoryId: product.subCategory?.id || undefined,
     categorySlug: product.category?.slug || "",
     subCategorySlug: product.subCategory?.slug || "",
+    categoryName: product.category?.title || "",
+    subCategoryName: product.subCategory?.title || "",
     price,
     cutPrice,
     discount: cutPrice > price ? Math.round((1 - price / cutPrice) * 100) : 0,
     rating: 4.5,
     reviews: 0,
-    images: (product.variants || [])
-      .map((v: any) => toAbsoluteUploadUrl(v.imageUrl))
-      .filter(Boolean),
+    images: imageCandidates,
     features: [],
     description: product.descriptionHtml || "",
     extraDescription: product.extraDescriptionHtml || undefined,

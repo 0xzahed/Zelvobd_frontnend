@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Copy, Pencil, Plus, Search, Trash2 } from "lucide-react"
+import Image from "next/image"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
@@ -14,15 +15,15 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
 
-  const getCategoryName = (slug: string) => {
+  const getCategoryName = (slug: string, fallbackName?: string) => {
     const cat = categories.find((c) => c.slug === slug)
-    return cat?.name || slug
+    return cat?.name || fallbackName || slug || "Uncategorized"
   }
 
-  const getSubCategoryName = (catSlug: string, subSlug: string) => {
+  const getSubCategoryName = (catSlug: string, subSlug: string, fallbackName?: string) => {
     const cat = categories.find((c) => c.slug === catSlug)
     const sub = cat?.subCategories.find((s) => s.slug === subSlug)
-    return sub?.name || subSlug
+    return sub?.name || fallbackName || subSlug || "No sub-category"
   }
 
   const filtered = useMemo(() => {
@@ -49,7 +50,7 @@ export default function AdminProductsPage() {
           <p className="text-xs text-muted-foreground">{products.length} total</p>
         </div>
         <div className="flex flex-1 items-center gap-2 md:flex-none">
-          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full bg-card px-3 shadow-card md:w-72 md:flex-none">
+          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-[8px] bg-card px-3 shadow-sm md:w-72 md:flex-none">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -63,7 +64,7 @@ export default function AdminProductsPage() {
               setEditing(null)
               setShowForm(true)
             }}
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#3B6CF4] px-4 text-sm font-semibold text-white"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] bg-[#3B6CF4] px-4 text-sm font-semibold text-white shadow-sm"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -81,13 +82,14 @@ export default function AdminProductsPage() {
         />
       )}
 
-      <div className="overflow-hidden rounded-lg bg-card shadow-card">
+      <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-200 text-left text-sm">
+          <table className="w-full min-w-[980px] text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-[#EEF0FB]/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-medium">Product</th>
                 <th className="px-5 py-3 font-medium">Category</th>
+                <th className="px-5 py-3 font-medium">Sub Category</th>
                 <th className="px-5 py-3 font-medium">Price</th>
                 <th className="px-5 py-3 font-medium">Discount</th>
                 <th className="px-5 py-3 font-medium">Stock</th>
@@ -100,8 +102,14 @@ export default function AdminProductsPage() {
                 <tr key={p.id} className="border-b border-border/60 last:border-b-0">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#EEF0FB] text-xs font-semibold text-[#3B6CF4]">
-                        {p.brand.slice(0, 2)}
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-[#EEF0FB]">
+                        <Image
+                          src={p.images?.[0] || "/placeholder.svg"}
+                          alt={p.name}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
                       </div>
                       <div className="min-w-0">
                         <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
@@ -110,7 +118,10 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-3 text-muted-foreground">
-                    {getCategoryName(p.categorySlug)} / {getSubCategoryName(p.categorySlug, p.subCategorySlug)}
+                    {getCategoryName(p.categorySlug, p.categoryName)}
+                  </td>
+                  <td className="px-5 py-3 text-muted-foreground">
+                    {getSubCategoryName(p.categorySlug, p.subCategorySlug, p.subCategoryName)}
                   </td>
                   <td className="px-5 py-3 font-medium text-foreground">{formatBDT(p.price)}</td>
                   <td className="px-5 py-3">
