@@ -1,0 +1,139 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* EcoMerce brand tokens */
+  --background: #f0f4fa;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
+  --primary: #3b6cf4;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f6fd;
+  --secondary-foreground: #1a1a2e;
+  --muted: #f4f6fd;
+  --muted-foreground: #6b7280;
+  --accent: #ff3b3b;
+  --accent-foreground: #ffffff;
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+  --destructive: #ff3b3b;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7f2;
+  --input: #e5e7f2;
+  --ring: #3b6cf4;
+
+  --radius: 1rem; /* 16px cards */
+  --radius-btn: 0.75rem; /* 12px buttons */
+  --radius-pill: 999px;
+
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  --background: #0f1020;
+  --foreground: #f5f6fb;
+  --card: #1a1b2e;
+  --card-foreground: #f5f6fb;
+  --popover: #1a1b2e;
+  --popover-foreground: #f5f6fb;
+  --primary: #3b6cf4;
+  --primary-foreground: #ffffff;
+  --secondary: #1f2142;
+  --secondary-foreground: #f5f6fb;
+  --muted: #1f2142;
+  --muted-foreground: #9ca3af;
+  --accent: #ff3b3b;
+  --accent-foreground: #ffffff;
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+  --destructive: #ff3b3b;
+  --destructive-foreground: #ffffff;
+  --border: #2a2c4a;
+  --input: #2a2c4a;
+  --ring: #3b6cf4;
+}
+
+@theme inline {
+  --font-sans: var(--font-poppins), 'Poppins Fallback', system-ui, sans-serif;
+  --font-mono: 'ui-monospace', 'SFMono-Regular', monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html,
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Utilities */
+.shadow-card {
+  box-shadow: none;
+}
+.shadow-top {
+  box-shadow: none;
+}
+
+/* Scalation (scale-pulse) loading animation used by ScaleLoader */
+@keyframes scale-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.96); opacity: 0.6; }
+}
+.animate-scale-pulse {
+  animation: scale-pulse 1.2s ease-in-out infinite;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
