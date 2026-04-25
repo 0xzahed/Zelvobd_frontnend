@@ -108,7 +108,7 @@ export default function AdminCategoriesPage() {
 
           {/* Right: title + add */}
           <div className="flex items-center justify-between gap-3 md:gap-4">
-            <h2 className="text-base text-foreground md:text-lg">Category List</h2>
+            <h2 className="text-base text-foreground md:text-lg"></h2>
             <button
               onClick={openAdd}
               className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#3B6CF4] px-4 text-sm text-white transition hover:bg-[#2E57D6]"

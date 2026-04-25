@@ -8,11 +8,22 @@ import { formatBDT, cx } from "@/lib/format"
 import { ProductForm } from "@/components/admin/product-form"
 
 export default function AdminProductsPage() {
-  const { products, addProduct, updateProduct, deleteProduct, copyProduct } = useAdminStore()
+  const { categories, products, addProduct, updateProduct, deleteProduct, copyProduct } = useAdminStore()
 
   const [q, setQ] = useState("")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Product | null>(null)
+
+  const getCategoryName = (slug: string) => {
+    const cat = categories.find((c) => c.slug === slug)
+    return cat?.name || slug
+  }
+
+  const getSubCategoryName = (catSlug: string, subSlug: string) => {
+    const cat = categories.find((c) => c.slug === catSlug)
+    const sub = cat?.subCategories.find((s) => s.slug === subSlug)
+    return sub?.name || subSlug
+  }
 
   const filtered = useMemo(() => {
     const lc = q.toLowerCase().trim()
@@ -72,7 +83,7 @@ export default function AdminProductsPage() {
 
       <div className="overflow-hidden rounded-lg bg-card shadow-card">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-left text-sm">
+          <table className="w-full min-w-200 text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-[#EEF0FB]/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-medium">Product</th>
@@ -99,7 +110,7 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-3 text-muted-foreground">
-                    {p.categorySlug} / {p.subCategorySlug}
+                    {getCategoryName(p.categorySlug)} / {getSubCategoryName(p.categorySlug, p.subCategorySlug)}
                   </td>
                   <td className="px-5 py-3 font-medium text-foreground">{formatBDT(p.price)}</td>
                   <td className="px-5 py-3">

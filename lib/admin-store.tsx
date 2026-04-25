@@ -52,7 +52,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const reloadAll = async () => {
     const [categoriesRes, productsRes, bannersRes] = await Promise.all([
       getCategories({ limit: 100 }),
-      getProducts({ limit: 200 }),
+      getProducts({ limit: 100 }),
       getBanners(),
     ])
 
@@ -281,6 +281,30 @@ const toHtml = (text: string) => {
 const fileFromUrl = async (url: string, fallbackName: string): Promise<File | null> => {
   if (!url) return null
   try {
+    // Handle data URLs (base64 images from file uploads)
+    if (url.startsWith("data:")) {
+      const [header, base64] = url.split(",")
+      if (!base64) return null
+      const mimeMatch = header.match(/:(.*?);/)
+      const mimeType = mimeMatch ? mimeMatch[1] : "image/png"
+      const byteCharacters = atob(base64)
+      const byteNumbers = new Array(byteCharacters.length)
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: mimeType })
+      const ext = mimeType.includes("png")
+        ? "png"
+        : mimeType.includes("webp")
+          ? "webp"
+          : mimeType.includes("jpeg") || mimeType.includes("jpg")
+            ? "jpg"
+            : "bin"
+      return new File([blob], `${fallbackName}.${ext}`, { type: mimeType })
+    }
+
+    // Handle regular URLs
     const res = await fetch(url)
     if (!res.ok) return null
     const blob = await res.blob()
