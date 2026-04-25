@@ -1,7 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { Pencil, Plus, ShieldCheck, Trash2, X } from "lucide-react"
+import { getAdmins } from "@/src/api/admin/getAdmins"
+import { createAdmin } from "@/src/api/admin/createAdmin"
+import { updateAdmin } from "@/src/api/admin/updateAdmin"
+import { deleteAdmin } from "@/src/api/admin/deleteAdmin"
+import { notify } from "@/lib/notify"
 
 type AdminRole = "Super Admin" | "Admin" | "Editor" | "Viewer"
 
@@ -13,17 +18,6 @@ type AdminUser = {
   active: boolean
   createdAt: string
 }
-
-const SEED: AdminUser[] = [
-  {
-    id: "a1",
-    name: "Main Admin",
-    email: "admin@shophub.com",
-    role: "Super Admin",
-    active: true,
-    createdAt: "2025-01-10",
-  },
-]
 
 const ROLES: AdminRole[] = ["Super Admin", "Admin", "Editor", "Viewer"]
 
@@ -61,11 +55,39 @@ const emptyForm: FormState = {
 }
 
 export default function AdminsPage() {
-  const [admins, setAdmins] = useState<AdminUser[]>(SEED)
+  const [admins, setAdmins] = useState<AdminUser[]>([])
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<FormState>(emptyForm)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEscapeToClose(open, () => setOpen(false))
+
+  const loadAdmins = async () => {
+    try {
+      setLoading(true)
+      const res = await getAdmins()
+      const list = Array.isArray(res?.data) ? res.data : []
+      setAdmins(
+        list.map((admin: { id: string; email: string; isActive: boolean; createdAt: string }) => ({
+          id: admin.id,
+          name: admin.email.split("@")[0] || "Admin",
+          email: admin.email,
+          role: "Admin",
+          active: Boolean(admin.isActive),
+          createdAt: String(admin.createdAt || "").slice(0, 10),
+        })),
+      )
+    } catch (error) {
+      notify.error({ title: "Failed to load admins", message: getErrorMessage(error) })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadAdmins()
+  }, [])
 
   const openAdd = () => {
     setForm(emptyForm)
@@ -84,41 +106,61 @@ export default function AdminsPage() {
     setOpen(true)
   }
 
-  const onSave = (e: React.FormEvent) => {
+  const onSave = async (e: FormEvent) => {
     e.preventDefault()
     if (!form.name.trim() || !form.email.trim()) return
     if (!form.id && !form.password.trim()) return
 
-    if (form.id) {
-      setAdmins((list) =>
-        list.map((a) =>
-          a.id === form.id
-            ? { ...a, name: form.name, email: form.email, role: form.role, active: form.active }
-            : a,
-        ),
-      )
-    } else {
-      const created: AdminUser = {
-        id: `a-${Date.now()}`,
-        name: form.name,
-        email: form.email,
-        role: form.role,
-        active: form.active,
-        createdAt: new Date().toISOString().slice(0, 10),
+    try {
+      setSaving(true)
+      if (form.id) {
+        const payload: { email: string; isActive: boolean; password?: string } = {
+          email: form.email.trim(),
+          isActive: form.active,
+        }
+        if (form.password.trim()) {
+          payload.password = form.password.trim()
+        }
+        await updateAdmin(form.id, payload)
+        notify.success({ title: "Admin updated", message: "Changes saved successfully." })
+      } else {
+        await createAdmin({
+          email: form.email.trim(),
+          password: form.password.trim(),
+          isActive: form.active,
+        })
+        notify.success({ title: "Admin created", message: "New admin added successfully." })
       }
-      setAdmins((list) => [created, ...list])
+      await loadAdmins()
+      setOpen(false)
+    } catch (error) {
+      notify.error({ title: "Save failed", message: getErrorMessage(error) })
+    } finally {
+      setSaving(false)
     }
-    setOpen(false)
   }
 
-  const onDelete = (id: string) => {
+  const onDelete = async (id: string) => {
     if (confirm("Remove this admin?")) {
-      setAdmins((list) => list.filter((a) => a.id !== id))
+      try {
+        await deleteAdmin(id)
+        notify.success({ title: "Admin deleted", message: "Admin removed successfully." })
+        await loadAdmins()
+      } catch (error) {
+        notify.error({ title: "Delete failed", message: getErrorMessage(error) })
+      }
     }
   }
 
-  const toggleActive = (id: string) => {
-    setAdmins((list) => list.map((a) => (a.id === id ? { ...a, active: !a.active } : a)))
+  const toggleActive = async (id: string) => {
+    const target = admins.find((a) => a.id === id)
+    if (!target) return
+    try {
+      await updateAdmin(id, { isActive: !target.active })
+      await loadAdmins()
+    } catch (error) {
+      notify.error({ title: "Status update failed", message: getErrorMessage(error) })
+    }
   }
 
   return (
@@ -152,7 +194,7 @@ export default function AdminsPage() {
               </tr>
             </thead>
             <tbody>
-              {admins.map((a) => (
+              {!loading && admins.map((a) => (
                 <tr key={a.id} className="border-t border-border">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
@@ -204,10 +246,17 @@ export default function AdminsPage() {
                   </td>
                 </tr>
               ))}
-              {admins.length === 0 && (
+              {!loading && admins.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
                     No admins yet.
+                  </td>
+                </tr>
+              )}
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
+                    Loading admins...
                   </td>
                 </tr>
               )}
@@ -306,9 +355,10 @@ export default function AdminsPage() {
                 </button>
                 <button
                   type="submit"
+                  disabled={saving}
                   className="rounded-full bg-[#3B6CF4] px-4 py-2 text-sm font-semibold text-white"
                 >
-                  {form.id ? "Save Changes" : "Add Admin"}
+                  {saving ? "Saving..." : form.id ? "Save Changes" : "Add Admin"}
                 </button>
               </div>
             </form>
@@ -317,4 +367,13 @@ export default function AdminsPage() {
       )}
     </div>
   )
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object") {
+    const maybe = error as { message?: unknown; error?: unknown }
+    if (typeof maybe.message === "string" && maybe.message.trim()) return maybe.message
+    if (typeof maybe.error === "string" && maybe.error.trim()) return maybe.error
+  }
+  return "Please try again."
 }

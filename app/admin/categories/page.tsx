@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category } from "@/lib/types"
+import { notify } from "@/lib/notify"
 
 export default function AdminCategoriesPage() {
   const { categories, addCategory, updateCategory, deleteCategory } = useAdminStore()
@@ -61,6 +62,17 @@ export default function AdminCategoriesPage() {
   const submit = () => {
     const n = name.trim()
     if (!n) return
+    const normalized = n.toLowerCase()
+    const hasDuplicate = categories.some(
+      (cat) => cat.id !== editingId && cat.name.trim().toLowerCase() === normalized,
+    )
+    if (hasDuplicate) {
+      notify.error({
+        title: "Category already exists",
+        message: "Please use a different category name.",
+      })
+      return
+    }
     const slug = n.toLowerCase().replace(/\s+/g, "-")
 
     if (editingId) {

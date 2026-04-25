@@ -68,7 +68,18 @@ export function useCategories() {
       }
     }
 
+    const handleRefetch = () => {
+      void load()
+    }
+
     void load()
+    window.addEventListener("focus", handleRefetch)
+    const intervalId = window.setInterval(handleRefetch, 30000)
+
+    return () => {
+      window.removeEventListener("focus", handleRefetch)
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   return { categories, loaded }
@@ -90,7 +101,18 @@ export function useProducts() {
       }
     }
 
+    const handleRefetch = () => {
+      void load()
+    }
+
     void load()
+    window.addEventListener("focus", handleRefetch)
+    const intervalId = window.setInterval(handleRefetch, 30000)
+
+    return () => {
+      window.removeEventListener("focus", handleRefetch)
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   return { products, loaded }
@@ -120,7 +142,18 @@ export function useSliders() {
       }
     }
 
+    const handleRefetch = () => {
+      void load()
+    }
+
     void load()
+    window.addEventListener("focus", handleRefetch)
+    const intervalId = window.setInterval(handleRefetch, 30000)
+
+    return () => {
+      window.removeEventListener("focus", handleRefetch)
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   return { sliders, loaded }

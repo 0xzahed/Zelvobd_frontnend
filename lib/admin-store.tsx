@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 import { notify } from "@/lib/notify"
-import type { Category, Product, Slider, SubCategory } from "@/lib/types"
+import type { Category, Product, ProductVariant, Slider, SubCategory } from "@/lib/types"
 import { getCategories } from "@/src/api/category/getCategories"
 import { createCategory as createCategoryApi } from "@/src/api/category/createCategory"
 import { updateCategory as updateCategoryApi } from "@/src/api/category/updateCategory"
@@ -11,6 +11,8 @@ import { createSubCategory as createSubCategoryApi } from "@/src/api/subCategory
 import { updateSubCategory as updateSubCategoryApi } from "@/src/api/subCategory/updateSubCategory"
 import { deleteSubCategory as deleteSubCategoryApi } from "@/src/api/subCategory/deleteSubCategory"
 import { getProducts } from "@/src/api/products/getProducts"
+import { createProduct as createProductApi } from "@/src/api/products/createProduct"
+import { updateProduct as updateProductApi } from "@/src/api/products/updateProduct"
 import { deleteProduct as deleteProductApi } from "@/src/api/products/deleteProduct"
 import { copyProduct as copyProductApi } from "@/src/api/products/copyProduct"
 import { getBanners } from "@/src/api/banner/getBanners"
@@ -70,124 +72,164 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     void load()
   }, [])
 
-  const addCategory = (c: Category) => {
+  const runApiAction = (action: () => Promise<void>) => {
     void (async () => {
+      try {
+        await action()
+      } catch (error) {
+        notify.error({ title: "Request failed", message: getErrorMessage(error) })
+      }
+    })()
+  }
+
+  const addCategory = (c: Category) => {
+    runApiAction(async () => {
       const formData = new FormData()
       formData.append("title", c.name)
-      if (c.image?.startsWith("http")) formData.append("image", c.image)
+      if (c.image) {
+        const file = await fileFromUrl(c.image, "category-image")
+        if (file) formData.append("image", file)
+      }
       await createCategoryApi(formData)
       await reloadAll()
       notify.success({ title: "Category added", message: `"${c.name}" was added successfully.` })
-    })()
+    })
   }
 
   const updateCategory = (id: string, c: Partial<Category>) => {
-    void (async () => {
+    runApiAction(async () => {
       const formData = new FormData()
       if (c.name) formData.append("title", c.name)
-      if (c.image?.startsWith("http")) formData.append("image", c.image)
+      if (c.image) {
+        const file = await fileFromUrl(c.image, "category-image")
+        if (file) formData.append("image", file)
+      }
       await updateCategoryApi(id, formData)
       await reloadAll()
       notify.success({ title: "Category updated", message: "Your changes have been saved." })
-    })()
+    })
   }
 
   const deleteCategory = (id: string) => {
-    void (async () => {
+    runApiAction(async () => {
       await deleteCategoryApi(id)
       await reloadAll()
       notify.success({ title: "Category deleted", message: "Category was removed." })
-    })()
+    })
   }
 
   const addSubCategory = (categoryId: string, sub: SubCategory) => {
-    void (async () => {
+    runApiAction(async () => {
       const formData = new FormData()
       formData.append("categoryId", categoryId)
       formData.append("title", sub.name)
-      if (sub.image?.startsWith("http")) formData.append("image", sub.image)
+      if (sub.image) {
+        const file = await fileFromUrl(sub.image, "subcategory-image")
+        if (file) formData.append("image", file)
+      }
       await createSubCategoryApi(formData)
       await reloadAll()
       notify.success({ title: "Sub-category added", message: `"${sub.name}" is now available.` })
-    })()
+    })
   }
 
   const updateSubCategory = (_categoryId: string, subId: string, data: Partial<SubCategory>) => {
-    void (async () => {
+    runApiAction(async () => {
       const formData = new FormData()
       if (data.name) formData.append("title", data.name)
-      if (data.image?.startsWith("http")) formData.append("image", data.image)
+      if (data.image) {
+        const file = await fileFromUrl(data.image, "subcategory-image")
+        if (file) formData.append("image", file)
+      }
       await updateSubCategoryApi(subId, formData)
       await reloadAll()
       notify.success({ title: "Sub-category updated", message: "Your changes have been saved." })
-    })()
+    })
   }
 
   const deleteSubCategory = (_categoryId: string, subId: string) => {
-    void (async () => {
+    runApiAction(async () => {
       await deleteSubCategoryApi(subId)
       await reloadAll()
       notify.success({ title: "Sub-category deleted", message: "The sub-category was removed." })
-    })()
+    })
   }
 
   const addProduct = (p: Product) => {
-    setProducts((prev) => [p, ...prev])
-    notify.success({ title: "Product updated in UI", message: "Connect product multipart payload to save on backend." })
+    runApiAction(async () => {
+      const formData = await buildProductFormData(p, categories)
+      await createProductApi(formData)
+      await reloadAll()
+      notify.success({ title: "Product added", message: `"${p.name}" was added successfully.` })
+    })
   }
 
   const updateProduct = (id: string, p: Partial<Product>) => {
-    setProducts((prev) => prev.map((item) => (item.id === id ? { ...item, ...p } : item)))
-    notify.success({ title: "Product updated in UI", message: "Connect product multipart payload to save on backend." })
+    runApiAction(async () => {
+      const current = products.find((item) => item.id === id)
+      if (!current) throw new Error("Product not found")
+
+      const merged = { ...current, ...p }
+      const formData = await buildProductFormData(merged, categories)
+      await updateProductApi(id, formData)
+      await reloadAll()
+      notify.success({ title: "Product updated", message: "Your changes have been saved." })
+    })
   }
 
   const deleteProduct = (id: string) => {
-    void (async () => {
+    runApiAction(async () => {
       await deleteProductApi(id)
       await reloadAll()
       notify.success({ title: "Product deleted", message: "Product was removed." })
-    })()
+    })
   }
 
   const copyProduct = (id: string) => {
-    void (async () => {
+    runApiAction(async () => {
       await copyProductApi(id)
       await reloadAll()
       notify.success({ title: "Product duplicated", message: "Copied product successfully." })
-    })()
+    })
   }
 
   const addSlider = (s: Slider) => {
-    void (async () => {
+    runApiAction(async () => {
       const formData = new FormData()
       formData.append("title", s.title)
       formData.append("url", s.link)
       formData.append("inHomePage", "true")
-      if (s.image?.startsWith("http")) formData.append("image", s.image)
+      if (s.image) {
+        const file = await fileFromUrl(s.image, "banner-image")
+        if (file) formData.append("image", file)
+      }
       await createBannerApi(formData)
       await reloadAll()
       notify.success({ title: "Banner added", message: `"${s.title}" is now in the slider.` })
-    })()
+    })
   }
 
   const updateSlider = (id: string, s: Partial<Slider>) => {
-    void (async () => {
+    runApiAction(async () => {
       const formData = new FormData()
       if (s.title) formData.append("title", s.title)
       if (s.link) formData.append("url", s.link)
-      if (s.image?.startsWith("http")) formData.append("image", s.image)
+      if (s.image) {
+        const file = await fileFromUrl(s.image, "banner-image")
+        if (file) formData.append("image", file)
+      }
       await updateBannerApi(id, formData)
       await reloadAll()
       notify.success({ title: "Banner updated", message: "Your changes have been saved." })
-    })()
+    })
   }
 
   const deleteSlider = (id: string) => {
-    void (async () => {
+    runApiAction(async () => {
       await deleteBannerApi(id)
       await reloadAll()
       notify.success({ title: "Banner deleted", message: "Banner was removed." })
-    })()
+    })
   }
 
   const resetAll = () => {
@@ -220,6 +262,153 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   if (!loaded) return null
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
+}
+
+const toQuillDelta = (text: string) => ({
+  ops: [{ insert: `${text || "N/A"}\n` }],
+})
+
+const toHtml = (text: string) => {
+  const safe = (text || "N/A")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br/>")
+
+  return `<p>${safe}</p>`
+}
+
+const fileFromUrl = async (url: string, fallbackName: string): Promise<File | null> => {
+  if (!url) return null
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const blob = await res.blob()
+    const ext = blob.type.includes("png")
+      ? "png"
+      : blob.type.includes("webp")
+        ? "webp"
+        : blob.type.includes("jpeg") || blob.type.includes("jpg")
+          ? "jpg"
+          : "bin"
+    return new File([blob], `${fallbackName}.${ext}`, { type: blob.type || "application/octet-stream" })
+  } catch {
+    return null
+  }
+}
+
+const getErrorMessage = (error: unknown): string => {
+  if (error && typeof error === "object") {
+    const maybe = error as { message?: unknown; error?: unknown }
+    const message =
+      (typeof maybe.message === "string" && maybe.message.trim() ? maybe.message : "") ||
+      (typeof maybe.error === "string" && maybe.error.trim() ? maybe.error : "")
+
+    if (message) {
+      const normalized = message.toLowerCase()
+      if (
+        normalized.includes("unique constraint failed") &&
+        (normalized.includes("title") || normalized.includes("category"))
+      ) {
+        return "Category name already exists. Please use a different name."
+      }
+      return message
+    }
+  }
+  return "Please try again."
+}
+
+const resolveVariantColorSize = (product: Product, variant: ProductVariant) => {
+  const rawName = variant?.name?.trim() || ""
+  const parts = rawName.includes("/") ? rawName.split("/") : []
+  const colorCandidate = (parts[0] || product.color || rawName || "Default").trim()
+  const sizeCandidate = (parts[1] || product.size || "Standard").trim()
+
+  return {
+    color: colorCandidate || "Default",
+    size: sizeCandidate || "Standard",
+  }
+}
+
+const buildProductFormData = async (product: Product, categories: Category[]) => {
+  const category = categories.find((c) => c.slug === product.categorySlug)
+  const subCategory = category?.subCategories.find((s) => s.slug === product.subCategorySlug)
+
+  if (!category?.id || !subCategory?.id) {
+    throw new Error("Category or sub-category is not valid")
+  }
+
+  const variants = (product.variants && product.variants.length > 0
+    ? product.variants
+    : [
+        {
+          id: "default",
+          name: product.color || "Default",
+          price: product.price || 0,
+          cutPrice: product.cutPrice || product.price || 0,
+          stock: product.stock || 0,
+          image: product.images?.[0],
+        },
+      ]) as ProductVariant[]
+
+  const variantPayload = variants.map((variant) => {
+    const actualPrice = Math.max(Number(variant.cutPrice || 0), Number(variant.price || 0))
+    const discountedPrice = Math.min(Number(variant.price || 0), actualPrice)
+    const { color, size } = resolveVariantColorSize(product, variant)
+
+    return {
+      actualPrice,
+      discountedPrice,
+      color,
+      size,
+      image: variant.image || product.images?.[0] || "",
+    }
+  })
+
+  const formData = new FormData()
+  formData.append("categoryId", category.id)
+  formData.append("subCategoryId", subCategory.id)
+  formData.append("title", product.name?.trim() || "Untitled Product")
+  formData.append("descriptionDelta", JSON.stringify(toQuillDelta(product.description || "N/A")))
+  formData.append("descriptionHtml", toHtml(product.description || "N/A"))
+  if (product.extraDescription?.trim()) {
+    formData.append("extraDescriptionDelta", JSON.stringify(toQuillDelta(product.extraDescription)))
+    formData.append("extraDescriptionHtml", toHtml(product.extraDescription))
+  }
+  formData.append("weight", product.weight?.trim() || "N/A")
+  formData.append("material", product.material?.trim() || "N/A")
+  formData.append("stock", String((product.stock || 0) > 0))
+  formData.append("availability", "true")
+  formData.append("status", (product.status || "PENDING").toUpperCase())
+  formData.append(
+    "variants",
+    JSON.stringify(
+      variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
+        actualPrice,
+        discountedPrice,
+        color,
+        size,
+      })),
+    ),
+  )
+
+  for (let i = 0; i < variantPayload.length; i += 1) {
+    const variant = variantPayload[i]
+    const file = await fileFromUrl(variant.image, `variant-${i + 1}`)
+    if (!file) {
+      throw new Error("Each variant must have an image")
+    }
+    formData.append("variantImages", file)
+  }
+
+  if (product.video) {
+    const videoFile = await fileFromUrl(product.video, "product-video")
+    if (videoFile) {
+      formData.append("video", videoFile)
+    }
+  }
+
+  return formData
 }
 
 export function useAdminStore() {

@@ -1,2 +1,24 @@
-import { apiRequest } from "../_shared/request"
-export const getAdmins = async () => apiRequest("/admins")
+export const getAdmins = async () => {
+  const BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.VITE_API_BASE_URL ||
+    "http://localhost:5000/api/v1"
+
+  const accessToken =
+    typeof window === "undefined" ? null : localStorage.getItem("admin_access_token")
+
+  const response = await fetch(`${BASE_URL}/admins`, {
+    method: "GET",
+    headers: {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+  })
+
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok || payload?.status === false) {
+    throw payload || { message: "Request failed", statusCode: response.status }
+  }
+
+  return payload
+}

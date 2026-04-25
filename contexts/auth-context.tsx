@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { login } from "@/src/api/auth/login"
 import { logout } from "@/src/api/auth/logout"
 import { refreshToken } from "@/src/api/auth/refreshToken"
-import { tokenStore } from "@/src/api/_shared/token-store"
 
 type User = { name: string; email: string }
 
@@ -31,8 +30,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const u = localStorage.getItem("ecomerce_user")
         if (u) setUser(JSON.parse(u))
 
-        const hasAccess = Boolean(tokenStore.getAccessToken())
-        const hasRefresh = Boolean(tokenStore.getRefreshToken())
+        const hasAccess = Boolean(localStorage.getItem("admin_access_token"))
+        const hasRefresh = Boolean(localStorage.getItem("admin_refresh_token"))
 
         if (hasAccess || hasRefresh) {
           setIsAdmin(true)
@@ -41,7 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch {
-        tokenStore.clearTokens()
+        localStorage.removeItem("admin_access_token")
+        localStorage.removeItem("admin_refresh_token")
         setIsAdmin(false)
       } finally {
         setAuthLoading(false)
@@ -71,7 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await logout()
     } finally {
-      tokenStore.clearTokens()
+      localStorage.removeItem("admin_access_token")
+      localStorage.removeItem("admin_refresh_token")
       setIsAdmin(false)
     }
   }

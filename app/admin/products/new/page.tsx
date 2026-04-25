@@ -3,18 +3,14 @@
 import { useRouter } from "next/navigation"
 import { ProductForm } from "@/components/admin/product-form"
 import type { Product } from "@/lib/types"
+import { useAdminStore } from "@/lib/admin-store"
 
 export default function NewProductPage() {
   const router = useRouter()
+  const { addProduct } = useAdminStore()
 
   function handleSave(product: Product) {
-    try {
-      const raw = localStorage.getItem("ecomerce_products")
-      const existing: Product[] = raw ? JSON.parse(raw) : []
-      localStorage.setItem("ecomerce_products", JSON.stringify([product, ...existing]))
-    } catch {
-      // noop
-    }
+    addProduct(product)
     router.push("/admin/products")
   }
 
