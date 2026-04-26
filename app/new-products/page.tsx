@@ -13,7 +13,7 @@ export default function NewProductsPage() {
     return (
       <AppShell>
         <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#3B6CF4] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
         </div>
       </AppShell>
     )
@@ -29,7 +29,7 @@ export default function NewProductsPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-[#3B6CF4] md:h-6 md:w-6" />
+              <Sparkles className="h-5 w-5 text-[#306FD7] md:h-6 md:w-6" />
               <h2 className="text-base font-bold text-foreground md:text-xl">All New Products</h2>
             </div>
             <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>

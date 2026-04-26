@@ -234,7 +234,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                     className={cx(
                       "relative aspect-square shrink-0 snap-start overflow-hidden rounded-md bg-white transition",
                       "w-[calc((100%-3rem)/4.3)]",
-                      selected ? "border-2 border-[#3B6CF4]" : "border border-border/50",
+                      selected ? "border-2 border-[#306FD7]" : "border border-border/50",
                     )}
                   >
                     <Image
@@ -309,7 +309,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
             {product.brand && (
               <p className="text-xs text-muted-foreground">
                 by{" "}
-                <Link href="#" className="font-medium text-[#3B6CF4]">
+                <Link href="#" className="font-medium text-[#306FD7]">
                   {product.brand}
                 </Link>
               </p>
@@ -331,7 +331,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                       className={cx(
                         "flex items-center gap-2 rounded-full border bg-transparent px-2 py-1.5 text-left transition",
                         selected
-                          ? "border-[#3B6CF4] text-[#3B6CF4]"
+                          ? "border-[#306FD7] text-[#306FD7]"
                           : "border-border/60 text-foreground hover:border-border",
                       )}
                     >
@@ -360,7 +360,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                     className={cx(
                       "rounded-full border bg-transparent px-3 py-1 text-xs transition",
                       storage === s
-                        ? "border-[#3B6CF4] text-[#3B6CF4]"
+                        ? "border-[#306FD7] text-[#306FD7]"
                         : "border-border/60 text-foreground hover:border-border",
                     )}
                   >
@@ -375,7 +375,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
           {product.features.length > 0 && (
             <div>
               <h3 className="mb-2 flex items-center gap-1.5 text-xs font-medium text-foreground">
-                <ListChecks className="h-4 w-4 text-[#3B6CF4]" strokeWidth={1.75} />
+                <ListChecks className="h-4 w-4 text-[#306FD7]" strokeWidth={1.75} />
                 A Snapshot View
               </h3>
               <ul className="space-y-2">
@@ -383,7 +383,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                   const Icon = featureIcon(f)
                   return (
                     <li key={i} className="flex items-center gap-2.5 text-xs text-foreground/90 md:text-sm">
-                      <Icon className="h-4 w-4 shrink-0 text-[#3B6CF4]" strokeWidth={1.75} />
+                      <Icon className="h-4 w-4 shrink-0 text-[#306FD7]" strokeWidth={1.75} />
                       <span className="leading-relaxed">{f}</span>
                     </li>
                   )
@@ -404,13 +404,13 @@ export function ProductDetail({ product, related }: { product: Product; related:
           <div className="hidden gap-3 md:flex">
             <button
               onClick={handleBuy}
-              className="h-11 flex-1 rounded-full border border-[#3B6CF4] bg-white text-sm font-semibold text-[#3B6CF4]"
+              className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-semibold text-[#306FD7]"
             >
               Buy Now
             </button>
             <button
               onClick={handleAdd}
-              className="h-11 flex-1 rounded-full bg-[#3B6CF4] text-sm font-semibold text-white"
+              className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-semibold text-white"
             >
               Add to Cart
             </button>
@@ -434,13 +434,13 @@ export function ProductDetail({ product, related }: { product: Product; related:
       <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-border/40 bg-card p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
         <button
           onClick={handleBuy}
-          className="h-11 flex-1 rounded-full border border-[#3B6CF4] bg-white text-sm font-semibold text-[#3B6CF4]"
+          className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-semibold text-[#306FD7]"
         >
           Buy Now
         </button>
         <button
           onClick={handleAdd}
-          className="h-11 flex-1 rounded-full bg-[#3B6CF4] text-sm font-semibold text-white"
+          className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-semibold text-white"
         >
           Add to Cart
         </button>
@@ -480,7 +480,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                   onClick={() => pickImage(i)}
                   className={cx(
                     "relative h-14 w-14 shrink-0 overflow-hidden rounded-md border bg-white",
-                    imgIdx === i ? "border-[#3B6CF4]" : "border-white/30",
+                    imgIdx === i ? "border-[#306FD7]" : "border-white/30",
                   )}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

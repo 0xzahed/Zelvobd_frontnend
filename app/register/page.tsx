@@ -30,7 +30,7 @@ export default function RegisterPage() {
       <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-6 flex flex-col items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#3B6CF4] text-lg font-bold text-white">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#306FD7] text-lg font-bold text-white">
               E
             </span>
             <span className="text-2xl font-bold text-foreground">EcoMerce</span>
@@ -57,11 +57,11 @@ export default function RegisterPage() {
             />
             <span>
               I agree to the{" "}
-              <Link href="#" className="font-medium text-[#3B6CF4]">
+              <Link href="#" className="font-medium text-[#306FD7]">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="#" className="font-medium text-[#3B6CF4]">
+              <Link href="#" className="font-medium text-[#306FD7]">
                 Privacy Policy
               </Link>
               .
@@ -72,7 +72,7 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            className="h-11 w-full rounded-full bg-[#3B6CF4] text-sm font-semibold text-white shadow-sm"
+            className="h-11 w-full rounded-full bg-[#306FD7] text-sm font-semibold text-white shadow-sm"
           >
             Create Account
           </button>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-[#3B6CF4]">
+          <Link href="/login" className="font-semibold text-[#306FD7]">
             Login
           </Link>
         </p>

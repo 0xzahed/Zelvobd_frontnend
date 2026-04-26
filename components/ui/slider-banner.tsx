@@ -59,7 +59,7 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
             <div className="absolute bottom-8 left-5 z-10 md:bottom-12 md:left-10">
               <Link
                 href={slide.link}
-                className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#3B6CF4] shadow-sm md:h-11 md:px-6 md:text-sm"
+                className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#306FD7] shadow-sm md:h-11 md:px-6 md:text-sm"
               >
                 Shop Now
               </Link>

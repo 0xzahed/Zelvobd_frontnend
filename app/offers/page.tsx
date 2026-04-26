@@ -16,7 +16,7 @@ export default function OffersPage() {
           <Link key={slide.id} href={slide.link} className="relative block w-full overflow-hidden rounded-lg shadow-card transition-transform hover:-translate-y-0.5">
             <div className="relative flex aspect-[16/8] w-full items-center overflow-hidden md:aspect-[16/5]" style={{ background: `linear-gradient(120deg, ${slide.bg}, ${slide.bg}cc 60%, #1A1A2E 120%)` }}>
               <div className="absolute bottom-8 left-5 z-10 md:bottom-12 md:left-10">
-                <span className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#3B6CF4] shadow-sm md:h-11 md:px-6 md:text-sm">Shop Now</span>
+                <span className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#306FD7] shadow-sm md:h-11 md:px-6 md:text-sm">Shop Now</span>
               </div>
             </div>
           </Link>

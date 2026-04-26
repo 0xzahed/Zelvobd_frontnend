@@ -6,23 +6,22 @@ import { CategoryCard, MoreCategoriesCard } from "@/components/ui/category-card"
 export function CategoriesSection() {
   const { categories, loaded } = useCategories()
 
-  const visible = categories.slice(0, 5)
-  const extras = categories.slice(5)
+  // Show up to 6 categories. If there are MORE than 6, replace the 6th tile
+  // with a "More" tile linking to the rest.
+  const hasOverflow = categories.length > 6
+  const visible = hasOverflow ? categories.slice(0, 5) : categories.slice(0, 6)
+  const extras = hasOverflow ? categories.slice(5) : []
 
   return (
     <section className="space-y-3">
       <h2 className="text-base font-bold text-foreground md:text-xl">Categories</h2>
 
-      {/* Mobile: 3-col grid with "More" tile */}
+      {/* Mobile: 3-col grid; "More" tile only when there are more than 6 categories */}
       <div className="grid grid-cols-3 gap-3 md:hidden">
         {visible.map((c) => (
           <CategoryCard key={c.id} category={c} />
         ))}
-        {extras.length > 0 ? (
-          <MoreCategoriesCard extras={extras} />
-        ) : (
-          categories.slice(5, 6).map((c) => <CategoryCard key={c.id} category={c} />)
-        )}
+        {hasOverflow && <MoreCategoriesCard extras={extras} />}
       </div>
 
       {/* Desktop: all categories in one horizontal line (scrollable if overflowing) */}

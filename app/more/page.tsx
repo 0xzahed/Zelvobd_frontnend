@@ -19,7 +19,7 @@ export default function MorePage() {
           {menu.map(({ icon: Icon, label, href }) => (
             <li key={label} className="border-b border-border/60 last:border-b-0">
               <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-[#EEF0FB]/50">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-[#3B6CF4]">
+                <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]">
                   <Icon className="h-4 w-4" />
                 </div>
                 <span className="flex-1 text-sm font-medium text-foreground">{label}</span>

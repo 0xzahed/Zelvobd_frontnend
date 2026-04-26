@@ -45,7 +45,7 @@ export function SiteFooter() {
           {/* Brand */}
           <div className="md:col-span-4">
             <Link href="/" className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#3B6CF4] text-sm font-bold text-white">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#306FD7] text-sm font-bold text-white">
                 E
               </span>
               <span className="text-xl font-bold text-foreground">EcoMerce</span>
@@ -56,15 +56,15 @@ export function SiteFooter() {
 
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-[#3B6CF4]" />
+                <Mail className="h-4 w-4 text-[#306FD7]" />
                 <span>support@ecomerce.app</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-[#3B6CF4]" />
+                <Phone className="h-4 w-4 text-[#306FD7]" />
                 <span>+880 1700 000 000</span>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[#3B6CF4]" />
+                <MapPin className="h-4 w-4 text-[#306FD7]" />
                 <span>Dhaka, Bangladesh</span>
               </li>
             </ul>
@@ -80,7 +80,7 @@ export function SiteFooter() {
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="text-sm text-muted-foreground transition hover:text-[#3B6CF4]"
+                        className="text-sm text-muted-foreground transition hover:text-[#306FD7]"
                       >
                         {l.label}
                       </Link>
@@ -100,7 +100,7 @@ export function SiteFooter() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground transition hover:border-[#3B6CF4] hover:text-[#3B6CF4]"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground transition hover:border-[#306FD7] hover:text-[#306FD7]"
                 >
                   <Icon className="h-4 w-4" />
                 </a>

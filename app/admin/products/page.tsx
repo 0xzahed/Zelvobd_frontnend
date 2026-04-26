@@ -7,9 +7,21 @@ import { useAdminStore } from "@/lib/admin-store"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { ProductForm } from "@/components/admin/product-form"
+import { useConfirm } from "@/components/ui/confirm-dialog"
 
 export default function AdminProductsPage() {
   const { categories, products, addProduct, updateProduct, deleteProduct, copyProduct } = useAdminStore()
+  const confirm = useConfirm()
+
+  const handleDelete = async (p: Product) => {
+    const ok = await confirm({
+      title: "Delete product?",
+      message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    if (ok) deleteProduct(p.id)
+  }
 
   const [q, setQ] = useState("")
   const [showForm, setShowForm] = useState(false)
@@ -64,7 +76,7 @@ export default function AdminProductsPage() {
               setEditing(null)
               setShowForm(true)
             }}
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] bg-[#3B6CF4] px-4 text-sm font-semibold text-white shadow-sm"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -142,7 +154,7 @@ export default function AdminProductsPage() {
                   <td className="px-5 py-3">
                     <div className="flex gap-1">
                       {p.isTrending && (
-                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-[#3B6CF4]">
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-[#306FD7]">
                           Trending
                         </span>
                       )}
@@ -175,12 +187,12 @@ export default function AdminProductsPage() {
                         onClick={() => copyProduct(p.id)}
                         aria-label="Copy"
                         title="Duplicate"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#3B6CF4]"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]"
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </button>
                       <button
-                        onClick={() => deleteProduct(p.id)}
+                        onClick={() => handleDelete(p)}
                         aria-label="Delete"
                         title="Delete"
                         className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B]"

@@ -5,6 +5,7 @@ import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category, Product, ProductVariant } from "@/lib/types"
 import { QuillEditor } from "@/components/ui/quill-editor"
+import { AdminSelect } from "@/components/admin/admin-select"
 
 type Props = {
   initial?: Product
@@ -303,7 +304,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-[72px_1fr]">
-                    <label className="relative grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#3B6CF4]/40 bg-card">
+                    <label className="relative grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card">
                       {v.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -312,7 +313,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <ImagePlus className="h-4 w-4 text-[#3B6CF4]" />
+                        <ImagePlus className="h-4 w-4 text-[#306FD7]" />
                       )}
                       <input
                         type="file"
@@ -385,10 +386,10 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
             <button
               type="button"
               onClick={() => videoInputRef.current?.click()}
-              className="flex w-full flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-[#3B6CF4]/40 bg-[#EEF4FF]/50 px-4 py-5 text-center transition hover:bg-[#EEF4FF]"
+              className="flex w-full flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-[#306FD7]/40 bg-[#EEF4FF]/50 px-4 py-5 text-center transition hover:bg-[#EEF4FF]"
             >
-              <UploadCloud className="h-5 w-5 text-[#3B6CF4]" />
-              <span className="text-sm text-[#3B6CF4]">
+              <UploadCloud className="h-5 w-5 text-[#306FD7]" />
+              <span className="text-sm text-[#306FD7]">
                 {videoName ? videoName : "Click to upload video"}
               </span>
               <span className="text-[11px] text-muted-foreground">
@@ -415,7 +416,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
           </button>
           <button
             type="submit"
-            className="rounded-full bg-[#3B6CF4] px-6 py-2 text-sm text-white hover:opacity-95"
+            className="rounded-full bg-[#306FD7] px-6 py-2 text-sm text-white hover:opacity-95"
           >
             Submit
           </button>
@@ -448,7 +449,7 @@ function Text({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[#3B6CF4]"
+        className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7]"
       />
     </label>
   )
@@ -480,7 +481,7 @@ function TextArea({
         required={required}
         placeholder={placeholder}
         rows={rows}
-        className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-[#3B6CF4]"
+        className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7]"
       />
     </label>
   )
@@ -507,7 +508,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-md border border-[#3B6CF4] bg-[#EEF4FF] px-3 text-sm text-[#3B6CF4] outline-none"
+        className="h-10 w-full rounded-md border border-[#306FD7] bg-[#EEF4FF] px-3 text-sm text-[#306FD7] outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value} className="text-foreground">

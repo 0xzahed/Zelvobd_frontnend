@@ -30,7 +30,7 @@ export default function SearchPage({
       <AppShell>
         <BackHeader title={q ? `Results for "${q}"` : "Search"} />
         <div className="flex min-h-[30vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#3B6CF4] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
         </div>
       </AppShell>
     )

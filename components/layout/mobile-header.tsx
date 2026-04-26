@@ -45,7 +45,7 @@ export function MobileHeader() {
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
           <Link href="/" className="flex shrink-0 items-center gap-1.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#3B6CF4] text-sm font-bold text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#306FD7] text-sm font-bold text-white">
               E
             </span>
             {!searchOpen && <span className="text-lg font-bold text-foreground">EcoMerce</span>}
@@ -91,7 +91,7 @@ export function MobileHeader() {
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCount > 0 && (
-                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#3B6CF4] px-1 text-[10px] font-bold text-white">
+                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#306FD7] px-1 text-[10px] font-bold text-white">
                   {totalCount}
                 </span>
               )}

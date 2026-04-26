@@ -35,8 +35,9 @@ import {
 } from "recharts"
 import { formatBDT, cx } from "@/lib/format"
 import { useAdminStore } from "@/lib/admin-store"
+import { AdminSelect } from "@/components/admin/admin-select"
 
-const PIE_COLORS = ["#3B6CF4", "#8B7DF4", "#EC4899", "#10B981", "#F59E0B", "#06B6D4", "#F97316", "#8B5CF6"]
+const PIE_COLORS = ["#306FD7", "#8B7DF4", "#EC4899", "#10B981", "#F59E0B", "#06B6D4", "#F97316", "#8B5CF6"]
 const WEEK_DAYS = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"] as const
 
 export default function AdminOverview() {
@@ -98,13 +99,13 @@ export default function AdminOverview() {
     productRows.filter((p) => normalizeStatus(p.status).toLowerCase() === status.toLowerCase()).length
 
   const stats = [
-    { label: "Total Products", value: products.length, icon: Package, tint: "text-[#3B6CF4]" },
+    { label: "Total Products", value: products.length, icon: Package, tint: "text-[#306FD7]" },
     { label: "Total Sales", value: totalSold, icon: CheckCircle2, tint: "text-[#22C55E]" },
     { label: "Total Remaining", value: remaining, icon: Archive, tint: "text-[#F59E0B]" },
     { label: "Total Revenue", value: formatBDT(totalRevenue), icon: DollarSign, tint: "text-[#8B5CF6]" },
     { label: "Total Orders", value: productRows.length, icon: ShoppingBag, tint: "text-[#06B6D4]" },
     { label: "Pending", value: countByStatus("Pending"), icon: Clock, tint: "text-[#F59E0B]" },
-    { label: "Processing", value: countByStatus("Processing"), icon: RefreshCw, tint: "text-[#3B6CF4]" },
+    { label: "Processing", value: countByStatus("Processing"), icon: RefreshCw, tint: "text-[#306FD7]" },
     { label: "On Hold", value: countByStatus("Hold"), icon: Pause, tint: "text-slate-500" },
     { label: "Pickup", value: countByStatus("Pickup"), icon: Truck, tint: "text-[#EC4899]" },
     { label: "Delivered", value: countByStatus("Delivered"), icon: PackageCheck, tint: "text-[#22C55E]" },
@@ -255,14 +256,16 @@ export default function AdminOverview() {
       <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-bold text-foreground">Weekly Sales Trend</h2>
-          <select
+          <div className="w-32">
+          <AdminSelect
             value={weeklyMetric}
             onChange={(e) => setWeeklyMetric(e.target.value as "sales" | "revenue")}
-            className="rounded-md border border-[#3B6CF4] bg-white px-3 py-1.5 text-xs font-semibold text-[#3B6CF4] outline-none"
+            className="h-8 border-[#306FD7] bg-white text-xs font-semibold text-[#306FD7]"
           >
             <option value="sales">Sales</option>
             <option value="revenue">Revenue</option>
-          </select>
+          </AdminSelect>
+          </div>
         </div>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -274,9 +277,9 @@ export default function AdminOverview() {
               <Line
                 type="monotone"
                 dataKey={weeklyMetric}
-                stroke="#3B6CF4"
+                stroke="#306FD7"
                 strokeWidth={2.5}
-                dot={{ r: 4, fill: "#3B6CF4" }}
+                dot={{ r: 4, fill: "#306FD7" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -307,25 +310,29 @@ export default function AdminOverview() {
         <div className="mb-4 flex items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-foreground">Monthly Sales Trend</h2>
           <div className="flex gap-2">
-            <select
+            <div className="w-28">
+            <AdminSelect
               value={monthlyMetric}
               onChange={(e) => setMonthlyMetric(e.target.value as "sales" | "revenue")}
-              className="rounded-md border border-[#3B6CF4] bg-white px-3 py-1.5 text-xs font-semibold text-[#3B6CF4] outline-none"
+              className="h-8 border-[#306FD7] bg-white text-xs font-semibold text-[#306FD7]"
             >
               <option value="sales">Sales</option>
               <option value="revenue">Revenue</option>
-            </select>
-            <select
+            </AdminSelect>
+            </div>
+            <div className="w-32">
+            <AdminSelect
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="rounded-md border border-[#3B6CF4] bg-white px-3 py-1.5 text-xs font-semibold text-[#3B6CF4] outline-none"
+              className="h-8 border-[#306FD7] bg-white text-xs font-semibold text-[#306FD7]"
             >
               {months.map((m) => (
                 <option key={m} value={m}>
                   {m}
                 </option>
               ))}
-            </select>
+            </AdminSelect>
+            </div>
           </div>
         </div>
         <div className="h-64 w-full">
@@ -351,14 +358,16 @@ export default function AdminOverview() {
       <section className="rounded-[10px] border border-border/70 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-bold text-foreground">Yearly Sales Trend</h2>
-          <select
+          <div className="w-28">
+          <AdminSelect
             value={yearlyMetric}
             onChange={(e) => setYearlyMetric(e.target.value as "sales" | "revenue")}
-            className="rounded-md border border-[#3B6CF4] bg-white px-3 py-1.5 text-xs font-semibold text-[#3B6CF4] outline-none"
+            className="h-8 border-[#306FD7] bg-white text-xs font-semibold text-[#306FD7]"
           >
             <option value="sales">Sales</option>
             <option value="revenue">Revenue</option>
-          </select>
+          </AdminSelect>
+          </div>
         </div>
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -370,9 +379,9 @@ export default function AdminOverview() {
               <Line
                 type="monotone"
                 dataKey={yearlyMetric}
-                stroke="#3B6CF4"
+                stroke="#306FD7"
                 strokeWidth={2.5}
-                dot={{ r: 5, fill: "#3B6CF4", stroke: "#fff", strokeWidth: 2 }}
+                dot={{ r: 5, fill: "#306FD7", stroke: "#fff", strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>

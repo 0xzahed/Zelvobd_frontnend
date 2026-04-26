@@ -43,7 +43,7 @@ export function SubCategoryClient({
   const chip = (active: boolean) =>
     cx(
       "rounded-full border px-3 py-1.5 text-xs font-medium transition whitespace-nowrap",
-      active ? "border-[#3B6CF4] bg-[#3B6CF4] text-white" : "border-border bg-card text-foreground",
+      active ? "border-[#306FD7] bg-[#306FD7] text-white" : "border-border bg-card text-foreground",
     )
 
   return (

@@ -47,7 +47,7 @@ export function TrendingSection() {
         <h2 className="text-base font-bold text-foreground md:text-xl">Trending Products</h2>
         <Link
           href="/trending"
-          className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#3B6CF4] md:text-xs"
+          className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#306FD7] md:text-xs"
         >
           See All <ChevronRight className="h-3 w-3" />
         </Link>

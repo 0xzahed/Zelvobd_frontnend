@@ -26,26 +26,19 @@ export function CategoryCard({ category }: { category: Category }) {
   )
 }
 
-export function MoreCategoriesCard({ extras }: { extras: Category[] }) {
-  const tiles = extras.slice(0, 4)
+export function MoreCategoriesCard({ extras: _extras }: { extras: Category[] }) {
   return (
     <Link
       href="/categories"
+      aria-label="See more categories"
       className="flex flex-col overflow-hidden rounded-md bg-card p-1.5 shadow-sm transition hover:-translate-y-0.5 md:rounded-sm md:p-1"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-sm md:rounded-sm">
-        <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-0.5">
-          {tiles.map((c) => (
-            <div key={c.id} className="relative overflow-hidden">
-              <Image
-                src={c.image || "/placeholder.svg"}
-                alt={c.name}
-                fill
-                sizes="6vw"
-                className="object-cover"
-              />
-            </div>
-          ))}
+      <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-sm bg-card">
+        <div className="grid h-12 w-12 grid-cols-2 grid-rows-2 place-items-center gap-1.5 rounded-full bg-[#EAEFFB] p-3 md:h-14 md:w-14 md:gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#306FD7] md:h-2.5 md:w-2.5" />
+          <span className="h-2 w-2 rounded-full bg-[#306FD7] md:h-2.5 md:w-2.5" />
+          <span className="h-2 w-2 rounded-full bg-[#306FD7] md:h-2.5 md:w-2.5" />
+          <span className="h-2 w-2 rounded-full bg-[#306FD7] md:h-2.5 md:w-2.5" />
         </div>
       </div>
       <span className="mt-1.5 truncate px-1 pb-0.5 text-center text-xs font-medium text-foreground md:mt-1 md:text-[11px]">

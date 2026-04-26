@@ -37,7 +37,7 @@ export default async function CheckoutSuccessPage({
           </div>
           <CopyCode code={code} />
           {maskedPhone && (
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#EEF0FB] px-3 py-1 text-[11px] font-medium text-[#3B6CF4]">
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#EEF0FB] px-3 py-1 text-[11px] font-medium text-[#306FD7]">
               <MessageSquare className="h-3 w-3" />
               SMS sent to {maskedPhone}
             </div>
@@ -47,7 +47,7 @@ export default async function CheckoutSuccessPage({
         <div className="flex w-full flex-col gap-2">
           <Link
             href="/more"
-            className="block w-full rounded-full bg-[#3B6CF4] py-3 text-center text-sm font-semibold text-white"
+            className="block w-full rounded-full bg-[#306FD7] py-3 text-center text-sm font-semibold text-white"
           >
             Track My Orders
           </Link>

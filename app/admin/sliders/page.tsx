@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ImagePlus, Link2, Pencil, Plus, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Slider } from "@/lib/types"
+import { useConfirm } from "@/components/ui/confirm-dialog"
 
 type Draft = {
   id?: string
@@ -17,6 +18,17 @@ const emptyDraft: Draft = { title: "", link: "", image: "" }
 
 export default function AdminSliders() {
   const { sliders, addSlider, updateSlider, deleteSlider } = useAdminStore()
+  const confirm = useConfirm()
+
+  const handleDeleteSlider = async (s: Slider) => {
+    const ok = await confirm({
+      title: "Delete slider?",
+      message: `Are you sure you want to delete${s.title ? ` "${s.title}"` : " this slider"}? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    if (ok) deleteSlider(s.id)
+  }
 
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<Draft>(emptyDraft)
@@ -60,7 +72,7 @@ export default function AdminSliders() {
         cta: "Shop Now",
         link: draft.link,
         image: draft.image || "/placeholder.svg",
-        bg: "#3B6CF4",
+        bg: "#306FD7",
       }
       addSlider(newSlider)
     }
@@ -82,7 +94,7 @@ export default function AdminSliders() {
           <h2 className="text-sm text-foreground">Banner List</h2>
           <button
             onClick={openCreate}
-            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-[#3B6CF4] px-4 text-sm text-[#3B6CF4] transition hover:bg-[#3B6CF4] hover:text-white"
+            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-[#306FD7] px-4 text-sm text-[#306FD7] transition hover:bg-[#306FD7] hover:text-white"
           >
             <Plus className="h-4 w-4" /> Add Banner
           </button>
@@ -119,7 +131,7 @@ export default function AdminSliders() {
                     ) : (
                       <div
                         className="absolute inset-0"
-                        style={{ backgroundColor: s.bg || "#3B6CF4" }}
+                        style={{ backgroundColor: s.bg || "#306FD7" }}
                       />
                     )}
                   </div>
@@ -129,12 +141,12 @@ export default function AdminSliders() {
                   <button
                     onClick={() => openEdit(s)}
                     aria-label="Edit"
-                    className="text-[#3B6CF4] transition hover:opacity-80"
+                    className="text-[#306FD7] transition hover:opacity-80"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => deleteSlider(s.id)}
+                    onClick={() => handleDeleteSlider(s)}
                     aria-label="Delete"
                     className="text-[#E14949] transition hover:opacity-80"
                   >
@@ -182,7 +194,7 @@ export default function AdminSliders() {
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Title"
-                className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-[#3B6CF4]"
+                className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-[#306FD7]"
                 required
               />
 
@@ -208,7 +220,7 @@ export default function AdminSliders() {
                     className="sr-only"
                     onChange={(e) => handleImagePick(e.target.files?.[0])}
                   />
-                  <div className="relative grid min-h-[140px] place-items-center rounded-md border-2 border-dashed border-[#3B6CF4] bg-[#EEF0FB]/60 p-4 transition hover:bg-[#EEF0FB]">
+                  <div className="relative grid min-h-[140px] place-items-center rounded-md border-2 border-dashed border-[#306FD7] bg-[#EEF0FB]/60 p-4 transition hover:bg-[#EEF0FB]">
                     {draft.image ? (
                       <div className="relative h-full w-full">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -223,8 +235,8 @@ export default function AdminSliders() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-1 text-center">
-                        <ImagePlus className="h-6 w-6 text-[#3B6CF4]" />
-                        <span className="text-sm text-[#3B6CF4]">
+                        <ImagePlus className="h-6 w-6 text-[#306FD7]" />
+                        <span className="text-sm text-[#306FD7]">
                           Click to upload image
                         </span>
                         <span className="text-[11px] text-muted-foreground">
@@ -240,7 +252,7 @@ export default function AdminSliders() {
               <div className="flex justify-center pt-2">
                 <button
                   type="submit"
-                  className="inline-flex h-10 min-w-[120px] items-center justify-center rounded-md bg-[#3B6CF4] px-6 text-sm text-white transition hover:bg-[#2E55C9]"
+                  className="inline-flex h-10 min-w-[120px] items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9]"
                 >
                   Submit
                 </button>

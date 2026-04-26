@@ -178,7 +178,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       >
         <div className="flex h-16 items-center justify-between px-4">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#3B6CF4] text-xs font-semibold text-white shadow-sm">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#306FD7] text-xs font-semibold text-white shadow-sm">
               <ShoppingBag className="h-4 w-4" />
             </span>
             <span className="text-2xl font-semibold text-[#202125]">Ecarto</span>
@@ -223,7 +223,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           <Icon
                             className={cx(
                               "h-4 w-4 shrink-0",
-                              active ? "text-[#3B6CF4]" : "text-muted-foreground",
+                              active ? "text-[#306FD7]" : "text-muted-foreground",
                             )}
                           />
                           <span className="flex-1">{item.label}</span>
@@ -251,7 +251,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         <Icon
                           className={cx(
                             "h-4 w-4 shrink-0",
-                            groupActive ? "text-[#3B6CF4]" : "text-muted-foreground",
+                            groupActive ? "text-[#306FD7]" : "text-muted-foreground",
                           )}
                         />
                         <span className="flex-1 text-left">{item.label}</span>
@@ -295,7 +295,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="px-4 pb-4">
           <div className="rounded-2xl border border-border/70 bg-white p-3 shadow-sm">
             <div className="flex items-center gap-2.5 rounded-xl border border-border/60 p-2">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-xs font-semibold text-[#3B6CF4]">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-xs font-semibold text-[#306FD7]">
                 M
               </div>
               <div className="min-w-0 flex-1">

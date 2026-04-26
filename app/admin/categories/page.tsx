@@ -6,9 +6,21 @@ import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category } from "@/lib/types"
 import { notify } from "@/lib/notify"
+import { useConfirm } from "@/components/ui/confirm-dialog"
 
 export default function AdminCategoriesPage() {
   const { categories, addCategory, updateCategory, deleteCategory } = useAdminStore()
+  const confirm = useConfirm()
+
+  const handleDelete = async (cat: Category) => {
+    const ok = await confirm({
+      title: "Delete category?",
+      message: `Are you sure you want to delete "${cat.name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    if (ok) deleteCategory(cat.id)
+  }
 
   const [query, setQuery] = useState("")
   const [showModal, setShowModal] = useState(false)
@@ -102,7 +114,7 @@ export default function AdminCategoriesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search categories..."
-              className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-[#3B6CF4]/60"
+              className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-[#306FD7]/60"
             />
           </div>
 
@@ -111,7 +123,7 @@ export default function AdminCategoriesPage() {
             <h2 className="text-base text-foreground md:text-lg"></h2>
             <button
               onClick={openAdd}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#3B6CF4] px-4 text-sm text-white transition hover:bg-[#2E57D6]"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#306FD7] px-4 text-sm text-white transition hover:bg-[#2E57D6]"
             >
               <Plus className="h-4 w-4" />
               Add Category
@@ -170,12 +182,12 @@ export default function AdminCategoriesPage() {
                   <button
                     onClick={() => openEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-[#3B6CF4] transition hover:bg-[#EEF0FB]"
+                    className="grid h-8 w-8 place-items-center rounded-md text-[#306FD7] transition hover:bg-[#EEF0FB]"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => deleteCategory(cat.id)}
+                    onClick={() => handleDelete(cat)}
                     aria-label={`Delete ${cat.name}`}
                     className="grid h-8 w-8 place-items-center rounded-md text-[#FF3B3B] transition hover:bg-[#FF3B3B]/10"
                   >
@@ -218,7 +230,7 @@ export default function AdminCategoriesPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Title"
-                className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-[#3B6CF4]/60"
+                className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-[#306FD7]/60"
               />
             </div>
 
@@ -237,7 +249,7 @@ export default function AdminCategoriesPage() {
               <button
                 type="button"
                 onClick={() => imgInputRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#3B6CF4]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#3B6CF4]/70 hover:bg-[#EEF0FB]"
+                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF0FB]"
               >
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -248,8 +260,8 @@ export default function AdminCategoriesPage() {
                   />
                 ) : (
                   <>
-                    <ImagePlus className="h-5 w-5 text-[#3B6CF4]" />
-                    <span className="text-sm text-[#3B6CF4]">
+                    <ImagePlus className="h-5 w-5 text-[#306FD7]" />
+                    <span className="text-sm text-[#306FD7]">
                       Click to upload image
                     </span>
                     <span className="text-[11px] text-muted-foreground">
@@ -275,7 +287,7 @@ export default function AdminCategoriesPage() {
               <button
                 type="button"
                 onClick={() => bannerInputRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#3B6CF4]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#3B6CF4]/70 hover:bg-[#EEF0FB]"
+                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF0FB]"
               >
                 {banner ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -286,8 +298,8 @@ export default function AdminCategoriesPage() {
                   />
                 ) : (
                   <>
-                    <ImagePlus className="h-5 w-5 text-[#3B6CF4]" />
-                    <span className="text-sm text-[#3B6CF4]">
+                    <ImagePlus className="h-5 w-5 text-[#306FD7]" />
+                    <span className="text-sm text-[#306FD7]">
                       Click to upload banner
                     </span>
                     <span className="text-[11px] text-muted-foreground">
@@ -303,7 +315,7 @@ export default function AdminCategoriesPage() {
               <button
                 onClick={submit}
                 disabled={!name.trim()}
-                className="h-11 min-w-[160px] rounded-full bg-[#3B6CF4] px-8 text-sm text-white transition hover:bg-[#2E57D6] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-11 min-w-[160px] rounded-full bg-[#306FD7] px-8 text-sm text-white transition hover:bg-[#2E57D6] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Submit
               </button>

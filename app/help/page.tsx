@@ -85,7 +85,7 @@ export default function HelpPage() {
 function QuickAction({ icon: Icon, label }: { icon: typeof Search; label: string }) {
   return (
     <button className="flex flex-col items-center gap-2 rounded-2xl bg-card p-4 shadow-card transition hover:-translate-y-0.5">
-      <div className="grid h-11 w-11 place-items-center rounded-full bg-[#EEF0FB] text-[#3B6CF4]">
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]">
         <Icon className="h-5 w-5" />
       </div>
       <span className="text-xs font-medium text-foreground">{label}</span>

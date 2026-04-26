@@ -25,7 +25,7 @@ export default function LoginPage() {
       <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-8 flex flex-col items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#3B6CF4] text-lg font-bold text-white">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#306FD7] text-lg font-bold text-white">
               E
             </span>
             <span className="text-2xl font-bold text-foreground">EcoMerce</span>
@@ -80,14 +80,14 @@ export default function LoginPage() {
               <input type="checkbox" className="h-4 w-4 rounded border-border" />
               Remember me
             </label>
-            <Link href="#" className="font-medium text-[#3B6CF4]">
+            <Link href="#" className="font-medium text-[#306FD7]">
               Forgot Password?
             </Link>
           </div>
 
           <button
             type="submit"
-            className="h-11 w-full rounded-full bg-[#3B6CF4] text-sm font-semibold text-white shadow-sm"
+            className="h-11 w-full rounded-full bg-[#306FD7] text-sm font-semibold text-white shadow-sm"
           >
             Login
           </button>
@@ -115,7 +115,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-semibold text-[#3B6CF4]">
+          <Link href="/register" className="font-semibold text-[#306FD7]">
             Register
           </Link>
         </p>

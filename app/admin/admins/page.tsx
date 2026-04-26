@@ -7,6 +7,8 @@ import { createAdmin } from "@/src/api/admin/createAdmin"
 import { updateAdmin } from "@/src/api/admin/updateAdmin"
 import { deleteAdmin } from "@/src/api/admin/deleteAdmin"
 import { notify } from "@/lib/notify"
+import { useConfirm } from "@/components/ui/confirm-dialog"
+import { AdminSelect } from "@/components/admin/admin-select"
 
 type AdminRole = "Super Admin" | "Admin" | "Editor" | "Viewer"
 
@@ -55,6 +57,7 @@ const emptyForm: FormState = {
 }
 
 export default function AdminsPage() {
+  const confirm = useConfirm()
   const [admins, setAdmins] = useState<AdminUser[]>([])
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<FormState>(emptyForm)
@@ -141,7 +144,16 @@ export default function AdminsPage() {
   }
 
   const onDelete = async (id: string) => {
-    if (confirm("Remove this admin?")) {
+    const target = admins.find((a) => a.id === id)
+    const ok = await confirm({
+      title: "Remove this admin?",
+      message: target
+        ? `Are you sure you want to remove "${target.email}"? This action cannot be undone.`
+        : "Are you sure you want to remove this admin? This action cannot be undone.",
+      confirmText: "Remove",
+      variant: "danger",
+    })
+    if (ok) {
       try {
         await deleteAdmin(id)
         notify.success({ title: "Admin deleted", message: "Admin removed successfully." })
@@ -174,7 +186,7 @@ export default function AdminsPage() {
         </div>
         <button
           onClick={openAdd}
-          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#3B6CF4] px-4 text-sm font-semibold text-white"
+          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#306FD7] px-4 text-sm font-semibold text-white"
         >
           <Plus className="h-4 w-4" /> Add Admin
         </button>
@@ -198,7 +210,7 @@ export default function AdminsPage() {
                 <tr key={a.id} className="border-t border-border">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#3B6CF4]">
+                      <div className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]">
                         <ShieldCheck className="h-4 w-4" />
                       </div>
                       <span className="font-medium text-foreground">{a.name}</span>
@@ -206,7 +218,7 @@ export default function AdminsPage() {
                   </td>
                   <td className="px-5 py-3 text-muted-foreground">{a.email}</td>
                   <td className="px-5 py-3">
-                    <span className="inline-flex rounded-full bg-[#EEF0FB] px-2 py-0.5 text-xs font-semibold text-[#3B6CF4]">
+                    <span className="inline-flex rounded-full bg-[#EEF0FB] px-2 py-0.5 text-xs font-semibold text-[#306FD7]">
                       {a.role}
                     </span>
                   </td>
@@ -325,17 +337,17 @@ export default function AdminsPage() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-foreground">Role</label>
-                <select
+                <AdminSelect
                   value={form.role}
                   onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as AdminRole }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm"
+                  className="bg-[#F7F9FD]"
                 >
                   {ROLES.map((r) => (
                     <option key={r} value={r}>
                       {r}
                     </option>
                   ))}
-                </select>
+                </AdminSelect>
               </div>
               <label className="flex items-center gap-2 text-sm text-foreground">
                 <input
@@ -356,7 +368,7 @@ export default function AdminsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-full bg-[#3B6CF4] px-4 py-2 text-sm font-semibold text-white"
+                  className="rounded-full bg-[#306FD7] px-4 py-2 text-sm font-semibold text-white"
                 >
                   {saving ? "Saving..." : form.id ? "Save Changes" : "Add Admin"}
                 </button>

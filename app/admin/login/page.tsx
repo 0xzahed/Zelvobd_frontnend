@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
         aria-hidden
         className="pointer-events-none absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full opacity-50 blur-3xl"
         style={{
-          background: "radial-gradient(closest-side, #3B6CF4, transparent)",
+          background: "radial-gradient(closest-side, #306FD7, transparent)",
         }}
       />
       <div
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
         {/* Left: brand / highlights */}
         <div className="hidden text-white lg:flex lg:flex-col lg:gap-10">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-[#3B6CF4] to-[#5B84F9] shadow-lg shadow-[#3B6CF4]/30">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30">
               <ShoppingBag className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -136,7 +136,7 @@ export default function AdminLoginPage() {
           <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-xl">
             <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#3B6CF4] to-[#5B84F9] shadow-lg shadow-[#3B6CF4]/30 lg:hidden">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30 lg:hidden">
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -155,7 +155,7 @@ export default function AdminLoginPage() {
                 <label className="mb-1.5 block text-xs font-medium text-white/70">
                   Email address
                 </label>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#3B6CF4]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#306FD7]">
                   <Mail className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type="email"
@@ -187,7 +187,7 @@ export default function AdminLoginPage() {
                     Forgot password?
                   </button>
                 </div>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#3B6CF4]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#306FD7]">
                   <Lock className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -217,7 +217,7 @@ export default function AdminLoginPage() {
                 <span
                   className={`relative h-4 w-4 rounded border transition ${
                     remember
-                      ? "border-[#3B6CF4] bg-[#3B6CF4]"
+                      ? "border-[#306FD7] bg-[#306FD7]"
                       : "border-white/20 bg-transparent"
                   }`}
                 >
@@ -245,7 +245,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3B6CF4] to-[#5B84F9] text-sm font-semibold text-white shadow-lg shadow-[#3B6CF4]/30 transition hover:shadow-xl hover:shadow-[#3B6CF4]/40 disabled:opacity-70"
+                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#306FD7] to-[#5B84F9] text-sm font-semibold text-white shadow-lg shadow-[#306FD7]/30 transition hover:shadow-xl hover:shadow-[#306FD7]/40 disabled:opacity-70"
               >
                 {loading ? (
                   <>
