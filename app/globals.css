@@ -98,6 +98,12 @@
   * {
     border-color: var(--border);
   }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  [contenteditable="true"] {
+    cursor: text !important;
+    caret-color: currentColor !important;
+  }
   html,
   body {
     background-color: var(--background);

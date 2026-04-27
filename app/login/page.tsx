@@ -65,7 +65,7 @@ export default function LoginPage() {
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl bg-card p-6 shadow-card">
           <div>
             <label className="mb-1 block text-xs font-medium text-foreground">Email</label>
-            <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3">
+            <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 cursor-text">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <input
                 type="email"
@@ -73,14 +73,14 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="adminemail@example.com"
                 required
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
               />
             </div>
           </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-foreground">Password</label>
-            <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3">
+            <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 cursor-text">
               <Lock className="h-4 w-4 text-muted-foreground" />
               <input
                 type={showPw ? "text" : "password"}
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 required
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
               />
               <button
                 type="button"

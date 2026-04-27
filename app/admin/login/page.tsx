@@ -155,7 +155,7 @@ export default function AdminLoginPage() {
                 <label className="mb-1.5 block text-xs font-medium text-white/70">
                   Email address
                 </label>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7] cursor-text">
                   <Mail className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type="email"
@@ -164,7 +164,7 @@ export default function AdminLoginPage() {
                     placeholder="you@company.com"
                     required
                     autoComplete="email"
-                    className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+                    className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30 cursor-text caret-current"
                   />
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function AdminLoginPage() {
                     Forgot password?
                   </button>
                 </div>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7] cursor-text">
                   <Lock className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -196,7 +196,7 @@ export default function AdminLoginPage() {
                     placeholder="••••••••"
                     required
                     autoComplete="current-password"
-                    className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+                    className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/30 cursor-text caret-current"
                   />
                   <button
                     type="button"

@@ -1,27 +1,28 @@
 "use client"
 
 import { useEffect, useState, type FormEvent } from "react"
-import { Pencil, Plus, ShieldCheck, Trash2, X } from "lucide-react"
+import { Pencil, Plus, Trash2, X } from "lucide-react"
 import { getAdmins } from "@/src/api/admin/getAdmins"
 import { createAdmin } from "@/src/api/admin/createAdmin"
 import { updateAdmin } from "@/src/api/admin/updateAdmin"
 import { deleteAdmin } from "@/src/api/admin/deleteAdmin"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
-import { AdminSelect } from "@/components/admin/admin-select"
-
-type AdminRole = "Super Admin" | "Admin" | "Editor" | "Viewer"
+import { useAuth } from "@/contexts/auth-context"
 
 type AdminUser = {
   id: string
-  name: string
   email: string
-  role: AdminRole
   active: boolean
   createdAt: string
 }
 
-const ROLES: AdminRole[] = ["Super Admin", "Admin", "Editor", "Viewer"]
+type BackendAdmin = {
+  id: string
+  email: string
+  isActive: boolean
+  createdAt: string
+}
 
 function useEscapeToClose(open: boolean, onClose: () => void) {
   useEffect(() => {
@@ -40,23 +41,20 @@ function useEscapeToClose(open: boolean, onClose: () => void) {
 
 type FormState = {
   id: string | null
-  name: string
   email: string
-  role: AdminRole
   password: string
   active: boolean
 }
 
 const emptyForm: FormState = {
   id: null,
-  name: "",
   email: "",
-  role: "Admin",
   password: "",
   active: true,
 }
 
 export default function AdminsPage() {
+  const { admin: currentAdmin } = useAuth()
   const confirm = useConfirm()
   const [admins, setAdmins] = useState<AdminUser[]>([])
   const [open, setOpen] = useState(false)
@@ -70,16 +68,17 @@ export default function AdminsPage() {
     try {
       setLoading(true)
       const res = await getAdmins()
-      const list = Array.isArray(res?.data) ? res.data : []
+      const list: BackendAdmin[] = Array.isArray(res?.data) ? res.data : []
+
       setAdmins(
-        list.map((admin: { id: string; email: string; isActive: boolean; createdAt: string }) => ({
-          id: admin.id,
-          name: admin.email.split("@")[0] || "Admin",
-          email: admin.email,
-          role: "Admin",
-          active: Boolean(admin.isActive),
-          createdAt: String(admin.createdAt || "").slice(0, 10),
-        })),
+        list.map((adminItem) => {
+          return {
+            id: adminItem.id,
+            email: adminItem.email,
+            active: Boolean(adminItem.isActive),
+            createdAt: String(adminItem.createdAt || "").slice(0, 10),
+          }
+        }),
       )
     } catch (error) {
       notify.error({ title: "Failed to load admins", message: getErrorMessage(error) })
@@ -90,7 +89,7 @@ export default function AdminsPage() {
 
   useEffect(() => {
     void loadAdmins()
-  }, [])
+  }, [currentAdmin?.id])
 
   const openAdd = () => {
     setForm(emptyForm)
@@ -100,9 +99,7 @@ export default function AdminsPage() {
   const openEdit = (a: AdminUser) => {
     setForm({
       id: a.id,
-      name: a.name,
       email: a.email,
-      role: a.role,
       password: "",
       active: a.active,
     })
@@ -111,7 +108,7 @@ export default function AdminsPage() {
 
   const onSave = async (e: FormEvent) => {
     e.preventDefault()
-    if (!form.name.trim() || !form.email.trim()) return
+    if (!form.email.trim()) return
     if (!form.id && !form.password.trim()) return
 
     try {
@@ -144,6 +141,14 @@ export default function AdminsPage() {
   }
 
   const onDelete = async (id: string) => {
+    if (id === currentAdmin?.id) {
+      notify.error({
+        title: "Action not allowed",
+        message: "You cannot delete the currently logged-in admin.",
+      })
+      return
+    }
+
     const target = admins.find((a) => a.id === id)
     const ok = await confirm({
       title: "Remove this admin?",
@@ -165,6 +170,14 @@ export default function AdminsPage() {
   }
 
   const toggleActive = async (id: string) => {
+    if (id === currentAdmin?.id) {
+      notify.error({
+        title: "Action not allowed",
+        message: "You cannot deactivate the currently logged-in admin.",
+      })
+      return
+    }
+
     const target = admins.find((a) => a.id === id)
     if (!target) return
     try {
@@ -197,9 +210,7 @@ export default function AdminsPage() {
           <table className="min-w-full text-left text-sm">
             <thead className="bg-[#F7F9FD] text-xs uppercase text-muted-foreground">
               <tr>
-                <th className="px-5 py-3 font-semibold">Name</th>
                 <th className="px-5 py-3 font-semibold">Email</th>
-                <th className="px-5 py-3 font-semibold">Role</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
                 <th className="px-5 py-3 font-semibold">Created</th>
                 <th className="px-5 py-3 text-right font-semibold">Actions</th>
@@ -208,20 +219,7 @@ export default function AdminsPage() {
             <tbody>
               {!loading && admins.map((a) => (
                 <tr key={a.id} className="border-t border-border">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]">
-                        <ShieldCheck className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium text-foreground">{a.name}</span>
-                    </div>
-                  </td>
                   <td className="px-5 py-3 text-muted-foreground">{a.email}</td>
-                  <td className="px-5 py-3">
-                    <span className="inline-flex rounded-full bg-[#EEF0FB] px-2 py-0.5 text-xs font-semibold text-[#306FD7]">
-                      {a.role}
-                    </span>
-                  </td>
                   <td className="px-5 py-3">
                     <button
                       onClick={() => toggleActive(a.id)}
@@ -249,7 +247,7 @@ export default function AdminsPage() {
                         onClick={() => onDelete(a.id)}
                         aria-label="Delete"
                         title="Delete"
-                        disabled={a.role === "Super Admin"}
+                        disabled={a.id === currentAdmin?.id}
                         className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B] disabled:opacity-40"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -260,14 +258,14 @@ export default function AdminsPage() {
               ))}
               {!loading && admins.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={4} className="px-5 py-10 text-center text-muted-foreground">
                     No admins yet.
                   </td>
                 </tr>
               )}
               {loading && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-muted-foreground">
+                  <td colSpan={4} className="px-5 py-10 text-center text-muted-foreground">
                     Loading admins...
                   </td>
                 </tr>
@@ -300,25 +298,13 @@ export default function AdminsPage() {
             </div>
             <form onSubmit={onSave} className="space-y-4 p-5">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-foreground">
-                  Full Name
-                </label>
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm"
-                  placeholder="e.g. John Doe"
-                />
-              </div>
-              <div>
                 <label className="mb-1 block text-xs font-semibold text-foreground">Email</label>
                 <input
                   type="email"
                   required
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm cursor-text caret-current"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -331,23 +317,9 @@ export default function AdminsPage() {
                   required={!form.id}
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm cursor-text caret-current"
                   placeholder="••••••••"
                 />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-foreground">Role</label>
-                <AdminSelect
-                  value={form.role}
-                  onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as AdminRole }))}
-                  className="bg-[#F7F9FD]"
-                >
-                  {ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </AdminSelect>
               </div>
               <label className="flex items-center gap-2 text-sm text-foreground">
                 <input

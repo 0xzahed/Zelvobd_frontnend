@@ -449,7 +449,7 @@ function Text({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7]"
+        className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7] cursor-text caret-current"
       />
     </label>
   )
@@ -481,7 +481,7 @@ function TextArea({
         required={required}
         placeholder={placeholder}
         rows={rows}
-        className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7]"
+        className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7] cursor-text caret-current"
       />
     </label>
   )
@@ -508,7 +508,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-md border border-[#306FD7] bg-[#EEF4FF] px-3 text-sm text-[#306FD7] outline-none"
+        className="h-10 w-full rounded-md border border-[#306FD7] bg-[#EEF4FF] px-3 text-sm text-[#306FD7] outline-none cursor-default"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value} className="text-foreground">

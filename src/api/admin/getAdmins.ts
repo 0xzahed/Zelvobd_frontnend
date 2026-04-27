@@ -1,16 +1,8 @@
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { requestWithAdminAuth } from "@/src/api/_shared/requestWithAdminAuth"
 
 export const getAdmins = async () => {
-  const response = await fetch(`${BASE_URL}/admins`, {
+  return requestWithAdminAuth({
+    path: "/admins",
     method: "GET",
-    headers: { ...authHeaders() },
   })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
 }
