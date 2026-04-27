@@ -49,8 +49,7 @@ export function DesktopHeader() {
   const hidden =
     pathname?.startsWith("/admin") ||
     pathname?.startsWith("/product/") ||
-    pathname?.startsWith("/login") ||
-    pathname?.startsWith("/register")
+    pathname?.startsWith("/login")
 
   // Close search panel whenever the route changes.
   useEffect(() => {

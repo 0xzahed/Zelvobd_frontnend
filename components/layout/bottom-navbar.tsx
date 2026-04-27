@@ -28,7 +28,6 @@ export function BottomNavbar() {
   if (
     pathname?.startsWith("/admin") ||
     pathname?.startsWith("/login") ||
-    pathname?.startsWith("/register") ||
     pathname?.startsWith("/product/")
   ) {
     return null

@@ -5,43 +5,106 @@ import { login } from "@/src/api/auth/login"
 import { logout } from "@/src/api/auth/logout"
 import { refreshToken } from "@/src/api/auth/refreshToken"
 
-type User = { name: string; email: string }
+type AdminUser = {
+  id: string
+  email: string
+}
 
 type AuthContextType = {
-  user: User | null
+  admin: AdminUser | null
   isAdmin: boolean
   authLoading: boolean
-  login: (email: string, name?: string) => void
-  logout: () => void
   loginAdmin: (email: string, password: string) => Promise<void>
+  refreshAdminSession: () => Promise<void>
   logoutAdmin: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
+const ADMIN_PROFILE_STORAGE_KEY = "admin_profile"
+const ACCESS_TOKEN_STORAGE_KEY = "admin_access_token"
+const REFRESH_TOKEN_STORAGE_KEY = "admin_refresh_token"
+
+const readStoredAdminProfile = (): AdminUser | null => {
+  if (typeof window === "undefined") return null
+
+  const rawValue = localStorage.getItem(ADMIN_PROFILE_STORAGE_KEY)
+  if (!rawValue) return null
+
+  try {
+    const parsedValue = JSON.parse(rawValue) as Partial<AdminUser>
+    if (typeof parsedValue?.id === "string" && typeof parsedValue?.email === "string") {
+      return {
+        id: parsedValue.id,
+        email: parsedValue.email,
+      }
+    }
+  } catch {
+    localStorage.removeItem(ADMIN_PROFILE_STORAGE_KEY)
+  }
+
+  return null
+}
+
+const clearAdminAuthStorage = () => {
+  if (typeof window === "undefined") return
+  localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
+  localStorage.removeItem(ADMIN_PROFILE_STORAGE_KEY)
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [admin, setAdmin] = useState<AdminUser | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [authLoading, setAuthLoading] = useState(true)
+
+  const refreshAdminSession = async () => {
+    const payload = await refreshToken()
+    const adminData = payload?.data?.admin
+
+    if (!adminData?.id || !adminData?.email) {
+      throw new Error("Invalid refresh-token response")
+    }
+
+    const nextAdmin = {
+      id: String(adminData.id),
+      email: String(adminData.email),
+    }
+
+    setAdmin(nextAdmin)
+    setIsAdmin(true)
+    if (typeof window !== "undefined") {
+      localStorage.setItem(ADMIN_PROFILE_STORAGE_KEY, JSON.stringify(nextAdmin))
+    }
+  }
 
   useEffect(() => {
     const hydrate = async () => {
       try {
-        const u = localStorage.getItem("ecomerce_user")
-        if (u) setUser(JSON.parse(u))
+        const hasAccessToken =
+          typeof window !== "undefined" && Boolean(localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY))
+        const hasRefreshToken =
+          typeof window !== "undefined" && Boolean(localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY))
+        const storedAdmin = readStoredAdminProfile()
 
-        const hasAccess = Boolean(localStorage.getItem("admin_access_token"))
-        const hasRefresh = Boolean(localStorage.getItem("admin_refresh_token"))
+        if (!hasAccessToken && !hasRefreshToken) {
+          setIsAdmin(false)
+          setAdmin(null)
+          return
+        }
 
-        if (hasAccess || hasRefresh) {
+        if (hasAccessToken && storedAdmin) {
+          setAdmin(storedAdmin)
           setIsAdmin(true)
-          if (!hasAccess && hasRefresh) {
-            await refreshToken()
-          }
+          return
+        }
+
+        if (hasRefreshToken) {
+          await refreshAdminSession()
+          return
         }
       } catch {
-        localStorage.removeItem("admin_access_token")
-        localStorage.removeItem("admin_refresh_token")
+        clearAdminAuthStorage()
+        setAdmin(null)
         setIsAdmin(false)
       } finally {
         setAuthLoading(false)
@@ -51,43 +114,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void hydrate()
   }, [])
 
-  const loginUser = (email: string, name = "Shopper") => {
-    const u = { email, name }
-    setUser(u)
-    localStorage.setItem("ecomerce_user", JSON.stringify(u))
-  }
-
-  const logoutUser = () => {
-    setUser(null)
-    localStorage.removeItem("ecomerce_user")
-  }
-
   const loginAdmin = async (email: string, password: string) => {
-    await login({ email, password })
+    const payload = await login({ email, password })
+    const adminData = payload?.data?.admin
+
+    if (!adminData?.id || !adminData?.email) {
+      clearAdminAuthStorage()
+      throw new Error("Invalid login response")
+    }
+
+    const nextAdmin = {
+      id: String(adminData.id),
+      email: String(adminData.email),
+    }
+
+    setAdmin(nextAdmin)
     setIsAdmin(true)
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(ADMIN_PROFILE_STORAGE_KEY, JSON.stringify(nextAdmin))
+    }
   }
 
   const logoutAdmin = async () => {
     try {
       await logout()
     } finally {
-      localStorage.removeItem("admin_access_token")
-      localStorage.removeItem("admin_refresh_token")
+      clearAdminAuthStorage()
+      setAdmin(null)
       setIsAdmin(false)
     }
   }
 
   const value = useMemo(
     () => ({
-      user,
+      admin,
       isAdmin,
       authLoading,
-      login: loginUser,
-      logout: logoutUser,
       loginAdmin,
+      refreshAdminSession,
       logoutAdmin,
     }),
-    [user, isAdmin, authLoading],
+    [admin, isAdmin, authLoading],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

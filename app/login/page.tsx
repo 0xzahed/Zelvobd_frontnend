@@ -5,19 +5,45 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { notify } from "@/lib/notify"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { loginAdmin } = useAuth()
   const [showPw, setShowPw] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
-    login(email, email.split("@")[0] || "Shopper")
-    router.push("/")
+
+    if (!email || !password || loading) return
+
+    setError("")
+    setLoading(true)
+
+    try {
+      await loginAdmin(email, password)
+      notify.success({
+        title: "Welcome back",
+        message: "Admin login successful.",
+        success: true,
+      })
+      router.push("/admin")
+    } catch (authError) {
+      const message =
+        (authError as { message?: string })?.message || "Invalid credentials. Please try again."
+      setError(message)
+      notify.error({
+        title: "Login failed",
+        message,
+        error: String(message),
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -31,21 +57,21 @@ export default function LoginPage() {
             <span className="text-2xl font-bold text-foreground">EcoMerce</span>
           </Link>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Sign in to continue shopping</p>
+            <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your store</p>
           </div>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl bg-card p-6 shadow-card">
           <div>
-            <label className="mb-1 block text-xs font-medium text-foreground">Email or Phone</label>
+            <label className="mb-1 block text-xs font-medium text-foreground">Email</label>
             <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <input
-                type="text"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="adminemail@example.com"
                 required
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
@@ -80,45 +106,21 @@ export default function LoginPage() {
               <input type="checkbox" className="h-4 w-4 rounded border-border" />
               Remember me
             </label>
-            <Link href="#" className="font-medium text-[#306FD7]">
+            <Link href="/admin/login" className="font-medium text-[#306FD7]">
               Forgot Password?
             </Link>
           </div>
 
+          {error && <p className="text-xs text-[#FF3B3B]">{error}</p>}
+
           <button
             type="submit"
-            className="h-11 w-full rounded-full bg-[#306FD7] text-sm font-semibold text-white shadow-sm"
+            disabled={loading}
+            className="h-11 w-full rounded-full bg-[#306FD7] text-sm font-semibold text-white shadow-sm disabled:opacity-70"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
-
-          <div className="relative py-2 text-center">
-            <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-border" />
-            <span className="relative bg-card px-3 text-xs text-muted-foreground">or continue with</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="h-11 rounded-xl border border-border bg-background text-sm font-medium text-foreground"
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              className="h-11 rounded-xl border border-border bg-background text-sm font-medium text-foreground"
-            >
-              Facebook
-            </button>
-          </div>
         </form>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-semibold text-[#306FD7]">
-            Register
-          </Link>
-        </p>
       </div>
     </div>
   )
