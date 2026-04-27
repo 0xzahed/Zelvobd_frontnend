@@ -113,7 +113,7 @@ export default function LoginPage() {
               <input type="checkbox" className="h-4 w-4 rounded border-border" />
               Remember me
             </label>
-            <Link href="/admin/login" className="font-medium text-[#306FD7]">
+            <Link href="/login" className="font-medium text-[#306FD7]">
               Forgot Password?
             </Link>
           </div>

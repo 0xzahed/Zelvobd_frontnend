@@ -149,13 +149,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
     if (!ready) return
     if (authLoading) return
 
-    if (pathname === "/admin/login" && isAdmin) {
-      router.replace("/admin")
-      return
-    }
-
-    if (pathname !== "/admin/login" && !isAdmin) {
-      router.replace("/admin/login")
+    if (!isAdmin) {
+      router.replace("/login")
     }
   }, [ready, authLoading, isAdmin, pathname, router])
 
@@ -169,7 +164,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         title: "Logged out",
         message: "You have been signed out successfully.",
       })
-      router.replace("/admin/login")
+      router.replace("/login")
     } catch (error) {
       notify.error({
         title: "Logout failed",
@@ -179,10 +174,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
       setLoggingOut(false)
       setOpen(false)
     }
-  }
-
-  if (pathname === "/admin/login") {
-    return <div className="min-h-dvh bg-[#0F1020] text-white">{children}</div>
   }
 
   const toggleGroup = (label: string) =>
