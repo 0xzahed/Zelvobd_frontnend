@@ -3,13 +3,15 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 import { notify } from "@/lib/notify"
 import type { Category, Product, ProductVariant, Slider, SubCategory } from "@/lib/types"
-import { getCategories } from "@/src/api/category/getCategories"
-import { createCategory as createCategoryApi } from "@/src/api/category/createCategory"
-import { updateCategory as updateCategoryApi } from "@/src/api/category/updateCategory"
-import { deleteCategory as deleteCategoryApi } from "@/src/api/category/deleteCategory"
-import { createSubCategory as createSubCategoryApi } from "@/src/api/subCategory/createSubCategory"
-import { updateSubCategory as updateSubCategoryApi } from "@/src/api/subCategory/updateSubCategory"
-import { deleteSubCategory as deleteSubCategoryApi } from "@/src/api/subCategory/deleteSubCategory"
+import {
+  createCategory as createCategoryApi,
+  createSubCategory as createSubCategoryApi,
+  deleteCategory as deleteCategoryApi,
+  deleteSubCategory as deleteSubCategoryApi,
+  getCategories,
+  updateCategory as updateCategoryApi,
+  updateSubCategory as updateSubCategoryApi,
+} from "@/src/api/categoryApi"
 import { getProducts } from "@/src/api/products/getProducts"
 import { createProduct as createProductApi } from "@/src/api/products/createProduct"
 import { updateProduct as updateProductApi } from "@/src/api/products/updateProduct"

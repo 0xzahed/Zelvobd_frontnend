@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getCategories } from "@/src/api/category/getCategories"
+import { getCategories } from "@/src/api/categoryApi"
 import { getProducts } from "@/src/api/products/getProducts"
 import { getHomePageBanners } from "@/src/api/banner/getHomePageBanners"
 import { getBanners } from "@/src/api/banner/getBanners"

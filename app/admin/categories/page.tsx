@@ -2,11 +2,32 @@
 
 import { useMemo, useRef, useState } from "react"
 import Image from "next/image"
-import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
+import { getCategoryDetails } from "@/src/api/categoryApi"
+
+type CategoryDetails = {
+  id: string
+  title: string
+  slug: string
+  imageUrl: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+const BASE_API =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.VITE_API_BASE_URL ||
+  "http://localhost:5000/api/v1"
+
+const toAbsoluteUploadUrl = (path: string | null | undefined) => {
+  if (!path) return "/placeholder.svg"
+  if (path.startsWith("http")) return path
+  return `${BASE_API.replace(/\/api\/v1$/, "")}${path}`
+}
 
 export default function AdminCategoriesPage() {
   const { categories, addCategory, updateCategory, deleteCategory } = useAdminStore()
@@ -25,13 +46,14 @@ export default function AdminCategoriesPage() {
   const [query, setQuery] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [viewOpen, setViewOpen] = useState(false)
+  const [viewLoading, setViewLoading] = useState(false)
+  const [viewCategory, setViewCategory] = useState<CategoryDetails | null>(null)
 
   // Modal form state
   const [name, setName] = useState("")
   const [image, setImage] = useState<string>("")
-  const [banner, setBanner] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
-  const bannerInputRef = useRef<HTMLInputElement>(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -42,7 +64,6 @@ export default function AdminCategoriesPage() {
   const resetForm = () => {
     setName("")
     setImage("")
-    setBanner("")
     setEditingId(null)
   }
 
@@ -55,13 +76,41 @@ export default function AdminCategoriesPage() {
     setEditingId(cat.id)
     setName(cat.name)
     setImage(cat.image ?? "")
-    setBanner("")
     setShowModal(true)
   }
 
   const closeModal = () => {
     setShowModal(false)
     resetForm()
+  }
+
+  const openView = async (cat: Category) => {
+    setViewOpen(true)
+    setViewLoading(true)
+    setViewCategory(null)
+
+    try {
+      const res = await getCategoryDetails(cat.id)
+      const details = res?.data
+      if (!details?.id) throw new Error("Category details not found")
+
+      setViewCategory({
+        id: String(details.id),
+        title: String(details.title || cat.name),
+        slug: String(details.slug || cat.slug),
+        imageUrl: toAbsoluteUploadUrl(details.imageUrl || cat.image),
+        createdAt: details.createdAt ? String(details.createdAt) : undefined,
+        updatedAt: details.updatedAt ? String(details.updatedAt) : undefined,
+      })
+    } catch (error) {
+      notify.error({
+        title: "Failed to load category",
+        message: getErrorMessage(error),
+      })
+      setViewOpen(false)
+    } finally {
+      setViewLoading(false)
+    }
   }
 
   const pickImage = (file: File | undefined, setter: (s: string) => void) => {
@@ -85,6 +134,15 @@ export default function AdminCategoriesPage() {
       })
       return
     }
+
+    if (!editingId && !image) {
+      notify.error({
+        title: "Image is required",
+        message: "Please upload a category image before submitting.",
+      })
+      return
+    }
+
     const slug = n.toLowerCase().replace(/\s+/g, "-")
 
     if (editingId) {
@@ -180,6 +238,13 @@ export default function AdminCategoriesPage() {
 
                 <div className="flex items-center justify-end gap-1.5">
                   <button
+                    onClick={() => void openView(cat)}
+                    aria-label={`View ${cat.name}`}
+                    className="grid h-8 w-8 place-items-center rounded-md text-foreground transition hover:bg-[#EEF0FB]"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => openEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
                     className="grid h-8 w-8 place-items-center rounded-md text-[#306FD7] transition hover:bg-[#EEF0FB]"
@@ -272,44 +337,6 @@ export default function AdminCategoriesPage() {
               </button>
             </div>
 
-            {/* Banner upload */}
-            <div className="mt-4">
-              <label className="mb-1.5 block text-xs text-foreground">
-                Banner Upload
-              </label>
-              <input
-                ref={bannerInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => pickImage(e.target.files?.[0], setBanner)}
-              />
-              <button
-                type="button"
-                onClick={() => bannerInputRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF0FB]"
-              >
-                {banner ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={banner || "/placeholder.svg"}
-                    alt="Banner preview"
-                    className="h-24 w-full object-cover"
-                  />
-                ) : (
-                  <>
-                    <ImagePlus className="h-5 w-5 text-[#306FD7]" />
-                    <span className="text-sm text-[#306FD7]">
-                      Click to upload banner
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      Max size 5 MB
-                    </span>
-                  </>
-                )}
-              </button>
-            </div>
-
             {/* Submit */}
             <div className="mt-6 flex justify-center">
               <button
@@ -323,6 +350,77 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       )}
+
+      {viewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setViewOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-lg rounded-2xl bg-card p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setViewOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-[#EEF0FB]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <h3 className="text-center text-lg text-foreground">Category Details</h3>
+            <div className="mx-auto mt-5 h-px w-full bg-border/60" />
+
+            {viewLoading && (
+              <p className="py-10 text-center text-sm text-muted-foreground">Loading details...</p>
+            )}
+
+            {!viewLoading && viewCategory && (
+              <div className="mt-5 space-y-4">
+                <div className="mx-auto h-36 w-36 overflow-hidden rounded-xl border border-border/60 bg-[#F7F9FD]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={viewCategory.imageUrl || "/placeholder.svg"}
+                    alt={viewCategory.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="space-y-2 rounded-xl border border-border/60 bg-[#F7F9FD] p-4 text-sm">
+                  <p className="text-foreground">
+                    <span className="mr-2 font-semibold">Title:</span>
+                    {viewCategory.title}
+                  </p>
+                  <p className="text-foreground">
+                    <span className="mr-2 font-semibold">Slug:</span>/{viewCategory.slug}
+                  </p>
+                  <p className="text-muted-foreground">
+                    <span className="mr-2 font-semibold text-foreground">Created:</span>
+                    {viewCategory.createdAt
+                      ? new Date(viewCategory.createdAt).toLocaleString()
+                      : "N/A"}
+                  </p>
+                  <p className="text-muted-foreground">
+                    <span className="mr-2 font-semibold text-foreground">Updated:</span>
+                    {viewCategory.updatedAt
+                      ? new Date(viewCategory.updatedAt).toLocaleString()
+                      : "N/A"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error && typeof error === "object") {
+    const maybe = error as { message?: unknown; error?: unknown }
+    if (typeof maybe.message === "string" && maybe.message.trim()) return maybe.message
+    if (typeof maybe.error === "string" && maybe.error.trim()) return maybe.error
+  }
+
+  return "Please try again."
 }

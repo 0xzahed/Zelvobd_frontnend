@@ -1,5 +1,5 @@
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
-import { refreshToken } from "@/src/api/auth/refreshToken"
+import { refreshAdminToken } from "@/src/api/authApi"
 
 type RequestOptions = {
   path: string
@@ -38,7 +38,7 @@ export const requestWithAdminAuth = async (options: RequestOptions) => {
 
   if (response.status === 401) {
     try {
-      await refreshToken()
+      await refreshAdminToken()
       response = await executeRequest(options)
       payload = await parseJsonSafe(response)
     } catch {

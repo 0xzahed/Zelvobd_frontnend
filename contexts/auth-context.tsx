@@ -1,9 +1,11 @@
 "use client"
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
-import { login } from "@/src/api/auth/login"
-import { logout } from "@/src/api/auth/logout"
-import { refreshToken } from "@/src/api/auth/refreshToken"
+import {
+  loginAdmin as loginAdminApi,
+  logoutAdmin as logoutAdminApi,
+  refreshAdminToken,
+} from "@/src/api/authApi"
 
 type AdminUser = {
   id: string
@@ -58,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true)
 
   const refreshAdminSession = async () => {
-    const payload = await refreshToken()
+    const payload = await refreshAdminToken()
     const adminData = payload?.data?.admin
 
     if (!adminData?.id || !adminData?.email) {
@@ -115,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const loginAdmin = async (email: string, password: string) => {
-    const payload = await login({ email, password })
+    const payload = await loginAdminApi({ email, password })
     const adminData = payload?.data?.admin
 
     if (!adminData?.id || !adminData?.email) {
@@ -138,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutAdmin = async () => {
     try {
-      await logout()
+      await logoutAdminApi()
     } finally {
       clearAdminAuthStorage()
       setAdmin(null)

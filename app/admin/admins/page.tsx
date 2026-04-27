@@ -2,10 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { Pencil, Plus, Trash2, X } from "lucide-react"
-import { getAdmins } from "@/src/api/admin/getAdmins"
-import { createAdmin } from "@/src/api/admin/createAdmin"
-import { updateAdmin } from "@/src/api/admin/updateAdmin"
-import { deleteAdmin } from "@/src/api/admin/deleteAdmin"
+import { createAdmin, deleteAdmin, getAdmins, updateAdmin } from "@/src/api/adminApi"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { useAuth } from "@/contexts/auth-context"
