@@ -4,7 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
 import type { Category, Product, ProductVariant } from "@/lib/types"
-import { QuillEditor } from "@/components/ui/quill-editor"
+import dynamic from "next/dynamic"
+
+const QuillEditor = dynamic(
+  () => import("@/components/ui/quill-editor").then((mod) => mod.QuillEditor),
+  { ssr: false }
+)
 import { AdminSelect } from "@/components/admin/admin-select"
 
 type Props = {
