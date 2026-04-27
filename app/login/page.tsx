@@ -50,12 +50,12 @@ export default function LoginPage() {
     <div className="min-h-dvh bg-background">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#306FD7] text-lg font-bold text-white">
               E
             </span>
             <span className="text-2xl font-bold text-foreground">EcoMerce</span>
-          </Link>
+          </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
             <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your store</p>
