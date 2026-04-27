@@ -1,6 +1,15 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react"
+import { usePathname } from "next/navigation"
 import { notify } from "@/lib/notify"
 import type { Category, Product, ProductVariant, Slider, SubCategory } from "@/lib/types"
 import {
@@ -26,6 +35,8 @@ import { mapBanner, mapCategory, mapProduct, mapSubCategory } from "@/src/api/_s
 
 type AdminStore = {
   categories: Category[]
+  loadCategories: () => Promise<void>
+  loadSubCategoriesByCategory: (categoryId: string) => Promise<void>
   addCategory: (c: Category) => void
   updateCategory: (id: string, c: Partial<Category>) => void
   deleteCategory: (id: string) => void
@@ -33,11 +44,13 @@ type AdminStore = {
   updateSubCategory: (categoryId: string, subId: string, data: Partial<SubCategory>) => void
   deleteSubCategory: (categoryId: string, subId: string) => void
   products: Product[]
+  loadProducts: () => Promise<void>
   addProduct: (p: Product) => void
   updateProduct: (id: string, p: Partial<Product>) => void
   deleteProduct: (id: string) => void
   copyProduct: (id: string) => void
   sliders: Slider[]
+  loadSliders: () => Promise<void>
   addSlider: (s: Slider) => void
   updateSlider: (id: string, s: Partial<Slider>) => void
   deleteSlider: (id: string) => void
@@ -47,20 +60,32 @@ type AdminStore = {
 const AdminContext = createContext<AdminStore | null>(null)
 
 export function AdminDataProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname()
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [sliders, setSliders] = useState<Slider[]>([])
-  const [loaded, setLoaded] = useState(false)
 
-  const reloadAll = async () => {
-    const [categoriesRes, subCategoriesRes, productsRes, bannersRes] = await Promise.all([
-      getCategories({ limit: 100 }),
-      getSubCategories({ limit: 100 }),
-      getProducts({ limit: 100 }),
-      getBanners(),
-    ])
-
+  const loadCategories = useCallback(async () => {
+    const categoriesRes = await getCategories({ limit: 100 })
     const categoryList: Category[] = (categoriesRes?.data?.categories || []).map(mapCategory)
+
+    setCategories((prev) => {
+      const previousSubCategoriesByCategoryId = new Map<string, Category["subCategories"]>()
+      for (const category of prev) {
+        previousSubCategoriesByCategoryId.set(category.id, category.subCategories || [])
+      }
+
+      return categoryList.map((category) => ({
+        ...category,
+        subCategories: previousSubCategoriesByCategoryId.get(category.id) || [],
+      }))
+    })
+  }, [])
+
+  const loadSubCategoriesByCategory = useCallback(async (categoryId: string) => {
+    if (!categoryId) return
+
+    const subCategoriesRes = await getSubCategories({ limit: 100, categoryId })
     const subCategoryList: Array<{
       id: string
       categoryId: string
@@ -69,39 +94,70 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       image: string
     }> = (subCategoriesRes?.data?.subCategories || []).map(mapSubCategory)
 
-    const subCategoriesByCategoryId = new Map<string, Category["subCategories"]>()
+    const mappedSubCategories: Category["subCategories"] = subCategoryList.map((sub) => ({
+      id: sub.id,
+      name: sub.name,
+      slug: sub.slug,
+      image: sub.image,
+    }))
 
-    for (const sub of subCategoryList) {
-      const current = subCategoriesByCategoryId.get(sub.categoryId) || []
-      current.push({
-        id: sub.id,
-        name: sub.name,
-        slug: sub.slug,
-        image: sub.image,
-      })
-      subCategoriesByCategoryId.set(sub.categoryId, current)
-    }
-
-    setCategories(
-      categoryList.map((category) => ({
-        ...category,
-        subCategories: subCategoriesByCategoryId.get(category.id) || [],
-      })),
+    setCategories((prev) =>
+      prev.map((category) =>
+        category.id === categoryId
+          ? {
+              ...category,
+              subCategories: mappedSubCategories,
+            }
+          : category,
+      ),
     )
+  }, [])
+
+  const loadProducts = useCallback(async () => {
+    const productsRes = await getProducts({ limit: 100 })
     setProducts((productsRes?.data?.products || []).map(mapProduct))
+  }, [])
+
+  const loadSliders = useCallback(async () => {
+    const bannersRes = await getBanners()
     setSliders((bannersRes?.data || []).map(mapBanner))
-  }
+  }, [])
 
   useEffect(() => {
-    const load = async () => {
+    const hydrateRouteData = async () => {
       try {
-        await reloadAll()
-      } finally {
-        setLoaded(true)
+        if (pathname === "/admin") {
+          return
+        }
+
+        if (pathname.startsWith("/admin/sliders")) {
+          await loadSliders()
+          return
+        }
+
+        if (pathname.startsWith("/admin/categories")) {
+          await loadCategories()
+          return
+        }
+
+        if (pathname.startsWith("/admin/products")) {
+          await loadCategories()
+          await loadProducts()
+          return
+        }
+
+        if (pathname.startsWith("/admin/trending") || pathname.startsWith("/admin/free-delivery")) {
+          await loadCategories()
+          await loadProducts()
+          return
+        }
+      } catch (error) {
+        notify.error({ title: "Failed to load data", message: getErrorMessage(error) })
       }
     }
-    void load()
-  }, [])
+
+    void hydrateRouteData()
+  }, [pathname, loadCategories, loadProducts, loadSliders])
 
   const runApiAction = (action: () => Promise<void>) => {
     void (async () => {
@@ -122,7 +178,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await createCategoryApi(formData)
-      await reloadAll()
+      await loadCategories()
       notify.success({ title: "Category added", message: `"${c.name}" was added successfully.` })
     })
   }
@@ -136,7 +192,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await updateCategoryApi(id, formData)
-      await reloadAll()
+      await loadCategories()
       notify.success({ title: "Category updated", message: "Your changes have been saved." })
     })
   }
@@ -144,7 +200,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const deleteCategory = (id: string) => {
     runApiAction(async () => {
       await deleteCategoryApi(id)
-      await reloadAll()
+      await loadCategories()
       notify.success({ title: "Category deleted", message: "Category was removed." })
     })
   }
@@ -159,12 +215,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await createSubCategoryApi(formData)
-      await reloadAll()
+      await loadSubCategoriesByCategory(categoryId)
       notify.success({ title: "Sub-category added", message: `"${sub.name}" is now available.` })
     })
   }
 
-  const updateSubCategory = (_categoryId: string, subId: string, data: Partial<SubCategory>) => {
+  const updateSubCategory = (categoryId: string, subId: string, data: Partial<SubCategory>) => {
     runApiAction(async () => {
       const formData = new FormData()
       if (data.name) formData.append("title", data.name)
@@ -173,15 +229,23 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await updateSubCategoryApi(subId, formData)
-      await reloadAll()
+      if (categoryId) {
+        await loadSubCategoriesByCategory(categoryId)
+      } else {
+        await loadCategories()
+      }
       notify.success({ title: "Sub-category updated", message: "Your changes have been saved." })
     })
   }
 
-  const deleteSubCategory = (_categoryId: string, subId: string) => {
+  const deleteSubCategory = (categoryId: string, subId: string) => {
     runApiAction(async () => {
       await deleteSubCategoryApi(subId)
-      await reloadAll()
+      if (categoryId) {
+        await loadSubCategoriesByCategory(categoryId)
+      } else {
+        await loadCategories()
+      }
       notify.success({ title: "Sub-category deleted", message: "The sub-category was removed." })
     })
   }
@@ -190,7 +254,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     runApiAction(async () => {
       const formData = await buildProductFormData(p, categories)
       await createProductApi(formData)
-      await reloadAll()
+      await loadProducts()
       notify.success({ title: "Product added", message: `"${p.name}" was added successfully.` })
     })
   }
@@ -203,7 +267,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const merged = { ...current, ...p }
       const formData = await buildProductFormData(merged, categories)
       await updateProductApi(id, formData)
-      await reloadAll()
+      await loadProducts()
       notify.success({ title: "Product updated", message: "Your changes have been saved." })
     })
   }
@@ -211,7 +275,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const deleteProduct = (id: string) => {
     runApiAction(async () => {
       await deleteProductApi(id)
-      await reloadAll()
+      await loadProducts()
       notify.success({ title: "Product deleted", message: "Product was removed." })
     })
   }
@@ -236,7 +300,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         const formData = await buildProductFormData(fallbackCopy, categories)
         await createProductApi(formData)
       }
-      await reloadAll()
+      await loadProducts()
       notify.success({ title: "Product duplicated", message: "Copied product successfully." })
     })
   }
@@ -252,7 +316,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await createBannerApi(formData)
-      await reloadAll()
+      await loadSliders()
       notify.success({ title: "Banner added", message: `"${s.title}" is now in the slider.` })
     })
   }
@@ -267,7 +331,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (file) formData.append("image", file)
       }
       await updateBannerApi(id, formData)
-      await reloadAll()
+      await loadSliders()
       notify.success({ title: "Banner updated", message: "Your changes have been saved." })
     })
   }
@@ -275,18 +339,24 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const deleteSlider = (id: string) => {
     runApiAction(async () => {
       await deleteBannerApi(id)
-      await reloadAll()
+      await loadSliders()
       notify.success({ title: "Banner deleted", message: "Banner was removed." })
     })
   }
 
   const resetAll = () => {
-    void reloadAll()
+    void (async () => {
+      await loadCategories()
+      await loadProducts()
+      await loadSliders()
+    })()
   }
 
   const value = useMemo(
     () => ({
       categories,
+      loadCategories,
+      loadSubCategoriesByCategory,
       addCategory,
       updateCategory,
       deleteCategory,
@@ -294,20 +364,28 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       updateSubCategory,
       deleteSubCategory,
       products,
+      loadProducts,
       addProduct,
       updateProduct,
       deleteProduct,
       copyProduct,
       sliders,
+      loadSliders,
       addSlider,
       updateSlider,
       deleteSlider,
       resetAll,
     }),
-    [categories, products, sliders],
+    [
+      categories,
+      products,
+      sliders,
+      loadCategories,
+      loadSubCategoriesByCategory,
+      loadProducts,
+      loadSliders,
+    ],
   )
-
-  if (!loaded) return null
 
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }

@@ -28,7 +28,7 @@ const htmlToPlainText = (html: string) => {
 }
 
 export function ProductForm({ initial, onSave, onCancel }: Props) {
-  const { categories } = useAdminStore()
+  const { categories, loadSubCategoriesByCategory } = useAdminStore()
   const [name, setName] = useState(initial?.name ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
   const [extraDescription, setExtraDescription] = useState(initial?.extraDescription ?? "")
@@ -56,8 +56,14 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
 
   const subs = useMemo(
     () => categories.find((c) => c.slug === categorySlug)?.subCategories ?? [],
-    [categorySlug],
+    [categories, categorySlug],
   )
+
+  useEffect(() => {
+    const category = categories.find((c) => c.slug === categorySlug)
+    if (!category?.id) return
+    void loadSubCategoriesByCategory(category.id)
+  }, [categories, categorySlug, loadSubCategoriesByCategory])
 
   // Close on Escape
   useEffect(() => {

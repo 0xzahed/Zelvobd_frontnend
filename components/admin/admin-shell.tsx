@@ -199,7 +199,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         )}
       >
         <div className="flex h-16 items-center justify-between px-4">
-          <Link href="/admin" className="flex items-center gap-2.5">
+          <Link href="/admin" prefetch={false} className="flex items-center gap-2.5">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#306FD7] text-xs font-semibold text-white shadow-sm">
               <ShoppingBag className="h-4 w-4" />
             </span>
@@ -234,6 +234,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                       <li key={item.label}>
                         <Link
                           href={item.href!}
+                          prefetch={false}
                           onClick={() => setOpen(false)}
                           className={cx(
                             "flex items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
@@ -292,6 +293,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                               <li key={child.href}>
                                 <Link
                                   href={child.href}
+                                  prefetch={false}
                                   onClick={() => setOpen(false)}
                                   className={cx(
                                     "flex items-center rounded-sm px-3 py-1.5 text-[13px] font-normal transition",

@@ -10,7 +10,13 @@ import { useConfirm } from "@/components/ui/confirm-dialog"
 import { AdminSelect } from "@/components/admin/admin-select"
 
 export default function AdminSubCategoriesPage() {
-  const { categories, addSubCategory, updateSubCategory, deleteSubCategory } = useAdminStore()
+  const {
+    categories,
+    addSubCategory,
+    updateSubCategory,
+    deleteSubCategory,
+    loadSubCategoriesByCategory,
+  } = useAdminStore()
   const confirm = useConfirm()
 
   const handleDeleteSub = async (parentId: string, sub: SubCategory) => {
@@ -45,6 +51,11 @@ export default function AdminSubCategoriesPage() {
       setSelectedCategoryId(categories[0].id)
     }
   }, [categories, selectedCategoryId])
+
+  useEffect(() => {
+    if (!selectedCategoryId) return
+    void loadSubCategoriesByCategory(selectedCategoryId)
+  }, [selectedCategoryId, loadSubCategoriesByCategory])
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase()
