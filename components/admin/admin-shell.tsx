@@ -47,7 +47,7 @@ const MENU: NavItem[] = [
     label: "Categories",
     icon: FolderTree,
     children: [
-      { href: "/admin/categories", label: "Category list" },
+      { href: "/admin/categories", label: "Category" },
       { href: "/admin/categories/sub", label: "Sub Category" },
     ],
   },
