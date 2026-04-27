@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
@@ -24,7 +24,7 @@ export default function AdminSubCategoriesPage() {
   }
 
   const [query, setQuery] = useState("")
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all")
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("")
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingParentId, setEditingParentId] = useState<string | null>(null)
@@ -33,6 +33,18 @@ export default function AdminSubCategoriesPage() {
   const [image, setImage] = useState<string>("")
   const [parentCategoryId, setParentCategoryId] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      setSelectedCategoryId("")
+      return
+    }
+
+    const hasCurrentCategory = categories.some((c) => c.id === selectedCategoryId)
+    if (!hasCurrentCategory) {
+      setSelectedCategoryId(categories[0].id)
+    }
+  }, [categories, selectedCategoryId])
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -44,7 +56,7 @@ export default function AdminSubCategoriesPage() {
         parentSlug: c.slug,
       })),
     )
-    if (selectedCategoryId !== "all") {
+    if (selectedCategoryId) {
       subs = subs.filter((s) => s.parentId === selectedCategoryId)
     }
     if (q) {
@@ -63,7 +75,7 @@ export default function AdminSubCategoriesPage() {
 
   const openAdd = () => {
     resetForm()
-    setParentCategoryId(selectedCategoryId !== "all" ? selectedCategoryId : "")
+    setParentCategoryId(selectedCategoryId)
     setShowModal(true)
   }
 
@@ -96,6 +108,11 @@ export default function AdminSubCategoriesPage() {
       return
     }
 
+    if (!editingId && !image) {
+      notify.error("Please upload an image for the sub-category")
+      return
+    }
+
     if (editingId && editingParentId) {
       updateSubCategory(editingParentId, editingId, { name: n, image: image || undefined })
     } else {
@@ -121,8 +138,8 @@ export default function AdminSubCategoriesPage() {
               <AdminSelect
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
+                disabled={categories.length === 0}
               >
-                <option value="all">All Categories</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -166,7 +183,9 @@ export default function AdminSubCategoriesPage() {
           <ul className="divide-y divide-border/60">
             {rows.length === 0 && (
               <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-                No sub-categories yet. Click &quot;Add Sub Category&quot; to create one.
+                {selectedCategoryId
+                  ? "No sub-categories in this category yet."
+                  : "No categories found. Create a category first."}
               </li>
             )}
             {rows.map((sub) => (

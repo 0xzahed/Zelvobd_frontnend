@@ -28,6 +28,15 @@ export const mapCategory = (category: any): Category => ({
   })),
 })
 
+export const mapSubCategory = (subCategory: any) => ({
+  id: subCategory.id,
+  categoryId: subCategory.categoryId,
+  categoryName: subCategory.category?.title || "",
+  name: subCategory.title,
+  slug: subCategory.slug,
+  image: toAbsoluteUploadUrl(subCategory.imageUrl),
+})
+
 export const mapProduct = (product: any): Product => {
   const firstVariant = product.firstVariant || product.variants?.[0]
   const price = Number(firstVariant?.discountedPrice || 0)

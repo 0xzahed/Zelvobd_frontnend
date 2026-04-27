@@ -9,6 +9,7 @@ import {
   deleteCategory as deleteCategoryApi,
   deleteSubCategory as deleteSubCategoryApi,
   getCategories,
+  getSubCategories,
   updateCategory as updateCategoryApi,
   updateSubCategory as updateSubCategoryApi,
 } from "@/src/api/categoryApi"
@@ -21,7 +22,7 @@ import { getBanners } from "@/src/api/banner/getBanners"
 import { createBanner as createBannerApi } from "@/src/api/banner/createBanner"
 import { updateBanner as updateBannerApi } from "@/src/api/banner/updateBanner"
 import { deleteBanner as deleteBannerApi } from "@/src/api/banner/deleteBanner"
-import { mapBanner, mapCategory, mapProduct } from "@/src/api/_shared/mappers"
+import { mapBanner, mapCategory, mapProduct, mapSubCategory } from "@/src/api/_shared/mappers"
 
 type AdminStore = {
   categories: Category[]
@@ -52,13 +53,41 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false)
 
   const reloadAll = async () => {
-    const [categoriesRes, productsRes, bannersRes] = await Promise.all([
+    const [categoriesRes, subCategoriesRes, productsRes, bannersRes] = await Promise.all([
       getCategories({ limit: 100 }),
+      getSubCategories({ limit: 100 }),
       getProducts({ limit: 100 }),
       getBanners(),
     ])
 
-    setCategories((categoriesRes?.data?.categories || []).map(mapCategory))
+    const categoryList: Category[] = (categoriesRes?.data?.categories || []).map(mapCategory)
+    const subCategoryList: Array<{
+      id: string
+      categoryId: string
+      name: string
+      slug: string
+      image: string
+    }> = (subCategoriesRes?.data?.subCategories || []).map(mapSubCategory)
+
+    const subCategoriesByCategoryId = new Map<string, Category["subCategories"]>()
+
+    for (const sub of subCategoryList) {
+      const current = subCategoriesByCategoryId.get(sub.categoryId) || []
+      current.push({
+        id: sub.id,
+        name: sub.name,
+        slug: sub.slug,
+        image: sub.image,
+      })
+      subCategoriesByCategoryId.set(sub.categoryId, current)
+    }
+
+    setCategories(
+      categoryList.map((category) => ({
+        ...category,
+        subCategories: subCategoriesByCategoryId.get(category.id) || [],
+      })),
+    )
     setProducts((productsRes?.data?.products || []).map(mapProduct))
     setSliders((bannersRes?.data || []).map(mapBanner))
   }
