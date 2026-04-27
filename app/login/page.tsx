@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
@@ -9,12 +9,19 @@ import { notify } from "@/lib/notify"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { loginAdmin } = useAuth()
+  const { loginAdmin, isAdmin, authLoading } = useAuth()
   const [showPw, setShowPw] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (authLoading) return
+    if (isAdmin) {
+      router.replace("/admin")
+    }
+  }, [authLoading, isAdmin, router])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

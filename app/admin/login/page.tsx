@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   Eye,
@@ -17,12 +17,19 @@ import { notify } from "@/lib/notify"
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const { loginAdmin } = useAuth()
+  const { loginAdmin, isAdmin, authLoading } = useAuth()
   const [email, setEmail] = useState("admin@ecomerce.com")
   const [password, setPassword] = useState("admin123")
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (authLoading) return
+    if (isAdmin) {
+      router.replace("/admin")
+    }
+  }, [authLoading, isAdmin, router])
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
