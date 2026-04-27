@@ -36,7 +36,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       </div>
 
       <div className="space-y-1.5 p-3 pb-4">
-        <h3 className="line-clamp-2 min-h-[40px] text-[13px] font-medium leading-snug text-foreground">
+        <h3 className="line-clamp-2 min-h-10 text-[13px] font-medium leading-snug text-foreground">
           {product.name}
         </h3>
         <div className="flex items-baseline gap-2">

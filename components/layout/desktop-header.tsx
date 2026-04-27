@@ -86,7 +86,7 @@ export function DesktopHeader() {
   return (
     <>
       <header className="sticky top-0 z-40 hidden border-b border-border/50 bg-background/90 backdrop-blur md:block">
-        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4 px-6">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6">
           {/* Brand */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#306FD7] text-sm font-bold text-white">
@@ -154,7 +154,7 @@ export function DesktopHeader() {
         {/* Slide-down search panel (appears only when the icon is clicked) */}
         {searchOpen && (
           <div className="border-t border-border/50 bg-background">
-            <div className="mx-auto max-w-[1280px] px-6 py-3">
+            <div className="mx-auto max-w-7xl px-6 py-3">
               <form
                 onSubmit={onSubmit}
                 className="flex h-11 items-center gap-2 rounded-full border border-border bg-card px-4"

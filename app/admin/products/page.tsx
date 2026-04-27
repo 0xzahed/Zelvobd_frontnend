@@ -62,7 +62,7 @@ export default function AdminProductsPage() {
           <p className="text-xs text-muted-foreground">{products.length} total</p>
         </div>
         <div className="flex flex-1 items-center gap-2 md:flex-none">
-          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-[8px] bg-card px-3 shadow-sm md:w-72 md:flex-none">
+          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-sm bg-card px-3 shadow-sm md:w-72 md:flex-none">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -76,7 +76,7 @@ export default function AdminProductsPage() {
               setEditing(null)
               setShowForm(true)
             }}
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -96,7 +96,7 @@ export default function AdminProductsPage() {
 
       <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm">
+          <table className="w-full min-w-245 text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-[#EEF0FB]/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-medium">Product</th>

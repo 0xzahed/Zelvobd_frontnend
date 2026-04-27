@@ -50,18 +50,18 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-[#0B1020]">
+    <div className="relative min-h-dvh overflow-hidden bg-[#0B1020]">
       {/* Ambient background gradient orbs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full opacity-50 blur-3xl"
+        className="pointer-events-none absolute -left-32 -top-32 h-105 w-105 rounded-full opacity-50 blur-3xl"
         style={{
           background: "radial-gradient(closest-side, #306FD7, transparent)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 right-0 h-[380px] w-[380px] rounded-full opacity-40 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 right-0 h-95 w-95 rounded-full opacity-40 blur-3xl"
         style={{
           background: "radial-gradient(closest-side, #5B84F9, transparent)",
         }}
@@ -76,11 +76,11 @@ export default function AdminLoginPage() {
         }}
       />
 
-      <div className="relative z-10 mx-auto grid min-h-[100dvh] max-w-6xl grid-cols-1 items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-16 lg:px-8">
+      <div className="relative z-10 mx-auto grid min-h-dvh max-w-6xl grid-cols-1 items-center gap-10 px-4 py-10 lg:grid-cols-2 lg:gap-16 lg:px-8">
         {/* Left: brand / highlights */}
         <div className="hidden text-white lg:flex lg:flex-col lg:gap-10">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-linear-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30">
               <ShoppingBag className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -96,7 +96,7 @@ export default function AdminLoginPage() {
             </div>
             <h2 className="text-balance text-4xl font-semibold leading-tight">
               Manage your store{" "}
-              <span className="bg-gradient-to-r from-[#5B84F9] to-[#A5C0FF] bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-[#5B84F9] to-[#A5C0FF] bg-clip-text text-transparent">
                 beautifully.
               </span>
             </h2>
@@ -133,10 +133,10 @@ export default function AdminLoginPage() {
 
         {/* Right: login card */}
         <div className="mx-auto w-full max-w-md">
-          <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+          <div className="relative rounded-2xl border border-white/10 bg-white/4 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.5)] backdrop-blur-xl">
             <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30 lg:hidden">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-linear-to-br from-[#306FD7] to-[#5B84F9] shadow-lg shadow-[#306FD7]/30 lg:hidden">
                   <ShieldCheck className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -155,7 +155,7 @@ export default function AdminLoginPage() {
                 <label className="mb-1.5 block text-xs font-medium text-white/70">
                   Email address
                 </label>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#306FD7]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7]">
                   <Mail className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type="email"
@@ -187,7 +187,7 @@ export default function AdminLoginPage() {
                     Forgot password?
                   </button>
                 </div>
-                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/[0.04] px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/[0.06] focus-within:ring-[#306FD7]">
+                <div className="group flex h-11 items-center gap-2 rounded-xl bg-white/4 px-3.5 ring-1 ring-white/10 transition focus-within:bg-white/6 focus-within:ring-[#306FD7]">
                   <Lock className="h-4 w-4 text-white/40 transition group-focus-within:text-[#5B84F9]" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -245,7 +245,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#306FD7] to-[#5B84F9] text-sm font-semibold text-white shadow-lg shadow-[#306FD7]/30 transition hover:shadow-xl hover:shadow-[#306FD7]/40 disabled:opacity-70"
+                className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#306FD7] to-[#5B84F9] text-sm font-semibold text-white shadow-lg shadow-[#306FD7]/30 transition hover:shadow-xl hover:shadow-[#306FD7]/40 disabled:opacity-70"
               >
                 {loading ? (
                   <>
@@ -263,7 +263,7 @@ export default function AdminLoginPage() {
                 <span className="h-px flex-1 bg-white/10" />
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-[11px] text-white/50">
+              <div className="rounded-xl border border-white/10 bg-white/3 p-3 text-[11px] text-white/50">
                 <div className="flex items-center justify-between">
                   <span>Email</span>
                   <code className="rounded bg-white/5 px-1.5 py-0.5 text-white/70">

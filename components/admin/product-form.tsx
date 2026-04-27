@@ -304,7 +304,7 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-[72px_1fr]">
-                    <label className="relative grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card">
+                    <label className="relative grid h-18 w-18 place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card">
                       {v.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img

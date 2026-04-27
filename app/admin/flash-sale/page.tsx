@@ -150,7 +150,7 @@ export default function AdminFlashSalePage() {
                 type="datetime-local"
                 value={endsAt}
                 onChange={(e) => setEndsAt(e.target.value)}
-                className="w-[210px] bg-transparent text-sm outline-none"
+                className="w-52.5 bg-transparent text-sm outline-none"
               />
               <CalendarDays className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -173,7 +173,7 @@ export default function AdminFlashSalePage() {
           <button
             type="button"
             onClick={() => bgFileInputRef.current?.click()}
-            className="grid h-20 w-full place-items-center rounded-2xl border border-border bg-[#EEF3FF] text-center md:w-[126px]"
+            className="grid h-20 w-full place-items-center rounded-2xl border border-border bg-[#EEF3FF] text-center md:w-31.5"
           >
             <div>
               <ImagePlus className="mx-auto mb-1 h-5 w-5 text-[#306FD7]" />
@@ -227,7 +227,7 @@ export default function AdminFlashSalePage() {
           </div>
         </div>
 
-        <div className="max-h-[360px] space-y-2 overflow-y-auto pr-1">
+        <div className="max-h-90 space-y-2 overflow-y-auto pr-1">
           {filteredProducts.map((p) => (
             <label
               key={p.id}

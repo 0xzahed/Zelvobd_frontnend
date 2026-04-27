@@ -315,7 +315,7 @@ export default function AdminCategoriesPage() {
               <button
                 onClick={submit}
                 disabled={!name.trim()}
-                className="h-11 min-w-[160px] rounded-full bg-[#306FD7] px-8 text-sm text-white transition hover:bg-[#2E57D6] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-11 min-w-40 rounded-full bg-[#306FD7] px-8 text-sm text-white transition hover:bg-[#2E57D6] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Submit
               </button>

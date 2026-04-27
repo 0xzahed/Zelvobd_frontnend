@@ -151,7 +151,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }, [ready, isAdmin, pathname, router])
 
   if (pathname === "/admin/login") {
-    return <div className="min-h-[100dvh] bg-[#0F1020] text-white">{children}</div>
+    return <div className="min-h-dvh bg-[#0F1020] text-white">{children}</div>
   }
 
   const toggleGroup = (label: string) =>
@@ -160,7 +160,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sections = groupBySection(MENU)
 
   return (
-    <div className="min-h-[100dvh] overflow-x-hidden bg-[#F5F7FB]">
+    <div className="min-h-dvh overflow-x-hidden bg-[#F5F7FB]">
       {open && (
         <button
           type="button"
@@ -172,7 +172,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed inset-y-0 left-0 z-40 w-[17.5rem] transform border-r border-border/60 bg-[#FAFAFB] transition-transform md:w-64 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-70 transform border-r border-border/60 bg-[#FAFAFB] transition-transform md:w-64 md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -214,7 +214,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           href={item.href!}
                           onClick={() => setOpen(false)}
                           className={cx(
-                            "flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-[13px] font-normal transition",
+                            "flex items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
                             active
                               ? "border border-border/70 bg-white text-[#202125] shadow-sm"
                               : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
@@ -242,7 +242,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         onClick={() => toggleGroup(item.label)}
                         aria-expanded={isOpen}
                         className={cx(
-                          "flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-[13px] font-normal transition",
+                          "flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
                           groupActive
                             ? "border border-border/70 bg-white text-[#202125] shadow-sm"
                             : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
@@ -263,7 +263,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         />
                       </button>
                       {isOpen && (
-                        <ul className="ml-[22px] mt-0.5 space-y-0.5 border-l border-border/60 pl-3">
+                        <ul className="ml-5.5 mt-0.5 space-y-0.5 border-l border-border/60 pl-3">
                           {item.children.map((child) => {
                             const active = isChildActive(pathname, child.href)
                             return (
@@ -272,7 +272,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                                   href={child.href}
                                   onClick={() => setOpen(false)}
                                   className={cx(
-                                    "flex items-center rounded-[8px] px-3 py-1.5 text-[13px] font-normal transition",
+                                    "flex items-center rounded-sm px-3 py-1.5 text-[13px] font-normal transition",
                                     active
                                       ? "bg-white text-[#202125] shadow-sm"
                                       : "text-muted-foreground hover:text-foreground",

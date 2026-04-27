@@ -26,8 +26,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background">
-      <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-6 py-8">
+    <div className="min-h-dvh bg-background">
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-6 flex flex-col items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#306FD7] text-lg font-bold text-white">

@@ -40,7 +40,7 @@ const socials = [
 export function SiteFooter() {
   return (
     <footer className="mt-10 border-t border-border/60 bg-card">
-      <div className="mx-auto w-full max-w-[1280px] px-4 py-10 md:px-6">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-4">

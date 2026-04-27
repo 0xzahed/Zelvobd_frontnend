@@ -28,7 +28,7 @@ export function CategoriesSection() {
       <div className="hidden md:block">
         <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
           {categories.map((c) => (
-            <div key={c.id} className="w-[110px] shrink-0 lg:w-[120px]">
+            <div key={c.id} className="w-27.5 shrink-0 lg:w-30">
               <CategoryCard category={c} />
             </div>
           ))}

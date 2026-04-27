@@ -16,7 +16,7 @@ export default async function CheckoutSuccessPage({
       <div className="mx-auto flex max-w-md flex-col items-center gap-5 py-8 text-center md:py-16">
         {/* Animated success tick */}
         <div className="relative">
-          <div className="absolute inset-0 -z-0 animate-ping rounded-full bg-[#22C55E]/30" />
+          <div className="absolute inset-0 z-0 animate-ping rounded-full bg-[#22C55E]/30" />
           <div className="relative grid h-20 w-20 place-items-center rounded-full bg-[#22C55E] text-white">
             <Check className="h-10 w-10" strokeWidth={3} />
           </div>

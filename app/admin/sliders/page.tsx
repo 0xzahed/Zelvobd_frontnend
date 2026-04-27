@@ -102,7 +102,7 @@ export default function AdminSliders() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <div className="min-w-[560px]">
+          <div className="min-w-140">
           <div className="grid grid-cols-[90px_1fr_120px] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
             <div>Image</div>
             <div>Title</div>
@@ -220,7 +220,7 @@ export default function AdminSliders() {
                     className="sr-only"
                     onChange={(e) => handleImagePick(e.target.files?.[0])}
                   />
-                  <div className="relative grid min-h-[140px] place-items-center rounded-md border-2 border-dashed border-[#306FD7] bg-[#EEF0FB]/60 p-4 transition hover:bg-[#EEF0FB]">
+                  <div className="relative grid min-h-35 place-items-center rounded-md border-2 border-dashed border-[#306FD7] bg-[#EEF0FB]/60 p-4 transition hover:bg-[#EEF0FB]">
                     {draft.image ? (
                       <div className="relative h-full w-full">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -252,7 +252,7 @@ export default function AdminSliders() {
               <div className="flex justify-center pt-2">
                 <button
                   type="submit"
-                  className="inline-flex h-10 min-w-[120px] items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9]"
+                  className="inline-flex h-10 min-w-30 items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9]"
                 >
                   Submit
                 </button>
