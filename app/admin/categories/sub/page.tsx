@@ -35,7 +35,7 @@ export default function AdminSubCategoriesPage() {
   const imgInputRef = useRef<HTMLInputElement>(null)
 
   // This will fetch subcategories for the selected category automatically
-  useSubCategories(selectedCategoryId, { enabled: Boolean(selectedCategoryId) })
+  const { data: subCategories = [], isLoading: isLoadingSubs } = useSubCategories(selectedCategoryId, { enabled: Boolean(selectedCategoryId) })
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -63,22 +63,13 @@ export default function AdminSubCategoriesPage() {
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase()
-    let subs = categories.flatMap((c) =>
-      (c.subCategories || []).map((s) => ({
-        ...s,
-        parentId: c.id,
-        parentName: c.name,
-        parentSlug: c.slug,
-      })),
-    )
-    if (selectedCategoryId) {
-      subs = subs.filter((s) => s.parentId === selectedCategoryId)
-    }
+    let subs = subCategories
+    
     if (q) {
       subs = subs.filter((s) => s.name.toLowerCase().includes(q))
     }
     return subs
-  }, [categories, query, selectedCategoryId])
+  }, [subCategories, query])
 
   const resetForm = () => {
     setName("")
@@ -202,7 +193,9 @@ export default function AdminSubCategoriesPage() {
           <ul className="divide-y divide-border/60">
             {rows.length === 0 && (
               <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-                {selectedCategoryId
+                {isLoadingSubs
+                  ? "Loading sub-categories..."
+                  : selectedCategoryId
                   ? "No sub-categories in this category yet."
                   : "No categories found. Create a category first."}
               </li>

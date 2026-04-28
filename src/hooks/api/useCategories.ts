@@ -52,14 +52,14 @@ export function useSubCategories(categoryId: string, options?: { enabled?: boole
       const res = await getSubCategories({ limit: 100, categoryId })
       const subCategoryList: any[] = (res?.data?.subCategories || []).map(mapSubCategory)
       
-      const mappedSubCategories: Category["subCategories"] = subCategoryList.map((sub) => ({
+      return subCategoryList.map((sub) => ({
         id: sub.id,
         name: sub.name,
         slug: sub.slug,
         image: sub.image,
+        parentId: sub.categoryId || categoryId,
+        parentName: sub.categoryName || "",
       }))
-      
-      return mappedSubCategories
     },
     ...options,
   })
