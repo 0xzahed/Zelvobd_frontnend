@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import { Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useAdminStore } from "@/lib/admin-store"
@@ -8,6 +8,7 @@ import type { Category } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { getCategoryDetails } from "@/src/api/categoryApi"
+import { toAbsoluteUrl, handleApiError } from "@/lib/api-utils"
 
 type CategoryDetails = {
   id: string
@@ -18,30 +19,9 @@ type CategoryDetails = {
   updatedAt?: string
 }
 
-const BASE_API =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  process.env.VITE_API_BASE_URL ||
-  "http://localhost:5000/api/v1"
-
-const toAbsoluteUploadUrl = (path: string | null | undefined) => {
-  if (!path) return "/placeholder.svg"
-  if (path.startsWith("http")) return path
-  return `${BASE_API.replace(/\/api\/v1$/, "")}${path}`
-}
-
 export default function AdminCategoriesPage() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useAdminStore()
+  const { categories, addCategory, updateCategory, deleteCategory, loadCategories } = useAdminStore()
   const confirm = useConfirm()
-
-  const handleDelete = async (cat: Category) => {
-    const ok = await confirm({
-      title: "Delete category?",
-      message: `Are you sure you want to delete "${cat.name}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      variant: "danger",
-    })
-    if (ok) deleteCategory(cat.id)
-  }
 
   const [query, setQuery] = useState("")
   const [showModal, setShowModal] = useState(false)
@@ -54,6 +34,20 @@ export default function AdminCategoriesPage() {
   const [name, setName] = useState("")
   const [image, setImage] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    void loadCategories()
+  }, [loadCategories])
+
+  const handleDelete = async (cat: Category) => {
+    const ok = await confirm({
+      title: "Delete category?",
+      message: `Are you sure you want to delete "${cat.name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    if (ok) deleteCategory(cat.id)
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -98,15 +92,12 @@ export default function AdminCategoriesPage() {
         id: String(details.id),
         title: String(details.title || cat.name),
         slug: String(details.slug || cat.slug),
-        imageUrl: toAbsoluteUploadUrl(details.imageUrl || cat.image),
+        imageUrl: toAbsoluteUrl(details.imageUrl || cat.image),
         createdAt: details.createdAt ? String(details.createdAt) : undefined,
         updatedAt: details.updatedAt ? String(details.updatedAt) : undefined,
       })
     } catch (error) {
-      notify.error({
-        title: "Failed to load category",
-        message: getErrorMessage(error),
-      })
+      handleApiError(error, "Failed to load category")
       setViewOpen(false)
     } finally {
       setViewLoading(false)
@@ -211,22 +202,24 @@ export default function AdminCategoriesPage() {
               >
                 <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
                   <Image
-                    src={cat.image || "/placeholder.svg"}
+                    src={toAbsoluteUrl(cat.image)}
                     alt={cat.name}
                     width={40}
                     height={40}
                     className="h-full w-full object-cover"
+                    unoptimized
                   />
                 </div>
 
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
                     <Image
-                      src={cat.image || "/placeholder.svg"}
+                      src={toAbsoluteUrl(cat.image)}
                       alt=""
                       width={36}
                       height={36}
                       className="h-full w-full object-cover"
+                      unoptimized
                     />
                   </div>
                   <p className="truncate text-sm text-foreground">{cat.name}</p>
@@ -319,7 +312,7 @@ export default function AdminCategoriesPage() {
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={image || "/placeholder.svg"}
+                    src={toAbsoluteUrl(image)}
                     alt="Preview"
                     className="h-28 w-full object-contain"
                   />
@@ -395,15 +388,15 @@ export default function AdminCategoriesPage() {
                   </p>
                   <p className="text-muted-foreground">
                     <span className="mr-2 font-semibold text-foreground">Created:</span>
-                    {viewCategory.createdAt
+                      {viewCategory.createdAt
                       ? new Date(viewCategory.createdAt).toLocaleString()
-                      : "N/A"}
+                        : "N/A"}
                   </p>
                   <p className="text-muted-foreground">
                     <span className="mr-2 font-semibold text-foreground">Updated:</span>
-                    {viewCategory.updatedAt
+                      {viewCategory.updatedAt
                       ? new Date(viewCategory.updatedAt).toLocaleString()
-                      : "N/A"}
+                        : "N/A"}
                   </p>
                 </div>
               </div>
@@ -413,14 +406,4 @@ export default function AdminCategoriesPage() {
       )}
     </div>
   )
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error && typeof error === "object") {
-    const maybe = error as { message?: unknown; error?: unknown }
-    if (typeof maybe.message === "string" && maybe.message.trim()) return maybe.message
-    if (typeof maybe.error === "string" && maybe.error.trim()) return maybe.error
-  }
-
-  return "Please try again."
 }

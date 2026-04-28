@@ -4,12 +4,10 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react"
-import { usePathname } from "next/navigation"
 import { notify } from "@/lib/notify"
 import type { Category, Product, ProductVariant, Slider, SubCategory } from "@/lib/types"
 import {
@@ -32,6 +30,7 @@ import { createBanner as createBannerApi } from "@/src/api/banner/createBanner"
 import { updateBanner as updateBannerApi } from "@/src/api/banner/updateBanner"
 import { deleteBanner as deleteBannerApi } from "@/src/api/banner/deleteBanner"
 import { mapBanner, mapCategory, mapProduct, mapSubCategory } from "@/src/api/_shared/mappers"
+import { fileFromUrl, handleApiError } from "@/lib/api-utils"
 
 type AdminStore = {
   categories: Category[]
@@ -60,111 +59,84 @@ type AdminStore = {
 const AdminContext = createContext<AdminStore | null>(null)
 
 export function AdminDataProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [sliders, setSliders] = useState<Slider[]>([])
 
   const loadCategories = useCallback(async () => {
-    const categoriesRes = await getCategories({ limit: 100 })
-    const categoryList: Category[] = (categoriesRes?.data?.categories || []).map(mapCategory)
+    try {
+      const categoriesRes = await getCategories({ limit: 100 })
+      const categoryList: Category[] = (categoriesRes?.data?.categories || []).map(mapCategory)
 
-    setCategories((prev) => {
-      const previousSubCategoriesByCategoryId = new Map<string, Category["subCategories"]>()
-      for (const category of prev) {
-        previousSubCategoriesByCategoryId.set(category.id, category.subCategories || [])
-      }
+      setCategories((prev) => {
+        const previousSubCategoriesByCategoryId = new Map<string, Category["subCategories"]>()
+        for (const category of prev) {
+          previousSubCategoriesByCategoryId.set(category.id, category.subCategories || [])
+        }
 
-      return categoryList.map((category) => ({
-        ...category,
-        subCategories: previousSubCategoriesByCategoryId.get(category.id) || [],
-      }))
-    })
+        return categoryList.map((category) => ({
+          ...category,
+          subCategories: previousSubCategoriesByCategoryId.get(category.id) || [],
+        }))
+      })
+    } catch (error) {
+      handleApiError(error, "Failed to load categories")
+    }
   }, [])
 
   const loadSubCategoriesByCategory = useCallback(async (categoryId: string) => {
     if (!categoryId) return
 
-    const subCategoriesRes = await getSubCategories({ limit: 100, categoryId })
-    const subCategoryList: Array<{
-      id: string
-      categoryId: string
-      name: string
-      slug: string
-      image: string
-    }> = (subCategoriesRes?.data?.subCategories || []).map(mapSubCategory)
+    try {
+      const subCategoriesRes = await getSubCategories({ limit: 100, categoryId })
+      const subCategoryList: any[] = (subCategoriesRes?.data?.subCategories || []).map(mapSubCategory)
 
-    const mappedSubCategories: Category["subCategories"] = subCategoryList.map((sub) => ({
-      id: sub.id,
-      name: sub.name,
-      slug: sub.slug,
-      image: sub.image,
-    }))
+      const mappedSubCategories: Category["subCategories"] = subCategoryList.map((sub) => ({
+        id: sub.id,
+        name: sub.name,
+        slug: sub.slug,
+        image: sub.image,
+      }))
 
-    setCategories((prev) =>
-      prev.map((category) =>
-        category.id === categoryId
-          ? {
-              ...category,
-              subCategories: mappedSubCategories,
-            }
-          : category,
-      ),
-    )
+      setCategories((prev) =>
+        prev.map((category) =>
+          category.id === categoryId
+            ? {
+                ...category,
+                subCategories: mappedSubCategories,
+              }
+            : category,
+        ),
+      )
+    } catch (error) {
+      handleApiError(error, "Failed to load sub-categories")
+    }
   }, [])
 
   const loadProducts = useCallback(async () => {
-    const productsRes = await getProducts({ limit: 100 })
-    setProducts((productsRes?.data?.products || []).map(mapProduct))
+    try {
+      const productsRes = await getProducts({ limit: 100 })
+      setProducts((productsRes?.data?.products || []).map(mapProduct))
+    } catch (error) {
+      handleApiError(error, "Failed to load products")
+    }
   }, [])
 
   const loadSliders = useCallback(async () => {
-    const bannersRes = await getBanners()
-    setSliders((bannersRes?.data || []).map(mapBanner))
-  }, [])
-
-  useEffect(() => {
-    const hydrateRouteData = async () => {
-      try {
-        if (pathname === "/admin") {
-          return
-        }
-
-        if (pathname.startsWith("/admin/sliders")) {
-          await loadSliders()
-          return
-        }
-
-        if (pathname.startsWith("/admin/categories")) {
-          await loadCategories()
-          return
-        }
-
-        if (pathname.startsWith("/admin/products")) {
-          await loadCategories()
-          await loadProducts()
-          return
-        }
-
-        if (pathname.startsWith("/admin/trending") || pathname.startsWith("/admin/free-delivery")) {
-          await loadCategories()
-          await loadProducts()
-          return
-        }
-      } catch (error) {
-        notify.error({ title: "Failed to load data", message: getErrorMessage(error) })
-      }
+    try {
+      const bannersRes = await getBanners()
+      setSliders((bannersRes?.data || []).map(mapBanner))
+    } catch (error) {
+      handleApiError(error, "Failed to load sliders")
     }
-
-    void hydrateRouteData()
-  }, [pathname, loadCategories, loadProducts, loadSliders])
+  }, [])
 
   const runApiAction = (action: () => Promise<void>) => {
     void (async () => {
       try {
         await action()
       } catch (error) {
-        notify.error({ title: "Request failed", message: getErrorMessage(error) })
+        handleApiError(error)
       }
     })()
   }
@@ -179,7 +151,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
       await createCategoryApi(formData)
       await loadCategories()
-      notify.success({ title: "Category added", message: `"${c.name}" was added successfully.` })
+      notify.success({ title: "Success", message: `Category "${c.name}" added.` })
     })
   }
 
@@ -193,7 +165,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
       await updateCategoryApi(id, formData)
       await loadCategories()
-      notify.success({ title: "Category updated", message: "Your changes have been saved." })
+      notify.success({ title: "Updated", message: "Category changes saved." })
     })
   }
 
@@ -201,7 +173,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     runApiAction(async () => {
       await deleteCategoryApi(id)
       await loadCategories()
-      notify.success({ title: "Category deleted", message: "Category was removed." })
+      notify.success({ title: "Deleted", message: "Category removed." })
     })
   }
 
@@ -216,7 +188,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
       await createSubCategoryApi(formData)
       await loadSubCategoriesByCategory(categoryId)
-      notify.success({ title: "Sub-category added", message: `"${sub.name}" is now available.` })
+      notify.success({ title: "Success", message: `Sub-category "${sub.name}" added.` })
     })
   }
 
@@ -234,7 +206,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       } else {
         await loadCategories()
       }
-      notify.success({ title: "Sub-category updated", message: "Your changes have been saved." })
+      notify.success({ title: "Updated", message: "Sub-category changes saved." })
     })
   }
 
@@ -246,7 +218,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       } else {
         await loadCategories()
       }
-      notify.success({ title: "Sub-category deleted", message: "The sub-category was removed." })
+      notify.success({ title: "Deleted", message: "Sub-category removed." })
     })
   }
 
@@ -255,7 +227,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const formData = await buildProductFormData(p, categories)
       await createProductApi(formData)
       await loadProducts()
-      notify.success({ title: "Product added", message: `"${p.name}" was added successfully.` })
+      notify.success({ title: "Success", message: `Product "${p.name}" added.` })
     })
   }
 
@@ -268,7 +240,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const formData = await buildProductFormData(merged, categories)
       await updateProductApi(id, formData)
       await loadProducts()
-      notify.success({ title: "Product updated", message: "Your changes have been saved." })
+      notify.success({ title: "Updated", message: "Product changes saved." })
     })
   }
 
@@ -276,7 +248,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     runApiAction(async () => {
       await deleteProductApi(id)
       await loadProducts()
-      notify.success({ title: "Product deleted", message: "Product was removed." })
+      notify.success({ title: "Deleted", message: "Product removed." })
     })
   }
 
@@ -301,7 +273,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         await createProductApi(formData)
       }
       await loadProducts()
-      notify.success({ title: "Product duplicated", message: "Copied product successfully." })
+      notify.success({ title: "Success", message: "Product duplicated." })
     })
   }
 
@@ -317,7 +289,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
       await createBannerApi(formData)
       await loadSliders()
-      notify.success({ title: "Banner added", message: `"${s.title}" is now in the slider.` })
+      notify.success({ title: "Success", message: "Banner added to slider." })
     })
   }
 
@@ -332,7 +304,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
       await updateBannerApi(id, formData)
       await loadSliders()
-      notify.success({ title: "Banner updated", message: "Your changes have been saved." })
+      notify.success({ title: "Updated", message: "Banner changes saved." })
     })
   }
 
@@ -340,7 +312,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     runApiAction(async () => {
       await deleteBannerApi(id)
       await loadSliders()
-      notify.success({ title: "Banner deleted", message: "Banner was removed." })
+      notify.success({ title: "Deleted", message: "Banner removed." })
     })
   }
 
@@ -390,6 +362,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
 }
 
+/**
+ * INTERNAL HELPERS (Should eventually move to lib/api-utils.ts if used outside)
+ */
+
 const toQuillDelta = (text: string) => ({
   ops: [{ insert: `${text || "N/A"}\n` }],
 })
@@ -417,70 +393,6 @@ const toHtml = (text: string) => {
     .replace(/\n/g, "<br/>")
 
   return `<p>${safe}</p>`
-}
-
-const fileFromUrl = async (url: string, fallbackName: string): Promise<File | null> => {
-  if (!url) return null
-  try {
-    // Handle data URLs (base64 images from file uploads)
-    if (url.startsWith("data:")) {
-      const [header, base64] = url.split(",")
-      if (!base64) return null
-      const mimeMatch = header.match(/:(.*?);/)
-      const mimeType = mimeMatch ? mimeMatch[1] : "image/png"
-      const byteCharacters = atob(base64)
-      const byteNumbers = new Array(byteCharacters.length)
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-      }
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: mimeType })
-      const ext = mimeType.includes("png")
-        ? "png"
-        : mimeType.includes("webp")
-          ? "webp"
-          : mimeType.includes("jpeg") || mimeType.includes("jpg")
-            ? "jpg"
-            : "bin"
-      return new File([blob], `${fallbackName}.${ext}`, { type: mimeType })
-    }
-
-    // Handle regular URLs
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const blob = await res.blob()
-    const ext = blob.type.includes("png")
-      ? "png"
-      : blob.type.includes("webp")
-        ? "webp"
-        : blob.type.includes("jpeg") || blob.type.includes("jpg")
-          ? "jpg"
-          : "bin"
-    return new File([blob], `${fallbackName}.${ext}`, { type: blob.type || "application/octet-stream" })
-  } catch {
-    return null
-  }
-}
-
-const getErrorMessage = (error: unknown): string => {
-  if (error && typeof error === "object") {
-    const maybe = error as { message?: unknown; error?: unknown }
-    const message =
-      (typeof maybe.message === "string" && maybe.message.trim() ? maybe.message : "") ||
-      (typeof maybe.error === "string" && maybe.error.trim() ? maybe.error : "")
-
-    if (message) {
-      const normalized = message.toLowerCase()
-      if (
-        normalized.includes("unique constraint failed") &&
-        (normalized.includes("title") || normalized.includes("category"))
-      ) {
-        return "Category name already exists. Please use a different name."
-      }
-      return message
-    }
-  }
-  return "Please try again."
 }
 
 const resolveVariantColorSize = (product: Product, variant: ProductVariant) => {

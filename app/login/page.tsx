@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { notify } from "@/lib/notify"
+import { handleApiError } from "@/lib/api-utils"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -34,20 +35,13 @@ export default function LoginPage() {
     try {
       await loginAdmin(email, password)
       notify.success({
-        title: "Welcome back",
-        message: "Admin login successful.",
-        success: true,
+        title: "Access Granted",
+        message: "Logged in as administrator.",
       })
       router.push("/admin")
     } catch (authError) {
-      const message =
-        (authError as { message?: string })?.message || "Invalid credentials. Please try again."
+      const message = handleApiError(authError, "Login Failed")
       setError(message)
-      notify.error({
-        title: "Login failed",
-        message,
-        error: String(message),
-      })
     } finally {
       setLoading(false)
     }

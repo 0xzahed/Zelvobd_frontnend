@@ -6,6 +6,7 @@ import { createAdmin, deleteAdmin, getAdmins, updateAdmin } from "@/src/api/admi
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { useAuth } from "@/contexts/auth-context"
+import { handleApiError } from "@/lib/api-utils"
 
 type AdminUser = {
   id: string
@@ -78,7 +79,7 @@ export default function AdminsPage() {
         }),
       )
     } catch (error) {
-      notify.error({ title: "Failed to load admins", message: getErrorMessage(error) })
+      handleApiError(error, "Failed to load admins")
     } finally {
       setLoading(false)
     }
@@ -131,7 +132,7 @@ export default function AdminsPage() {
       await loadAdmins()
       setOpen(false)
     } catch (error) {
-      notify.error({ title: "Save failed", message: getErrorMessage(error) })
+      handleApiError(error, "Save failed")
     } finally {
       setSaving(false)
     }
@@ -161,7 +162,7 @@ export default function AdminsPage() {
         notify.success({ title: "Admin deleted", message: "Admin removed successfully." })
         await loadAdmins()
       } catch (error) {
-        notify.error({ title: "Delete failed", message: getErrorMessage(error) })
+        handleApiError(error, "Delete failed")
       }
     }
   }
@@ -181,7 +182,7 @@ export default function AdminsPage() {
       await updateAdmin(id, { isActive: !target.active })
       await loadAdmins()
     } catch (error) {
-      notify.error({ title: "Status update failed", message: getErrorMessage(error) })
+      handleApiError(error, "Status update failed")
     }
   }
 
@@ -319,13 +320,13 @@ export default function AdminsPage() {
                 />
               </div>
               <label className="flex items-center gap-2 text-sm text-foreground">
-                <input
-                  type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
-                />
+                    <input
+                      type="checkbox"
+                      checked={form.active}
+                      onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
+                    />
                 Active
-              </label>
+                </label>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
@@ -348,13 +349,4 @@ export default function AdminsPage() {
       )}
     </div>
   )
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error && typeof error === "object") {
-    const maybe = error as { message?: unknown; error?: unknown }
-    if (typeof maybe.message === "string" && maybe.message.trim()) return maybe.message
-    if (typeof maybe.error === "string" && maybe.error.trim()) return maybe.error
-  }
-  return "Please try again."
 }

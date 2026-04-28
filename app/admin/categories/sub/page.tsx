@@ -8,6 +8,7 @@ import type { SubCategory } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { AdminSelect } from "@/components/admin/admin-select"
+import { toAbsoluteUrl, handleApiError } from "@/lib/api-utils"
 
 export default function AdminSubCategoriesPage() {
   const {
@@ -15,19 +16,10 @@ export default function AdminSubCategoriesPage() {
     addSubCategory,
     updateSubCategory,
     deleteSubCategory,
+    loadCategories,
     loadSubCategoriesByCategory,
   } = useAdminStore()
   const confirm = useConfirm()
-
-  const handleDeleteSub = async (parentId: string, sub: SubCategory) => {
-    const ok = await confirm({
-      title: "Delete sub-category?",
-      message: `Are you sure you want to delete "${sub.name}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      variant: "danger",
-    })
-    if (ok) deleteSubCategory(parentId, sub.id)
-  }
 
   const [query, setQuery] = useState("")
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("")
@@ -39,6 +31,10 @@ export default function AdminSubCategoriesPage() {
   const [image, setImage] = useState<string>("")
   const [parentCategoryId, setParentCategoryId] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    void loadCategories()
+  }, [loadCategories])
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -57,10 +53,20 @@ export default function AdminSubCategoriesPage() {
     void loadSubCategoriesByCategory(selectedCategoryId)
   }, [selectedCategoryId, loadSubCategoriesByCategory])
 
+  const handleDeleteSub = async (parentId: string, sub: SubCategory) => {
+    const ok = await confirm({
+      title: "Delete sub-category?",
+      message: `Are you sure you want to delete "${sub.name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      variant: "danger",
+    })
+    if (ok) deleteSubCategory(parentId, sub.id)
+  }
+
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase()
     let subs = categories.flatMap((c) =>
-      c.subCategories.map((s) => ({
+      (c.subCategories || []).map((s) => ({
         ...s,
         parentId: c.id,
         parentName: c.name,
@@ -206,22 +212,24 @@ export default function AdminSubCategoriesPage() {
               >
                 <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
                   <Image
-                    src={sub.image || "/placeholder.svg"}
+                    src={toAbsoluteUrl(sub.image)}
                     alt={sub.name}
                     width={40}
                     height={40}
                     className="h-full w-full object-cover"
+                    unoptimized
                   />
                 </div>
 
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
                     <Image
-                      src={sub.image || "/placeholder.svg"}
+                      src={toAbsoluteUrl(sub.image)}
                       alt=""
                       width={36}
                       height={36}
                       className="h-full w-full object-cover"
+                      unoptimized
                     />
                   </div>
                   <p className="truncate text-sm text-foreground">{sub.name}</p>
@@ -322,7 +330,7 @@ export default function AdminSubCategoriesPage() {
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={image || "/placeholder.svg"}
+                    src={toAbsoluteUrl(image)}
                     alt="Preview"
                     className="h-28 w-full object-contain"
                   />
