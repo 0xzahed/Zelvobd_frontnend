@@ -3,21 +3,37 @@
 import { useState } from "react"
 import Image from "next/image"
 import { ImagePlus, Link2, Pencil, Plus, Trash2, X } from "lucide-react"
-import { useAdminStore } from "@/lib/admin-store"
 import type { Slider } from "@/lib/types"
 import { useConfirm } from "@/components/ui/confirm-dialog"
+import { AdminSelect } from "@/components/admin/admin-select"
+import { notify } from "@/lib/notify"
+import { useCategories } from "@/src/hooks/api/useCategories"
+import {
+  useBanners,
+  useCreateBanner,
+  useUpdateBanner,
+  useDeleteBanner,
+} from "@/src/hooks/api/useBanners"
 
 type Draft = {
   id?: string
   title: string
   link: string
   image: string
+  categoryId: string
+  inHomePage: boolean
 }
 
-const emptyDraft: Draft = { title: "", link: "", image: "" }
+const emptyDraft: Draft = { title: "", link: "", image: "", categoryId: "", inHomePage: true }
 
 export default function AdminSliders() {
-  const { sliders, addSlider, updateSlider, deleteSlider } = useAdminStore()
+  const { data: sliders = [], isLoading: isLoadingBanners } = useBanners()
+  const { data: categories = [] } = useCategories()
+
+  const createMutation = useCreateBanner()
+  const updateMutation = useUpdateBanner()
+  const deleteMutation = useDeleteBanner()
+
   const confirm = useConfirm()
 
   const handleDeleteSlider = async (s: Slider) => {
@@ -27,7 +43,7 @@ export default function AdminSliders() {
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) deleteSlider(s.id)
+    if (ok) deleteMutation.mutate(s.id)
   }
 
   const [open, setOpen] = useState(false)
@@ -39,12 +55,14 @@ export default function AdminSliders() {
     setOpen(true)
   }
 
-  const openEdit = (s: Slider) => {
+  const openEdit = (s: Slider & { categoryId?: string, inHomePage?: boolean }) => {
     setDraft({
       id: s.id,
       title: s.title || "",
       link: s.link || "",
       image: typeof s.image === "string" ? s.image : "",
+      categoryId: s.categoryId || "",
+      inHomePage: s.inHomePage ?? true,
     })
     setOpen(true)
   }
@@ -58,26 +76,51 @@ export default function AdminSliders() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (editing && draft.id) {
-      updateSlider(draft.id, {
-        title: draft.title,
-        link: draft.link,
-        image: draft.image || undefined,
-      })
-    } else {
-      const newSlider: Slider = {
-        id: `slider-${Date.now()}`,
-        title: draft.title,
-        subtitle: "",
-        cta: "Shop Now",
-        link: draft.link,
-        image: draft.image || "/placeholder.svg",
-        bg: "#306FD7",
-      }
-      addSlider(newSlider)
+
+    if (!draft.categoryId) {
+      notify.error({ title: "Validation Error", message: "Please select a category." })
+      return
     }
-    setOpen(false)
-    setDraft(emptyDraft)
+
+    if (!editing && !draft.image) {
+      notify.error({ title: "Validation Error", message: "Please upload an image." })
+      return
+    }
+
+    if (editing && draft.id) {
+      updateMutation.mutate(
+        {
+          id: draft.id,
+          title: draft.title,
+          url: draft.link,
+          categoryId: draft.categoryId,
+          image: draft.image,
+          inHomePage: draft.inHomePage,
+        },
+        {
+          onSuccess: () => {
+            setOpen(false)
+            setDraft(emptyDraft)
+          },
+        }
+      )
+    } else {
+      createMutation.mutate(
+        {
+          title: draft.title,
+          url: draft.link,
+          categoryId: draft.categoryId,
+          image: draft.image,
+          inHomePage: draft.inHomePage,
+        },
+        {
+          onSuccess: () => {
+            setOpen(false)
+            setDraft(emptyDraft)
+          },
+        }
+      )
+    }
   }
 
   return (
@@ -102,21 +145,26 @@ export default function AdminSliders() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <div className="min-w-140">
-          <div className="grid grid-cols-[90px_1fr_120px] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
+          <div className="min-w-125">
+          <div className="grid grid-cols-[90px_1fr_100px_120px] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
             <div>Image</div>
-            <div>Title</div>
+            <div className="text-left pl-2">Title</div>
+            <div>Home Page</div>
             <div>Action</div>
           </div>
-          {sliders.length === 0 ? (
+          {isLoadingBanners ? (
+            <div className="py-16 text-center text-sm text-muted-foreground">
+              Loading banners...
+            </div>
+          ) : sliders.length === 0 ? (
             <div className="py-16 text-center text-sm text-muted-foreground">
               No banners added yet.
             </div>
           ) : (
-            sliders.map((s) => (
+            sliders.map((s: Slider & { categoryId?: string, inHomePage?: boolean }) => (
               <div
                 key={s.id}
-                className="grid grid-cols-[90px_1fr_120px] items-center gap-3 border-b border-border py-3 text-center text-sm"
+                className="grid grid-cols-[90px_1fr_100px_120px] items-center gap-3 border-b border-border py-3 text-center text-sm"
               >
                 <div className="flex justify-center">
                   <div className="relative h-14 w-14 overflow-hidden rounded-md bg-[#F5F6FA]">
@@ -127,6 +175,7 @@ export default function AdminSliders() {
                         fill
                         sizes="56px"
                         className="object-cover"
+                        unoptimized
                       />
                     ) : (
                       <div
@@ -136,7 +185,18 @@ export default function AdminSliders() {
                     )}
                   </div>
                 </div>
-                <div className="text-foreground">{s.title || "Untitled"}</div>
+                <div className="text-foreground text-left pl-2">{s.title || "Untitled"}</div>
+                <div>
+                  <span
+                    className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-tight ${
+                      s.inHomePage
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {s.inHomePage ? "Yes" : "No"}
+                  </span>
+                </div>
                 <div className="flex items-center justify-center gap-4">
                   <button
                     onClick={() => openEdit(s)}
@@ -188,6 +248,22 @@ export default function AdminSliders() {
             </div>
 
             <div className="space-y-4">
+              {/* Category */}
+              <div>
+                <AdminSelect
+                  value={draft.categoryId}
+                  onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
+                  disabled={categories.length === 0}
+                >
+                  <option value="">Select Category...</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </AdminSelect>
+              </div>
+
               {/* Title */}
               <input
                 type="text"
@@ -209,6 +285,17 @@ export default function AdminSliders() {
                   className="h-full w-full bg-transparent text-sm outline-none"
                 />
               </div>
+
+              {/* In Home Page Checkbox */}
+              <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={draft.inHomePage}
+                  onChange={(e) => setDraft({ ...draft, inHomePage: e.target.checked })}
+                  className="h-4 w-4 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+                />
+                Show on Home Page
+              </label>
 
               {/* Image Upload */}
               <div>
@@ -252,9 +339,10 @@ export default function AdminSliders() {
               <div className="flex justify-center pt-2">
                 <button
                   type="submit"
-                  className="inline-flex h-10 min-w-30 items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9]"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="inline-flex h-10 min-w-30 items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9] disabled:opacity-70"
                 >
-                  Submit
+                  {createMutation.isPending || updateMutation.isPending ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </div>
