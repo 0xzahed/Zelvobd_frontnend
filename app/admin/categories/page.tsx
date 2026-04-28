@@ -1,14 +1,19 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import { Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
-import { useAdminStore } from "@/lib/admin-store"
 import type { Category } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { getCategoryDetails } from "@/src/api/categoryApi"
 import { toAbsoluteUrl, handleApiError } from "@/lib/api-utils"
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from "@/src/hooks/api/useCategories"
 
 type CategoryDetails = {
   id: string
@@ -20,7 +25,11 @@ type CategoryDetails = {
 }
 
 export default function AdminCategoriesPage() {
-  const { categories, addCategory, updateCategory, deleteCategory, loadCategories } = useAdminStore()
+  const { data: categories = [] } = useCategories()
+  const createMutation = useCreateCategory()
+  const updateMutation = useUpdateCategory()
+  const deleteMutation = useDeleteCategory()
+
   const confirm = useConfirm()
 
   const [query, setQuery] = useState("")
@@ -35,10 +44,6 @@ export default function AdminCategoriesPage() {
   const [image, setImage] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    void loadCategories()
-  }, [loadCategories])
-
   const handleDelete = async (cat: Category) => {
     const ok = await confirm({
       title: "Delete category?",
@@ -46,7 +51,9 @@ export default function AdminCategoriesPage() {
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) deleteCategory(cat.id)
+    if (ok) {
+      deleteMutation.mutate(cat.id)
+    }
   }
 
   const filtered = useMemo(() => {
@@ -137,7 +144,7 @@ export default function AdminCategoriesPage() {
     const slug = n.toLowerCase().replace(/\s+/g, "-")
 
     if (editingId) {
-      updateCategory(editingId, { name: n, slug, image: image || undefined })
+      updateMutation.mutate({ id: editingId, data: { name: n, slug, image: image || undefined } })
     } else {
       const newCat: Category = {
         id: `cat-${Date.now()}`,
@@ -146,7 +153,7 @@ export default function AdminCategoriesPage() {
         image: image || "/placeholder.svg",
         subCategories: [],
       }
-      addCategory(newCat)
+      createMutation.mutate(newCat)
     }
     closeModal()
   }
@@ -202,24 +209,22 @@ export default function AdminCategoriesPage() {
               >
                 <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
                   <Image
-                    src={toAbsoluteUrl(cat.image)}
+                    src={cat.image || "/placeholder.svg"}
                     alt={cat.name}
                     width={40}
                     height={40}
                     className="h-full w-full object-cover"
-                    unoptimized
                   />
                 </div>
 
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
                     <Image
-                      src={toAbsoluteUrl(cat.image)}
+                      src={cat.image || "/placeholder.svg"}
                       alt=""
                       width={36}
                       height={36}
                       className="h-full w-full object-cover"
-                      unoptimized
                     />
                   </div>
                   <p className="truncate text-sm text-foreground">{cat.name}</p>
@@ -312,7 +317,7 @@ export default function AdminCategoriesPage() {
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={toAbsoluteUrl(image)}
+                    src={image || "/placeholder.svg"}
                     alt="Preview"
                     className="h-28 w-full object-contain"
                   />

@@ -3,22 +3,24 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
-import { useAdminStore } from "@/lib/admin-store"
 import type { SubCategory } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { AdminSelect } from "@/components/admin/admin-select"
-import { toAbsoluteUrl, handleApiError } from "@/lib/api-utils"
+import {
+  useCategories,
+  useSubCategories,
+  useCreateSubCategory,
+  useUpdateSubCategory,
+  useDeleteSubCategory,
+} from "@/src/hooks/api/useCategories"
 
 export default function AdminSubCategoriesPage() {
-  const {
-    categories,
-    addSubCategory,
-    updateSubCategory,
-    deleteSubCategory,
-    loadCategories,
-    loadSubCategoriesByCategory,
-  } = useAdminStore()
+  const { data: categories = [] } = useCategories()
+  const createMutation = useCreateSubCategory()
+  const updateMutation = useUpdateSubCategory()
+  const deleteMutation = useDeleteSubCategory()
+
   const confirm = useConfirm()
 
   const [query, setQuery] = useState("")
@@ -32,9 +34,8 @@ export default function AdminSubCategoriesPage() {
   const [parentCategoryId, setParentCategoryId] = useState<string>("")
   const imgInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    void loadCategories()
-  }, [loadCategories])
+  // This will fetch subcategories for the selected category automatically
+  useSubCategories(selectedCategoryId, { enabled: Boolean(selectedCategoryId) })
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -48,11 +49,6 @@ export default function AdminSubCategoriesPage() {
     }
   }, [categories, selectedCategoryId])
 
-  useEffect(() => {
-    if (!selectedCategoryId) return
-    void loadSubCategoriesByCategory(selectedCategoryId)
-  }, [selectedCategoryId, loadSubCategoriesByCategory])
-
   const handleDeleteSub = async (parentId: string, sub: SubCategory) => {
     const ok = await confirm({
       title: "Delete sub-category?",
@@ -60,7 +56,9 @@ export default function AdminSubCategoriesPage() {
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) deleteSubCategory(parentId, sub.id)
+    if (ok) {
+      deleteMutation.mutate({ categoryId: parentId, subId: sub.id })
+    }
   }
 
   const rows = useMemo(() => {
@@ -131,7 +129,11 @@ export default function AdminSubCategoriesPage() {
     }
 
     if (editingId && editingParentId) {
-      updateSubCategory(editingParentId, editingId, { name: n, image: image || undefined })
+      updateMutation.mutate({
+        categoryId: editingParentId,
+        subId: editingId,
+        data: { name: n, image: image || undefined },
+      })
     } else {
       const slug = n.toLowerCase().replace(/\s+/g, "-")
       const newSub: SubCategory = {
@@ -140,7 +142,7 @@ export default function AdminSubCategoriesPage() {
         slug,
         image: image || "/placeholder.svg",
       }
-      addSubCategory(parentCategoryId, newSub)
+      createMutation.mutate({ categoryId: parentCategoryId, sub: newSub })
     }
     closeModal()
   }
@@ -212,24 +214,22 @@ export default function AdminSubCategoriesPage() {
               >
                 <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
                   <Image
-                    src={toAbsoluteUrl(sub.image)}
+                    src={sub.image || "/placeholder.svg"}
                     alt={sub.name}
                     width={40}
                     height={40}
                     className="h-full w-full object-cover"
-                    unoptimized
                   />
                 </div>
 
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
                     <Image
-                      src={toAbsoluteUrl(sub.image)}
+                      src={sub.image || "/placeholder.svg"}
                       alt=""
                       width={36}
                       height={36}
                       className="h-full w-full object-cover"
-                      unoptimized
                     />
                   </div>
                   <p className="truncate text-sm text-foreground">{sub.name}</p>
@@ -330,7 +330,7 @@ export default function AdminSubCategoriesPage() {
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={toAbsoluteUrl(image)}
+                    src={image || "/placeholder.svg"}
                     alt="Preview"
                     className="h-28 w-full object-contain"
                   />
