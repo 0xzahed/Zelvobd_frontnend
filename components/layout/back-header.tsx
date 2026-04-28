@@ -15,7 +15,7 @@ export function BackHeader({ title, right }: { title: string; right?: ReactNode 
       >
         <ArrowLeft className="h-4 w-4" />
       </button>
-      <h1 className="text-base font-bold text-foreground md:text-xl">{title}</h1>
+      <h1 className="text-base font-medium text-foreground md:text-xl">{title}</h1>
       <div className="h-10 w-10">{right}</div>
     </div>
   )

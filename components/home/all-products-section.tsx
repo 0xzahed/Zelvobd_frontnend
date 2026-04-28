@@ -14,7 +14,7 @@ export function AllProductsSection() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Package className="h-5 w-5 text-[#306FD7] md:h-6 md:w-6" />
-          <h2 className="text-base font-bold text-foreground md:text-xl">All Products</h2>
+          <h2 className="text-base font-medium text-foreground md:text-xl">All Products</h2>
         </div>
       </div>
 

@@ -28,7 +28,6 @@ import type { LucideIcon } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
-import { ProductCard } from "@/components/ui/product-card"
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -96,7 +95,7 @@ function WhatsAppFab({ number }: { number: string }) {
 
 const VISIBLE_THUMBS = 4
 
-export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
+export function ProductDetail({ product }: { product: Product }) {
   const router = useRouter()
   const { addItem } = useCart()
 
@@ -404,13 +403,13 @@ export function ProductDetail({ product, related }: { product: Product; related:
           <div className="hidden gap-3 md:flex">
             <button
               onClick={handleBuy}
-              className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-semibold text-[#306FD7]"
+              className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-medium text-[#306FD7]"
             >
               Buy Now
             </button>
             <button
               onClick={handleAdd}
-              className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-semibold text-white"
+              className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-medium text-white"
             >
               Add to Cart
             </button>
@@ -418,29 +417,17 @@ export function ProductDetail({ product, related }: { product: Product; related:
         </div>
       </div>
 
-      {/* Related */}
-      {related.length > 0 && (
-        <section className="mt-6 space-y-3 md:mt-10">
-          <h2 className="text-sm font-semibold text-foreground md:text-lg">You may also like</h2>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Mobile fixed bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-border/40 bg-card p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
         <button
           onClick={handleBuy}
-          className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-semibold text-[#306FD7]"
+          className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-medium text-[#306FD7]"
         >
           Buy Now
         </button>
         <button
           onClick={handleAdd}
-          className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-semibold text-white"
+          className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-medium text-white"
         >
           Add to Cart
         </button>

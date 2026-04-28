@@ -28,7 +28,7 @@ export default function TrendingPage() {
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-[#306FD7] md:h-6 md:w-6" />
-            <h2 className="text-base font-bold text-foreground md:text-xl">All Trending Products</h2>
+            <h2 className="text-base font-medium text-foreground md:text-xl">All Trending Products</h2>
           </div>
 
           {items.length > 0 ? (

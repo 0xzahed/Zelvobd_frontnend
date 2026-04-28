@@ -47,7 +47,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         {/* Sub-categories */}
         {category.subCategories.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-base font-bold text-foreground md:text-xl">Browse {category.name}</h2>
+            <h2 className="text-base font-medium text-foreground md:text-xl">Browse {category.name}</h2>
             <div className="grid grid-cols-3 gap-3 md:grid-cols-8 md:gap-2">
               {category.subCategories.map((sc) => (
                 <SubCategoryTile key={sc.id} categorySlug={category.slug} sub={sc} />
@@ -59,7 +59,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         {/* Products */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-foreground md:text-xl">All Products</h2>
+            <h2 className="text-base font-medium text-foreground md:text-xl">All Products</h2>
             <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>
           </div>
           {items.length > 0 ? (

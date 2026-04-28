@@ -14,7 +14,7 @@ export function CategoriesSection() {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-base font-bold text-foreground md:text-xl">Categories</h2>
+      <h2 className="text-base font-medium text-foreground md:text-xl">Categories</h2>
 
       {/* Mobile: 3-col grid; "More" tile only when there are more than 6 categories */}
       <div className="grid grid-cols-3 gap-3 md:hidden">

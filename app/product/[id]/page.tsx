@@ -23,11 +23,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const product = products.find((p) => p.id === id)
   if (!product) notFound()
 
-  const related = products.filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id).slice(0, 4)
-
   return (
     <AppShell>
-      <ProductDetail product={product} related={related} />
+      <ProductDetail product={product} />
     </AppShell>
   )
 }

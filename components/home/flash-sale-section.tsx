@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ChevronRight, Flame } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
+import { LottieIcon } from "@/components/ui/lottie-icon"
 import { getAllActiveFlashSaleProducts } from "@/src/api/flashSale/getAllActiveFlashSaleProducts"
 import { getActiveFlashSaleCampaign } from "@/src/api/flashSale/getActiveFlashSaleCampaign"
 import { mapProduct } from "@/src/api/_shared/mappers"
@@ -54,7 +55,7 @@ export function FlashSaleSection() {
       >
         {backgroundImage && <div className="absolute inset-0 bg-black/25" />}
         <div className="relative z-10 flex items-center gap-2 p-3 md:p-4">
-          <div className="flex shrink-0 items-center gap-1"><h2 className="text-sm font-bold text-foreground md:text-base">Flash Sale</h2><Flame className="h-4 w-4 text-[#FF3B3B]" fill="#FF3B3B" /></div>
+          <div className="flex shrink-0 items-center gap-1"><LottieIcon src="/fire-animaiton.json" className="block h-5 w-5 md:h-6 md:w-6" ariaLabel="Flash sale" /><h2 className="text-sm font-medium text-foreground md:text-base">Flash Sale</h2></div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />
           <Link href="/offers" className="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-[#306FD7] md:text-xs">See All <ChevronRight className="h-3 w-3" /></Link>

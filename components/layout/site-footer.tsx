@@ -37,6 +37,17 @@ const socials = [
   { Icon: Youtube, label: "YouTube", href: "#" },
 ]
 
+// Whitelist of routes where the footer should be visible.
+// Add additional pathnames here if more pages should include the footer.
+const FOOTER_VISIBLE_PATHS: ReadonlyArray<string> = ["/", "/help"]
+
+export function SiteFooterGate() {
+  // Lazy import inside the function to keep the rest of the module SSR-friendly.
+  // We can't call usePathname here because this file is not a client component.
+  // Instead, render a small client component that owns the conditional logic.
+  return <SiteFooterWhenAllowed />
+}
+
 export function SiteFooter() {
   return (
     <footer className="mt-10 border-t border-border/60 bg-card">

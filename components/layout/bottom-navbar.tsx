@@ -35,14 +35,16 @@ export function BottomNavbar() {
 
   return (
     <nav
-      className="rm-bottom-nav fixed inset-x-0 bottom-3 z-50 px-3 lg:hidden"
+      className="rm-bottom-nav fixed inset-x-0 bottom-0 z-50 lg:hidden"
       aria-label="Bottom navigation"
     >
       <style>{`
         .rm-bottom-nav {
-          --clr: var(--background);
           --nav-height: 64px;
           --indicator-size: 60px;
+          /* Cutout radius == indicator outer radius, so the see-through gap
+             matches the previous ring exactly. */
+          --cutout-radius: calc(var(--indicator-size) / 2);
         }
 
         @media (min-width: 380px) {
@@ -57,9 +59,8 @@ export function BottomNavbar() {
         }
 
         .rm-bottom-nav .navigation-shell {
+          position: relative;
           width: 100%;
-          max-width: 420px;
-          margin-inline: auto;
         }
 
         .rm-bottom-nav .navigation {
@@ -68,8 +69,10 @@ export function BottomNavbar() {
           height: var(--nav-height);
           background: var(--card);
           display: flex;
-          border-radius: 14px;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          /* Carve a circular gap at top-center the size of the indicator's outer
+             ring so the page shows through where the ring used to sit. */
+          -webkit-mask-image: radial-gradient(circle var(--cutout-radius) at 50% 0%, transparent 99%, black 100%);
+          mask-image: radial-gradient(circle var(--cutout-radius) at 50% 0%, transparent 99%, black 100%);
         }
 
         .rm-bottom-nav .navigation ul {
@@ -109,7 +112,7 @@ export function BottomNavbar() {
         .rm-bottom-nav .navigation ul li .nav-button .icon {
           line-height: 1;
           transition: transform 0.3s, color 0.3s;
-          color: var(--foreground);
+          color: var(--muted-foreground);
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -124,7 +127,7 @@ export function BottomNavbar() {
         }
 
         .rm-bottom-nav .navigation ul li .nav-button .text {
-          color: var(--foreground);
+          color: var(--muted-foreground);
           font-size: 0.7rem;
           letter-spacing: 0.02em;
           line-height: 1;
@@ -150,12 +153,15 @@ export function BottomNavbar() {
           width: var(--indicator-size);
           height: var(--indicator-size);
           background: var(--card);
+          /* Clip the white background to the inner padding box so the 6px outer
+             band stays truly transparent and the navbar cutout shows through. */
+          background-clip: padding-box;
           display: flex;
           justify-content: center;
           align-items: center;
           border-radius: 50%;
-          border: 6px solid var(--clr);
-          pointer-events: none;
+          border: 6px solid transparent;
+          pointer-events: auto;
         }
 
         .rm-bottom-nav .indicator .indicator-icon {
@@ -167,27 +173,6 @@ export function BottomNavbar() {
           z-index: 2;
         }
 
-        .rm-bottom-nav .indicator::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: -22px;
-          width: 20px;
-          height: 20px;
-          border-top-right-radius: 20px;
-          box-shadow: 0px -10px 0 0 var(--clr);
-        }
-
-        .rm-bottom-nav .indicator::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          right: -22px;
-          width: 20px;
-          height: 20px;
-          border-top-left-radius: 20px;
-          box-shadow: 0px -10px 0 0 var(--clr);
-        }
       `}</style>
 
       <div className="navigation-shell">
@@ -197,10 +182,7 @@ export function BottomNavbar() {
               const active = isActive(path)
               const isScanner = index === SCANNER_INDEX
               return (
-                <li
-                  key={label}
-                  className={`list ${isScanner ? "is-scanner" : ""}`}
-                >
+                <li key={label} className={`list ${isScanner ? "is-scanner" : ""}`}>
                   <Link href={path} className="nav-button" aria-current={active ? "page" : undefined}>
                     <span className={`icon ${active ? "icon-active" : ""}`}>
                       <Icon size={22} aria-hidden="true" />
@@ -212,14 +194,16 @@ export function BottomNavbar() {
                 </li>
               )
             })}
-
-            <Link href="/scan" className="indicator" aria-label="Scanner">
-              <span className="indicator-icon">
-                <ScanLine size={24} aria-hidden="true" />
-              </span>
-            </Link>
           </ul>
         </div>
+
+        {/* Indicator must be a sibling of `.navigation` (NOT inside it) so the
+            mask cutout on `.navigation` doesn't clip the scanner button. */}
+        <Link href="/scan" className="indicator" aria-label="Scanner">
+          <span className="indicator-icon">
+            <ScanLine size={24} aria-hidden="true" />
+          </span>
+        </Link>
       </div>
     </nav>
   )
