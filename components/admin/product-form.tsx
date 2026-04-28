@@ -1,21 +1,28 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
-import { useAdminStore } from "@/lib/admin-store"
-import type { Category, Product, ProductVariant } from "@/lib/types"
+import { ImagePlus, Plus, Trash2, UploadCloud } from "lucide-react"
+import type { Product, ProductVariant } from "@/lib/types"
 import dynamic from "next/dynamic"
+import { useCategories, useSubCategories } from "@/src/hooks/api/useCategories"
+import { AdminSelect } from "@/components/admin/admin-select"
 
 const QuillEditor = dynamic(
   () => import("@/components/ui/quill-editor").then((mod) => mod.QuillEditor),
   { ssr: false }
 )
-import { AdminSelect } from "@/components/admin/admin-select"
 
 type Props = {
   initial?: Product
-  onSave: (p: Product) => void
+  onSave: (
+    p: Product,
+    descriptionDelta: any,
+    extraDescriptionDelta: any,
+    categoryId: string,
+    subCategoryId: string
+  ) => void
   onCancel: () => void
+  isSaving?: boolean
 }
 
 function makeVariantId() {
@@ -23,7 +30,7 @@ function makeVariantId() {
 }
 
 function emptyVariant(): ProductVariant {
-  return { id: makeVariantId(), name: "", price: 0, cutPrice: 0, stock: 0, image: "" }
+  return { id: makeVariantId(), color: "", size: "", actualPrice: 0, discountedPrice: 0, image: "" }
 }
 
 const htmlToPlainText = (html: string) => {
@@ -32,61 +39,54 @@ const htmlToPlainText = (html: string) => {
   return (doc.body.textContent || "").replace(/\u00a0/g, " ").trim()
 }
 
-export function ProductForm({ initial, onSave, onCancel }: Props) {
-  const { categories, loadSubCategoriesByCategory } = useAdminStore()
+export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
+  const { data: categories = [] } = useCategories()
+  
   const [name, setName] = useState(initial?.name ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
+  const [descriptionDelta, setDescriptionDelta] = useState<any>(null)
+  
   const [extraDescription, setExtraDescription] = useState(initial?.extraDescription ?? "")
-  const [categorySlug, setCategorySlug] = useState(
-    initial?.categorySlug ?? categories[0]?.slug ?? "",
-  )
-  const [subCategorySlug, setSubCategorySlug] = useState(
-    initial?.subCategorySlug ?? categories[0]?.subCategories[0]?.slug ?? "",
-  )
-  const [size, setSize] = useState(initial?.size ?? "")
-  const [quantity, setQuantity] = useState(initial?.quantity ?? "")
+  const [extraDescriptionDelta, setExtraDescriptionDelta] = useState<any>(null)
+  
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "")
+  const [subCategoryId, setSubCategoryId] = useState(initial?.subCategoryId ?? "")
+  
   const [material, setMaterial] = useState(initial?.material ?? "")
-  const [color, setColor] = useState(initial?.color ?? "")
   const [weight, setWeight] = useState(initial?.weight ?? "")
   const [video, setVideo] = useState(initial?.video ?? "")
   const [videoName, setVideoName] = useState("")
 
+  const [stock, setStock] = useState<boolean>(initial?.stock ?? true)
+  const [availability, setAvailability] = useState<boolean>(initial?.availability ?? true)
+
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
-  // Variants — at least one required
   const [variants, setVariants] = useState<ProductVariant[]>(() => {
     if (initial?.variants && initial.variants.length > 0) return initial.variants
     return [emptyVariant()]
   })
 
-  const subs = useMemo(
-    () => categories.find((c) => c.slug === categorySlug)?.subCategories ?? [],
-    [categories, categorySlug],
-  )
-
+  // Auto-select first category if none is selected and categories are loaded
   useEffect(() => {
-    const category = categories.find((c) => c.slug === categorySlug)
-    if (!category?.id) return
-    void loadSubCategoriesByCategory(category.id)
-  }, [categories, categorySlug, loadSubCategoriesByCategory])
-
-  // Close on Escape
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel()
+    if (categories.length > 0 && !categoryId) {
+      setCategoryId(categories[0].id)
     }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onCancel])
+  }, [categories, categoryId])
 
-  // Lock body scroll while modal open
+  const { data: subs = [] } = useSubCategories(categoryId, { enabled: Boolean(categoryId) })
+
+  // Auto-select first subcategory when category changes
   useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = prev
+    if (subs.length > 0) {
+      const hasCurrent = subs.some(s => s.id === subCategoryId)
+      if (!hasCurrent) {
+        setSubCategoryId(subs[0].id)
+      }
+    } else {
+      if (categoryId) setSubCategoryId("") // No subs available
     }
-  }, [])
+  }, [subs, subCategoryId, categoryId])
 
   const updateVariant = (id: string, patch: Partial<ProductVariant>) => {
     setVariants((list) => list.map((v) => (v.id === id ? { ...v, ...patch } : v)))
@@ -116,18 +116,17 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
 
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
-      name: v.name.trim() || "Default",
-      price: Math.max(0, Number(v.price) || 0),
-      cutPrice: Math.max(0, Number(v.cutPrice) || 0),
-      stock: Math.max(0, Number(v.stock) || 0),
+      color: v.color.trim() || "Default",
+      size: v.size.trim() || "Standard",
+      actualPrice: Math.max(0, Number(v.actualPrice) || 0),
+      discountedPrice: Math.max(0, Number(v.discountedPrice) || 0),
       image: v.image || undefined,
     }))
 
     const first = cleanVariants[0]
-    const price = first.price
-    const cutPrice = first.cutPrice
+    const price = first.discountedPrice || first.actualPrice
+    const cutPrice = first.actualPrice
     const discount = cutPrice > price ? Math.round((1 - price / cutPrice) * 100) : 0
-    const totalStock = cleanVariants.reduce((sum, v) => sum + v.stock, 0)
 
     const variantImages = cleanVariants.map((v) => v.image).filter(Boolean) as string[]
     const images =
@@ -141,299 +140,290 @@ export function ProductForm({ initial, onSave, onCancel }: Props) {
       brand: initial?.brand ?? "",
       description: description.trim(),
       extraDescription: htmlToPlainText(extraDescription) ? extraDescription.trim() : undefined,
-      categorySlug,
-      subCategorySlug: subs.find((s) => s.slug === subCategorySlug)
-        ? subCategorySlug
-        : subs[0]?.slug ?? "",
+      categorySlug: "", // We rely on categoryId now
+      subCategorySlug: "", // We rely on subCategoryId now
+      categoryId,
+      subCategoryId,
       price,
       cutPrice,
       discount,
       rating: initial?.rating ?? 4.5,
       reviews: initial?.reviews ?? 0,
       images,
-      colors: initial?.colors,
-      storage: initial?.storage,
       features: initial?.features ?? [],
       isTrending: initial?.isTrending ?? false,
       isFlashSale: initial?.isFlashSale ?? false,
-      stock: totalStock,
+      stock, 
+      availability,
       whatsapp: initial?.whatsapp ?? "+8801700000000",
       weight: weight.trim() || undefined,
       video: video.trim() || undefined,
-      size: size.trim() || undefined,
-      quantity: quantity.trim() || undefined,
       material: material.trim() || undefined,
-      color: color.trim() || undefined,
       variants: cleanVariants,
     }
-    onSave(product)
+    onSave(product, descriptionDelta, extraDescriptionDelta, categoryId, subCategoryId)
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="product-form-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <form
+      onSubmit={submit}
+      className="flex w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm border border-border/40"
     >
-      {/* Backdrop */}
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onCancel}
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
-      />
-
-      {/* Modal */}
-      <form
-        onSubmit={submit}
-        className="relative z-10 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-card shadow-xl"
-      >
-        <div className="relative border-b border-border px-5 py-4">
-          <h3
-            id="product-form-title"
-            className="text-center text-base text-foreground"
-          >
-            {initial ? "Edit Product" : "Add New Product"}
-          </h3>
-          <button
-            type="button"
-            onClick={onCancel}
-            aria-label="Close"
-            className="absolute right-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:bg-[#EEF0FB]"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      <div className="flex-1 space-y-5 p-5 md:p-6">
+        {/* Category & Sub-category */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-foreground">Category</label>
+            <AdminSelect
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              disabled={categories.length === 0}
+              className="h-11 px-4"
+            >
+              <option value="">Select Category...</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </AdminSelect>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-foreground">Sub Category</label>
+            <AdminSelect
+              value={subCategoryId}
+              onChange={(e) => setSubCategoryId(e.target.value)}
+              disabled={subs.length === 0}
+              className="h-11 px-4"
+            >
+              <option value="">Select Sub-category...</option>
+              {subs.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </AdminSelect>
+          </div>
         </div>
 
-        <div className="flex-1 space-y-4 overflow-y-auto p-5">
-          {/* Category & Sub-category */}
-          <div className="grid gap-3 md:grid-cols-2">
-            <Select
-              label="Category"
-              required
-              value={categorySlug}
-              onChange={(v) => {
-                setCategorySlug(v)
-                const next = categories.find((c) => c.slug === v)
-                setSubCategorySlug(next?.subCategories[0]?.slug ?? "")
-              }}
-              options={categories.map((c) => ({ value: c.slug, label: c.name }))}
-            />
-            <Select
-              label="Sub Category"
-              required
-              value={subCategorySlug}
-              onChange={setSubCategorySlug}
-              options={subs.map((s) => ({ value: s.slug, label: s.name }))}
-            />
-          </div>
+        {/* Title */}
+        <Text label="Title" value={name} onChange={setName} required placeholder="Product Title" />
 
-          {/* Title */}
-          <Text label="Title" value={name} onChange={setName} required placeholder="Title" />
+        {/* Description */}
+        <QuillEditor
+          label="Description"
+          required
+          value={description}
+          onChange={(html, delta) => {
+            setDescription(html)
+            setDescriptionDelta(delta)
+          }}
+          placeholder="Detailed product description..."
+        />
 
-          {/* Description */}
-          <QuillEditor
-            label="Description"
-            required
-            value={description}
-            onChange={setDescription}
-            placeholder="Description"
-          />
+        {/* Extra description */}
+        <QuillEditor
+          label="Extra description"
+          value={extraDescription}
+          onChange={(html, delta) => {
+            setExtraDescription(html)
+            setExtraDescriptionDelta(delta)
+          }}
+          placeholder="Additional info, specs, warranty..."
+        />
 
-          {/* Extra description */}
-          <QuillEditor
-            label="Extra description"
-            value={extraDescription}
-            onChange={setExtraDescription}
-            placeholder="Additional info, specs, warranty..."
-          />
+        {/* Material & Weight */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Text label="Material" value={material} onChange={setMaterial} placeholder="Material" required />
+          <Text label="Weight" value={weight} onChange={setWeight} required placeholder="e.g., 500g, 1.2kg" />
+        </div>
 
-          {/* Size & Quantity */}
-          <div className="grid gap-3 md:grid-cols-2">
-            <Text label="Size" value={size} onChange={setSize} placeholder="e.g., XL, Large" />
-            <Text
-              label="Quantity"
-              required
-              value={quantity}
-              onChange={setQuantity}
-              placeholder="e.g., 24 PCS"
-            />
-          </div>
-
-          {/* Material & Color */}
-          <div className="grid gap-3 md:grid-cols-2">
-            <Text label="Material" value={material} onChange={setMaterial} placeholder="Material" />
-            <Text label="Color" value={color} onChange={setColor} placeholder="Color" />
-          </div>
-
-          {/* Weight */}
-          <Text
-            label="Weight"
-            required
-            value={weight}
-            onChange={setWeight}
-            placeholder="e.g., 500g, 1.2kg"
-          />
-
-          {/* Variants */}
-          <div className="space-y-2 pt-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground">Variants</span>
-              <button
-                type="button"
-                onClick={addVariant}
-                className="inline-flex h-9 items-center gap-1 rounded-md bg-[#10B981] px-3 text-xs text-white shadow-sm hover:bg-[#0EA373]"
-              >
-                <Plus className="h-3.5 w-3.5" /> Add Variant
-              </button>
+        {/* Stock & Availability Checkboxes */}
+        <div className="grid gap-4 md:grid-cols-2 pt-2">
+          <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
+            <div className="relative flex items-center">
+              <input
+                type="checkbox"
+                checked={stock}
+                onChange={(e) => setStock(e.target.checked)}
+                className="h-5 w-5 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+              />
             </div>
-
-            <p className="text-[11px] text-muted-foreground">
-              Minimum one variant is required. Upload a separate image for each.
-            </p>
-
-            <div className="space-y-2">
-              {variants.map((v, idx) => (
-                <div
-                  key={v.id}
-                  className="rounded-md border border-border bg-[#F7F9FD] p-3"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      Variant {idx + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeVariant(v.id)}
-                      disabled={variants.length === 1}
-                      aria-label="Remove variant"
-                      className="grid h-7 w-7 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B] disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="grid gap-3 md:grid-cols-[72px_1fr]">
-                    <label className="relative grid h-18 w-18 place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card">
-                      {v.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={v.image || "/placeholder.svg"}
-                          alt={v.name || "Variant"}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <ImagePlus className="h-4 w-4 text-[#306FD7]" />
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                        onChange={(e) =>
-                          handleImagePick(e.target.files?.[0], (url) =>
-                            updateVariant(v.id, { image: url }),
-                          )
-                        }
-                      />
-                    </label>
-
-                    <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                      <label className="col-span-2 block text-xs md:col-span-1">
-                        <span className="mb-1 block text-foreground">Name</span>
-                        <input
-                          value={v.name}
-                          onChange={(e) => updateVariant(v.id, { name: e.target.value })}
-                          placeholder="e.g., Red / XL"
-                          className="h-9 w-full rounded-md border border-border bg-card px-2.5 text-xs outline-none"
-                        />
-                      </label>
-                      <label className="block text-xs">
-                        <span className="mb-1 block text-foreground">Price (৳)</span>
-                        <input
-                          type="number"
-                          min={0}
-                          value={v.price}
-                          onChange={(e) =>
-                            updateVariant(v.id, { price: Number(e.target.value) || 0 })
-                          }
-                          className="h-9 w-full rounded-md border border-border bg-card px-2.5 text-xs outline-none"
-                        />
-                      </label>
-                      <label className="block text-xs">
-                        <span className="mb-1 block text-foreground">Cut price</span>
-                        <input
-                          type="number"
-                          min={0}
-                          value={v.cutPrice}
-                          onChange={(e) =>
-                            updateVariant(v.id, { cutPrice: Number(e.target.value) || 0 })
-                          }
-                          className="h-9 w-full rounded-md border border-border bg-card px-2.5 text-xs outline-none"
-                        />
-                      </label>
-                      <label className="block text-xs">
-                        <span className="mb-1 block text-foreground">Stock</span>
-                        <input
-                          type="number"
-                          min={0}
-                          value={v.stock}
-                          onChange={(e) =>
-                            updateVariant(v.id, { stock: Number(e.target.value) || 0 })
-                          }
-                          className="h-9 w-full rounded-md border border-border bg-card px-2.5 text-xs outline-none"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            In Stock
+          </label>
+          <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
+            <div className="relative flex items-center">
+              <input
+                type="checkbox"
+                checked={availability}
+                onChange={(e) => setAvailability(e.target.checked)}
+                className="h-5 w-5 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+              />
             </div>
-          </div>
+            Available for Purchase
+          </label>
+        </div>
 
-          {/* Video Upload */}
-          <div className="pt-2">
-            <span className="mb-1 block text-sm text-foreground">Video Upload</span>
+        {/* Variants */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-foreground">Variants</span>
             <button
               type="button"
-              onClick={() => videoInputRef.current?.click()}
-              className="flex w-full flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-[#306FD7]/40 bg-[#EEF4FF]/50 px-4 py-5 text-center transition hover:bg-[#EEF4FF]"
+              onClick={addVariant}
+              className="inline-flex h-9 items-center gap-1 rounded-md bg-[#10B981] px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0EA373]"
             >
-              <UploadCloud className="h-5 w-5 text-[#306FD7]" />
-              <span className="text-sm text-[#306FD7]">
-                {videoName ? videoName : "Click to upload video"}
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                Maximum video size 500 MB
-              </span>
+              <Plus className="h-3.5 w-3.5" /> Add Variant
             </button>
-            <input
-              ref={videoInputRef}
-              type="file"
-              accept="video/*"
-              className="hidden"
-              onChange={(e) => handleVideoPick(e.target.files?.[0])}
-            />
+          </div>
+
+          <p className="text-[11px] text-muted-foreground">
+            Minimum one variant is required. Upload a separate image for each.
+          </p>
+
+          <div className="space-y-3">
+            {variants.map((v, idx) => (
+              <div
+                key={v.id}
+                className="rounded-lg border border-border bg-[#F7F9FD] p-4"
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    Variant {idx + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(v.id)}
+                    disabled={variants.length === 1}
+                    aria-label="Remove variant"
+                    className="grid h-7 w-7 place-items-center rounded-md bg-[#FF3B3B]/10 text-[#FF3B3B] transition hover:bg-[#FF3B3B] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#FF3B3B]/10 disabled:hover:text-[#FF3B3B]"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-[80px_1fr]">
+                  <label className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card transition hover:border-[#306FD7]/70 cursor-pointer">
+                    {v.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={v.image || "/placeholder.svg"}
+                        alt={v.color || "Variant"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <ImagePlus className="h-5 w-5 text-[#306FD7]" />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      onChange={(e) =>
+                        handleImagePick(e.target.files?.[0], (url) =>
+                          updateVariant(v.id, { image: url }),
+                        )
+                      }
+                    />
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                    <label className="col-span-2 block text-xs md:col-span-1">
+                      <span className="mb-1.5 block font-semibold text-foreground">Color</span>
+                      <input
+                        value={v.color}
+                        onChange={(e) => updateVariant(v.id, { color: e.target.value })}
+                        placeholder="e.g., Red, Blue"
+                        required
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                      />
+                    </label>
+                    <label className="col-span-2 block text-xs md:col-span-1">
+                      <span className="mb-1.5 block font-semibold text-foreground">Size</span>
+                      <input
+                        value={v.size}
+                        onChange={(e) => updateVariant(v.id, { size: e.target.value })}
+                        placeholder="e.g., XL, Large"
+                        required
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                      />
+                    </label>
+                    <label className="block text-xs">
+                      <span className="mb-1.5 block font-semibold text-foreground">Actual Price (৳)</span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={v.actualPrice || ""}
+                        onChange={(e) =>
+                          updateVariant(v.id, { actualPrice: Number(e.target.value) || 0 })
+                        }
+                        required
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                      />
+                    </label>
+                    <label className="block text-xs">
+                      <span className="mb-1.5 block font-semibold text-foreground">Discounted Price (৳)</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={v.discountedPrice || ""}
+                        onChange={(e) =>
+                          updateVariant(v.id, { discountedPrice: Number(e.target.value) || 0 })
+                        }
+                        required
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-border bg-card px-5 py-3">
+        {/* Video Upload */}
+        <div className="pt-3">
+          <span className="mb-2 block text-sm font-semibold text-foreground">Video Upload (Optional)</span>
           <button
             type="button"
-            onClick={onCancel}
-            className="rounded-full px-4 py-2 text-sm text-foreground hover:bg-[#EEF0FB]"
+            onClick={() => videoInputRef.current?.click()}
+            className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF4FF]/50 px-4 py-8 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF4FF]"
           >
-            Cancel
+            <UploadCloud className="h-6 w-6 text-[#306FD7]" />
+            <span className="text-sm font-semibold text-[#306FD7]">
+              {videoName ? videoName : "Click to upload video"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Maximum video size 500 MB
+            </span>
           </button>
-          <button
-            type="submit"
-            className="rounded-full bg-[#306FD7] px-6 py-2 text-sm text-white hover:opacity-95"
-          >
-            Submit
-          </button>
+          <input
+            ref={videoInputRef}
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => handleVideoPick(e.target.files?.[0])}
+          />
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div className="flex justify-end gap-3 border-t border-border/40 bg-card px-6 py-4">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSaving}
+          className="rounded-full px-6 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-[#EEF0FB] disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="rounded-full bg-[#306FD7] px-8 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2E55C9] disabled:opacity-70"
+        >
+          {isSaving ? "Saving..." : initial ? "Save Changes" : "Create Product"}
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -452,7 +442,7 @@ function Text({
 }) {
   return (
     <label className="block text-sm">
-      <span className="mb-1 block text-foreground">
+      <span className="mb-1.5 block font-semibold text-foreground">
         {label} {required && <span className="text-[#FF3B3B]">*</span>}
       </span>
       <input
@@ -460,73 +450,8 @@ function Text({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7] cursor-text caret-current"
+        className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-[#306FD7]/60 cursor-text caret-current"
       />
-    </label>
-  )
-}
-
-function TextArea({
-  label,
-  value,
-  onChange,
-  required,
-  placeholder,
-  rows = 3,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  required?: boolean
-  placeholder?: string
-  rows?: number
-}) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1 block text-foreground">
-        {label} {required && <span className="text-[#FF3B3B]">*</span>}
-      </span>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required={required}
-        placeholder={placeholder}
-        rows={rows}
-        className="w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-[#306FD7] cursor-text caret-current"
-      />
-    </label>
-  )
-}
-
-function Select({
-  label,
-  value,
-  onChange,
-  options,
-  required,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  options: { value: string; label: string }[]
-  required?: boolean
-}) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1 block text-foreground">
-        {label} {required && <span className="text-[#FF3B3B]">*</span>}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-md border border-[#306FD7] bg-[#EEF4FF] px-3 text-sm text-[#306FD7] outline-none cursor-default"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value} className="text-foreground">
-            {o.label}
-          </option>
-        ))}
-      </select>
     </label>
   )
 }

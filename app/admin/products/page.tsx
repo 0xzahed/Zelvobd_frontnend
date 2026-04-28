@@ -3,15 +3,19 @@
 import { useMemo, useState } from "react"
 import { Copy, Pencil, Plus, Search, Trash2 } from "lucide-react"
 import Image from "next/image"
-import { useAdminStore } from "@/lib/admin-store"
+import Link from "next/link"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
-import { ProductForm } from "@/components/admin/product-form"
 import { useConfirm } from "@/components/ui/confirm-dialog"
+import { useProducts, useDeleteProduct, useCopyProduct } from "@/src/hooks/api/useProducts"
 
 export default function AdminProductsPage() {
-  const { categories, products, addProduct, updateProduct, deleteProduct, copyProduct } = useAdminStore()
+  const { data: products = [], isLoading } = useProducts()
+  const deleteMutation = useDeleteProduct()
+  const copyMutation = useCopyProduct()
   const confirm = useConfirm()
+
+  const [q, setQ] = useState("")
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
@@ -20,22 +24,13 @@ export default function AdminProductsPage() {
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) deleteProduct(p.id)
+    if (ok) {
+      deleteMutation.mutate(p.id)
+    }
   }
 
-  const [q, setQ] = useState("")
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<Product | null>(null)
-
-  const getCategoryName = (slug: string, fallbackName?: string) => {
-    const cat = categories.find((c) => c.slug === slug)
-    return cat?.name || fallbackName || slug || "Uncategorized"
-  }
-
-  const getSubCategoryName = (catSlug: string, subSlug: string, fallbackName?: string) => {
-    const cat = categories.find((c) => c.slug === catSlug)
-    const sub = cat?.subCategories.find((s) => s.slug === subSlug)
-    return sub?.name || fallbackName || subSlug || "No sub-category"
+  const handleCopy = (id: string) => {
+    copyMutation.mutate(id)
   }
 
   const filtered = useMemo(() => {
@@ -43,16 +38,6 @@ export default function AdminProductsPage() {
     if (!lc) return products
     return products.filter((p) => p.name.toLowerCase().includes(lc) || p.brand.toLowerCase().includes(lc))
   }, [products, q])
-
-  const onSave = (p: Product) => {
-    if (products.find((x) => x.id === p.id)) {
-      updateProduct(p.id, p)
-    } else {
-      addProduct(p)
-    }
-    setShowForm(false)
-    setEditing(null)
-  }
 
   return (
     <div className="space-y-4">
@@ -71,28 +56,14 @@ export default function AdminProductsPage() {
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <button
-            onClick={() => {
-              setEditing(null)
-              setShowForm(true)
-            }}
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm"
+          <Link
+            href="/admin/products/new"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2E55C9]"
           >
             <Plus className="h-4 w-4" /> Add
-          </button>
+          </Link>
         </div>
       </div>
-
-      {showForm && (
-        <ProductForm
-          initial={editing ?? undefined}
-          onSave={onSave}
-          onCancel={() => {
-            setShowForm(false)
-            setEditing(null)
-          }}
-        />
-      )}
 
       <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
         <div className="overflow-x-auto">
@@ -110,8 +81,25 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/60 last:border-b-0">
+              {isLoading && (
+                <tr>
+                  <td colSpan={8} className="px-5 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
+                       <p className="text-xs text-muted-foreground">Loading products...</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!isLoading && filtered.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">
+                    No products found.
+                  </td>
+                </tr>
+              )}
+              {!isLoading && filtered.map((p) => (
+                <tr key={p.id} className="border-b border-border/60 last:border-b-0 transition hover:bg-[#F7F9FD]/50">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-[#EEF0FB]">
@@ -121,19 +109,20 @@ export default function AdminProductsPage() {
                           fill
                           sizes="40px"
                           className="object-cover"
+                          unoptimized
                         />
                       </div>
                       <div className="min-w-0">
                         <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.brand}</p>
+                        <p className="text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-5 py-3 text-muted-foreground">
-                    {getCategoryName(p.categorySlug, p.categoryName)}
+                    {p.categoryName || p.categorySlug || "Uncategorized"}
                   </td>
                   <td className="px-5 py-3 text-muted-foreground">
-                    {getSubCategoryName(p.categorySlug, p.subCategorySlug, p.subCategoryName)}
+                    {p.subCategoryName || p.subCategorySlug || "No sub-category"}
                   </td>
                   <td className="px-5 py-3 font-medium text-foreground">{formatBDT(p.price)}</td>
                   <td className="px-5 py-3">
@@ -145,10 +134,10 @@ export default function AdminProductsPage() {
                     <span
                       className={cx(
                         "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                        p.stock > 20 ? "bg-green-50 text-[#22C55E]" : p.stock > 0 ? "bg-amber-50 text-amber-600" : "bg-red-50 text-[#FF3B3B]",
+                        p.stock ? "bg-green-50 text-[#22C55E]" : "bg-red-50 text-[#FF3B3B]",
                       )}
                     >
-                      {p.stock}
+                      {p.stock ? "In Stock" : "Out of Stock"}
                     </span>
                   </td>
                   <td className="px-5 py-3">
@@ -172,30 +161,29 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => {
-                          setEditing(p)
-                          setShowForm(true)
-                        }}
+                      <Link
+                        href={`/admin/products/${p.id}`}
                         aria-label="Edit"
                         title="Edit"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-foreground"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-foreground transition hover:bg-[#306FD7] hover:text-white"
                       >
                         <Pencil className="h-3.5 w-3.5" />
-                      </button>
+                      </Link>
                       <button
-                        onClick={() => copyProduct(p.id)}
+                        onClick={() => handleCopy(p.id)}
+                        disabled={copyMutation.isPending}
                         aria-label="Copy"
                         title="Duplicate"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7]"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7] transition hover:bg-[#306FD7] hover:text-white disabled:opacity-50"
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(p)}
+                        disabled={deleteMutation.isPending}
                         aria-label="Delete"
                         title="Delete"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B]"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B] transition hover:bg-[#FF3B3B] hover:text-white disabled:opacity-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

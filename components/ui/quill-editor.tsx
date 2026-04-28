@@ -6,7 +6,7 @@ import Quill from "quill"
 type QuillEditorProps = {
   label: string
   value: string
-  onChange: (value: string) => void
+  onChange: (html: string, delta?: any) => void
   placeholder?: string
   required?: boolean
 }
@@ -44,8 +44,9 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
 
     quill.on("text-change", () => {
       const html = quill.root.innerHTML
+      const delta = quill.getContents()
       currentRef.current = html
-      onChange(html)
+      onChange(html, delta)
     })
   }, [onChange, placeholder])
 
@@ -63,7 +64,7 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
         {label} {required && <span className="text-[#FF3B3B]">*</span>}
       </span>
       <div className="overflow-hidden rounded-md border border-border bg-background">
-        <div ref={hostRef} className="min-h-[160px]" />
+        <div ref={hostRef} className="min-h-40" />
       </div>
       {required && (
         <input
