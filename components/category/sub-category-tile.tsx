@@ -13,7 +13,7 @@ export function SubCategoryTile({
       href={`/category/${categorySlug}/${sub.slug}`}
       className="flex aspect-square flex-col items-center justify-between overflow-hidden rounded-lg bg-card p-1.5 transition hover:-translate-y-0.5 md:rounded-md md:p-1"
     >
-      <div className="relative w-full flex-1 overflow-hidden rounded-md bg-[#F7F8FC]">
+      <div className="relative w-full flex-1 overflow-hidden rounded-md bg-muted">
         {sub.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

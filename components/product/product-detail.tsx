@@ -18,6 +18,7 @@ import {
   Monitor,
   Plus,
   Share2,
+  ShoppingCart,
   Smartphone,
   Weight,
   Wifi,
@@ -28,6 +29,7 @@ import type { LucideIcon } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
+import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -84,7 +86,7 @@ function WhatsAppFab({ number }: { number: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-24 right-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-[#22C55E] text-white shadow-[0_8px_20px_rgba(34,197,94,0.4)] md:bottom-6"
+      className="fixed bottom-24 right-4 z-30 grid h-12 w-12 place-items-center rounded-full bg-success text-white shadow-[0_8px_20px_rgba(34,197,94,0.4)] md:bottom-6"
     >
       <svg viewBox="0 0 32 32" className="h-6 w-6 fill-current" aria-hidden="true">
         <path d="M19.11 17.2c-.26-.13-1.52-.75-1.76-.83s-.41-.13-.58.13-.67.83-.82 1-.3.2-.56.07a7.1 7.1 0 0 1-2.1-1.3 7.9 7.9 0 0 1-1.45-1.8c-.15-.26 0-.4.11-.53s.26-.3.4-.44a1.7 1.7 0 0 0 .26-.44.48.48 0 0 0 0-.46c-.07-.13-.58-1.4-.8-1.92s-.42-.44-.58-.45h-.5a1 1 0 0 0-.7.33 2.92 2.92 0 0 0-.91 2.17 5.07 5.07 0 0 0 1.06 2.7 11.6 11.6 0 0 0 4.44 3.92 14.9 14.9 0 0 0 1.48.55 3.56 3.56 0 0 0 1.63.1 2.67 2.67 0 0 0 1.76-1.24 2.16 2.16 0 0 0 .15-1.24c-.06-.1-.24-.17-.5-.3zM16 6a10 10 0 0 0-8.36 15.5L6 26l4.64-1.6A10 10 0 1 0 16 6zm0 18.26a8.24 8.24 0 0 1-4.23-1.16l-.3-.18-2.75.95.93-2.69-.2-.3a8.26 8.26 0 1 1 6.55 3.38z" />
@@ -107,6 +109,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const [storage, setStorage] = useState<string | undefined>(product.storage?.[0])
   const [qty, setQty] = useState(1)
   const [zoomOpen, setZoomOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
+  const { totalCount } = useCart()
   const variantScrollRef = useRef<HTMLDivElement>(null)
 
   const colorList = product.colors ?? []
@@ -174,17 +178,34 @@ export function ProductDetail({ product }: { product: Product }) {
   return (
     <div className="pb-28 md:pb-8">
       {/* Mobile sub-header */}
-      <div className="-mx-4 flex items-center justify-between bg-background px-4 py-2 md:hidden">
+      <div className="-mx-4 flex items-center justify-between bg-card px-4 py-2 md:hidden">
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="grid h-9 w-9 place-items-center rounded-full bg-card"
+          className="grid h-10 w-10 place-items-center rounded-full border border-border/60 bg-card text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <button aria-label="Share" className="grid h-9 w-9 place-items-center rounded-full bg-card">
-          <Share2 className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            aria-label="Share"
+            className="grid h-10 w-10 place-items-center rounded-full border border-border/60 bg-card text-foreground hover:bg-secondary"
+          >
+            <Share2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setCartOpen(true)}
+            aria-label="Open cart"
+            className="relative grid h-10 w-10 place-items-center rounded-full border border-border/60 bg-card text-foreground hover:bg-secondary"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            {totalCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                {totalCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-5 py-3 md:grid-cols-2 md:gap-10 md:py-8">
@@ -233,7 +254,7 @@ export function ProductDetail({ product }: { product: Product }) {
                     className={cx(
                       "relative aspect-square shrink-0 snap-start overflow-hidden rounded-md bg-white transition",
                       "w-[calc((100%-3rem)/4.3)]",
-                      selected ? "border-2 border-[#306FD7]" : "border border-border/50",
+                      selected ? "border-2 border-primary" : "border border-border/50",
                     )}
                   >
                     <Image
@@ -275,14 +296,14 @@ export function ProductDetail({ product }: { product: Product }) {
         {/* Info — flat on page background, no inner cards */}
         <div className="space-y-5">
           <div className="space-y-1">
-            <h1 className="text-pretty text-sm font-medium leading-snug text-foreground md:text-base">
+            <h1 className="text-pretty text-2xl font-medium leading-snug text-[#292929]">
               {product.name}
             </h1>
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-medium text-foreground md:text-base">{formatBDT(product.price)}</span>
+                <span className="text-2xl font-medium text-[#292929]">{formatBDT(product.price)}</span>
                 {product.cutPrice > product.price && (
-                  <span className="text-[11px] text-muted-foreground line-through md:text-xs">
+                  <span className="text-sm text-muted-foreground line-through">
                     {formatBDT(product.cutPrice)}
                   </span>
                 )}
@@ -308,7 +329,7 @@ export function ProductDetail({ product }: { product: Product }) {
             {product.brand && (
               <p className="text-xs text-muted-foreground">
                 by{" "}
-                <Link href="#" className="font-medium text-[#306FD7]">
+                <Link href="#" className="font-medium text-primary">
                   {product.brand}
                 </Link>
               </p>
@@ -330,7 +351,7 @@ export function ProductDetail({ product }: { product: Product }) {
                       className={cx(
                         "flex items-center gap-2 rounded-full border bg-transparent px-2 py-1.5 text-left transition",
                         selected
-                          ? "border-[#306FD7] text-[#306FD7]"
+                          ? "border-primary text-primary"
                           : "border-border/60 text-foreground hover:border-border",
                       )}
                     >
@@ -359,7 +380,7 @@ export function ProductDetail({ product }: { product: Product }) {
                     className={cx(
                       "rounded-full border bg-transparent px-3 py-1 text-xs transition",
                       storage === s
-                        ? "border-[#306FD7] text-[#306FD7]"
+                        ? "border-primary text-primary"
                         : "border-border/60 text-foreground hover:border-border",
                     )}
                   >
@@ -374,7 +395,7 @@ export function ProductDetail({ product }: { product: Product }) {
           {product.features.length > 0 && (
             <div>
               <h3 className="mb-2 flex items-center gap-1.5 text-xs font-medium text-foreground">
-                <ListChecks className="h-4 w-4 text-[#306FD7]" strokeWidth={1.75} />
+                <ListChecks className="h-4 w-4 text-primary" strokeWidth={1.75} />
                 A Snapshot View
               </h3>
               <ul className="space-y-2">
@@ -382,7 +403,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   const Icon = featureIcon(f)
                   return (
                     <li key={i} className="flex items-center gap-2.5 text-xs text-foreground/90 md:text-sm">
-                      <Icon className="h-4 w-4 shrink-0 text-[#306FD7]" strokeWidth={1.75} />
+                      <Icon className="h-4 w-4 shrink-0 text-primary" strokeWidth={1.75} />
                       <span className="leading-relaxed">{f}</span>
                     </li>
                   )
@@ -403,13 +424,13 @@ export function ProductDetail({ product }: { product: Product }) {
           <div className="hidden gap-3 md:flex">
             <button
               onClick={handleBuy}
-              className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-medium text-[#306FD7]"
+              className="h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary"
             >
               Buy Now
             </button>
             <button
               onClick={handleAdd}
-              className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-medium text-white"
+              className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white"
             >
               Add to Cart
             </button>
@@ -417,21 +438,23 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Mobile fixed bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 border-t border-border/40 bg-card p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
+      {/* Mobile fixed bottom bar — transparent wrapper, no white bg or top border */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 bg-transparent p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
         <button
           onClick={handleBuy}
-          className="h-11 flex-1 rounded-full border border-[#306FD7] bg-white text-sm font-medium text-[#306FD7]"
+          className="h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary"
         >
           Buy Now
         </button>
         <button
           onClick={handleAdd}
-          className="h-11 flex-1 rounded-full bg-[#306FD7] text-sm font-medium text-white"
+          className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white"
         >
           Add to Cart
         </button>
       </div>
+
+      <CartBottomSheet open={cartOpen} onClose={() => setCartOpen(false)} />
 
       <WhatsAppFab number={product.whatsapp} />
 
@@ -467,7 +490,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   onClick={() => pickImage(i)}
                   className={cx(
                     "relative h-14 w-14 shrink-0 overflow-hidden rounded-md border bg-white",
-                    imgIdx === i ? "border-[#306FD7]" : "border-white/30",
+                    imgIdx === i ? "border-primary" : "border-white/30",
                   )}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

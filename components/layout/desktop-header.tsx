@@ -28,11 +28,11 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/", Icon: Home },
-  { label: "Flash Sale", href: "/offers", Icon: Flame, accent: "text-[#FF3B3B]" },
-  { label: "Trending", href: "/trending", Icon: TrendingUp, accent: "text-[#306FD7]" },
-  { label: "Free Delivery", href: "/free-delivery", Icon: Truck, accent: "text-[#22C55E]" },
-  { label: "New", href: "/new-products", Icon: Sparkles, accent: "text-[#306FD7]" },
-  { label: "Offers", href: "/offers", Icon: Gift, accent: "text-[#F59E0B]" },
+  { label: "Flash Sale", href: "/offers", Icon: Flame, accent: "text-accent" },
+  { label: "Trending", href: "/trending", Icon: TrendingUp, accent: "text-primary" },
+  { label: "Free Delivery", href: "/free-delivery", Icon: Truck, accent: "text-success" },
+  { label: "New", href: "/new-products", Icon: Sparkles, accent: "text-primary" },
+  { label: "Offers", href: "/offers", Icon: Gift, accent: "text-warning" },
   { label: "Help", href: "/help", Icon: Headphones },
 ]
 
@@ -88,7 +88,7 @@ export function DesktopHeader() {
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6">
           {/* Brand */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#306FD7] text-sm font-bold text-white">
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
               E
             </span>
             <span className="text-xl font-bold text-foreground">EcoMerce</span>
@@ -105,8 +105,8 @@ export function DesktopHeader() {
                     href={href}
                     className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-medium transition ${
                       active
-                        ? "bg-[#EEF0FB] text-[#306FD7]"
-                        : "text-foreground hover:bg-[#EEF0FB]"
+                        ? "bg-secondary text-primary"
+                        : "text-foreground hover:bg-secondary"
                     }`}
                   >
                     <Icon className={`h-4 w-4 ${!active && accent ? accent : ""}`} />
@@ -126,8 +126,8 @@ export function DesktopHeader() {
               aria-expanded={searchOpen}
               className={`grid h-10 w-10 place-items-center rounded-full transition ${
                 searchOpen
-                  ? "bg-[#EEF0FB] text-[#306FD7]"
-                  : "text-foreground hover:bg-[#EEF0FB]"
+                  ? "bg-secondary text-primary"
+                  : "text-foreground hover:bg-secondary"
               }`}
             >
               <Search className="h-5 w-5" />
@@ -138,11 +138,11 @@ export function DesktopHeader() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-[#EEF0FB]"
+              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCount > 0 && (
-                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#306FD7] px-1 text-[10px] font-bold text-white">
+                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
                   {totalCount}
                 </span>
               )}
@@ -173,14 +173,14 @@ export function DesktopHeader() {
                     type="button"
                     onClick={() => setQuery("")}
                     aria-label="Clear search"
-                    className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground hover:bg-[#EEF0FB] hover:text-foreground"
+                    className="grid h-7 w-7 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 )}
                 <button
                   type="submit"
-                  className="rounded-full bg-[#306FD7] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#2f58d0]"
+                  className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-primary/90"
                 >
                   Search
                 </button>

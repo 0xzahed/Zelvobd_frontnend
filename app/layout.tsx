@@ -31,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} bg-background`}>
-      <body className="font-sans antialiased bg-background text-foreground">
+    <html lang="en" className={`${poppins.variable} bg-card`}>
+      <body className="font-sans antialiased bg-card text-foreground">
         <Providers>{children}</Providers>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

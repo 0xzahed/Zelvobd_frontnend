@@ -43,7 +43,7 @@ export function SubCategoryClient({
   const chip = (active: boolean) =>
     cx(
       "rounded-full border px-3 py-1.5 text-xs font-medium transition whitespace-nowrap",
-      active ? "border-[#306FD7] bg-[#306FD7] text-white" : "border-border bg-card text-foreground",
+      active ? "border-primary bg-primary text-white" : "border-border bg-card text-foreground",
     )
 
   return (
@@ -83,7 +83,7 @@ export function SubCategoryClient({
           <p className="text-sm text-muted-foreground">No products match your filters.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

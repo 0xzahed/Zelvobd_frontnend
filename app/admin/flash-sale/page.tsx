@@ -159,7 +159,7 @@ export default function AdminFlashSalePage() {
           <button
             onClick={() => void save()}
             disabled={saving || loading}
-            className="h-11 rounded-full bg-[#306FD7] px-7 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+            className="h-11 rounded-full bg-primary px-7 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>
@@ -173,17 +173,17 @@ export default function AdminFlashSalePage() {
           <button
             type="button"
             onClick={() => bgFileInputRef.current?.click()}
-            className="grid h-20 w-full place-items-center rounded-2xl border border-border bg-[#EEF3FF] text-center md:w-31.5"
+            className="grid h-20 w-full place-items-center rounded-2xl border border-border bg-secondary text-center md:w-31.5"
           >
             <div>
-              <ImagePlus className="mx-auto mb-1 h-5 w-5 text-[#306FD7]" />
+              <ImagePlus className="mx-auto mb-1 h-5 w-5 text-primary" />
               <p className="text-xs text-muted-foreground">Upload / paste URL below</p>
             </div>
           </button>
 
           <div className="flex-1">
             {backgroundImage ? (
-              <div className="relative h-28 w-full overflow-hidden rounded-xl border border-border bg-[#EEF0F7]">
+              <div className="relative h-28 w-full overflow-hidden rounded-xl border border-border bg-secondary">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={backgroundImage}
@@ -192,7 +192,7 @@ export default function AdminFlashSalePage() {
                 />
               </div>
             ) : (
-              <div className="grid h-28 w-full place-items-center rounded-xl border border-dashed border-border bg-[#EEF0F7] text-xs text-muted-foreground">
+              <div className="grid h-28 w-full place-items-center rounded-xl border border-dashed border-border bg-secondary text-xs text-muted-foreground">
                 No image selected
               </div>
             )}
@@ -238,7 +238,7 @@ export default function AdminFlashSalePage() {
                 type="checkbox"
                 checked={selected.includes(p.id)}
                 onChange={() => toggleProduct(p.id)}
-                className="h-4 w-4 accent-[#306FD7]"
+                className="h-4 w-4 accent-primary"
               />
             </label>
           ))}

@@ -23,7 +23,7 @@ export const AdminSelect = React.forwardRef<
         {...props}
         className={cn(
           // Base look — 8px radius to match the rest of admin panel
-          "h-10 w-full appearance-none rounded-lg border border-border bg-background pl-3 pr-9 text-sm outline-none transition focus:border-[#306FD7]/60",
+          "h-10 w-full appearance-none rounded-lg border border-border bg-background pl-3 pr-9 text-sm outline-none transition focus:border-primary/60",
           className,
         )}
       >

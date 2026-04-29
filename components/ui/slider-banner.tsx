@@ -38,7 +38,7 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="relative flex aspect-[16/8] w-full shrink-0 items-center overflow-hidden bg-[#1A1A2E] md:aspect-[16/5]"
+            className="relative flex aspect-[16/8] w-full shrink-0 items-center overflow-hidden bg-foreground md:aspect-[16/5]"
           >
             {slide.image ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -52,14 +52,14 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
                 aria-hidden
                 className="absolute inset-0"
                 style={{
-                  background: `linear-gradient(120deg, ${slide.bg}, ${slide.bg}cc 60%, #1A1A2E 120%)`,
+                  background: `linear-gradient(120deg, ${slide.bg}, ${slide.bg}cc 60%, var(--foreground) 120%)`,
                 }}
               />
             )}
             <div className="absolute bottom-8 left-5 z-10 md:bottom-12 md:left-10">
               <Link
                 href={slide.link}
-                className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-[#306FD7] shadow-sm md:h-11 md:px-6 md:text-sm"
+                className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-primary shadow-sm md:h-11 md:px-6 md:text-sm"
               >
                 Shop Now
               </Link>

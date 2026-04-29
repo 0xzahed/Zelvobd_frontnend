@@ -29,7 +29,7 @@ export function ScaleLoader({ className, rounded = "xl" }: ScaleLoaderProps) {
       role="status"
       aria-label="Loading"
       className={cx(
-        "block bg-[#E5E9F2] animate-scale-pulse",
+        "block bg-border animate-scale-pulse",
         radius,
         className,
       )}

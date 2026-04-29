@@ -246,7 +246,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                 type="checkbox"
                 checked={stock}
                 onChange={(e) => setStock(e.target.checked)}
-                className="h-5 w-5 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+                className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
               />
             </div>
             In Stock
@@ -257,7 +257,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                 type="checkbox"
                 checked={availability}
                 onChange={(e) => setAvailability(e.target.checked)}
-                className="h-5 w-5 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+                className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
               />
             </div>
             Available for Purchase
@@ -271,7 +271,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex h-9 items-center gap-1 rounded-md bg-[#10B981] px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-[#0EA373]"
+              className="inline-flex h-9 items-center gap-1 rounded-md bg-success px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-success/90"
             >
               <Plus className="h-3.5 w-3.5" /> Add Variant
             </button>
@@ -285,7 +285,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
             {variants.map((v, idx) => (
               <div
                 key={v.id}
-                className="rounded-lg border border-border bg-[#F7F9FD] p-4"
+                className="rounded-lg border border-border bg-secondary p-4"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-semibold text-muted-foreground">
@@ -296,14 +296,14 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                     onClick={() => removeVariant(v.id)}
                     disabled={variants.length === 1}
                     aria-label="Remove variant"
-                    className="grid h-7 w-7 place-items-center rounded-md bg-[#FF3B3B]/10 text-[#FF3B3B] transition hover:bg-[#FF3B3B] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#FF3B3B]/10 disabled:hover:text-[#FF3B3B]"
+                    className="grid h-7 w-7 place-items-center rounded-md bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-accent/10 disabled:hover:text-accent"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-[80px_1fr]">
-                  <label className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-md border-2 border-dashed border-[#306FD7]/40 bg-card transition hover:border-[#306FD7]/70 cursor-pointer">
+                  <label className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-md border-2 border-dashed border-primary/40 bg-card transition hover:border-primary/70 cursor-pointer">
                     {v.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -312,7 +312,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <ImagePlus className="h-5 w-5 text-[#306FD7]" />
+                      <ImagePlus className="h-5 w-5 text-primary" />
                     )}
                     <input
                       type="file"
@@ -334,7 +334,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                         onChange={(e) => updateVariant(v.id, { color: e.target.value })}
                         placeholder="e.g., Red, Blue"
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                     <label className="col-span-2 block text-xs md:col-span-1">
@@ -344,7 +344,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                         onChange={(e) => updateVariant(v.id, { size: e.target.value })}
                         placeholder="e.g., XL, Large"
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                     <label className="block text-xs">
@@ -357,7 +357,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                           updateVariant(v.id, { actualPrice: Number(e.target.value) || 0 })
                         }
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                     <label className="block text-xs">
@@ -370,7 +370,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
                           updateVariant(v.id, { discountedPrice: Number(e.target.value) || 0 })
                         }
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-[#306FD7]/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                   </div>
@@ -386,10 +386,10 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
           <button
             type="button"
             onClick={() => videoInputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF4FF]/50 px-4 py-8 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF4FF]"
+            className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-secondary/50 px-4 py-8 text-center transition hover:border-primary/70 hover:bg-secondary"
           >
-            <UploadCloud className="h-6 w-6 text-[#306FD7]" />
-            <span className="text-sm font-semibold text-[#306FD7]">
+            <UploadCloud className="h-6 w-6 text-primary" />
+            <span className="text-sm font-semibold text-primary">
               {videoName ? videoName : "Click to upload video"}
             </span>
             <span className="text-xs text-muted-foreground">
@@ -411,14 +411,14 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
           type="button"
           onClick={onCancel}
           disabled={isSaving}
-          className="rounded-full px-6 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-[#EEF0FB] disabled:opacity-50"
+          className="rounded-full px-6 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-secondary disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSaving}
-          className="rounded-full bg-[#306FD7] px-8 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2E55C9] disabled:opacity-70"
+          className="rounded-full bg-primary px-8 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
         >
           {isSaving ? "Saving..." : initial ? "Save Changes" : "Create Product"}
         </button>
@@ -443,14 +443,14 @@ function Text({
   return (
     <label className="block text-sm">
       <span className="mb-1.5 block font-semibold text-foreground">
-        {label} {required && <span className="text-[#FF3B3B]">*</span>}
+        {label} {required && <span className="text-accent">*</span>}
       </span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-[#306FD7]/60 cursor-text caret-current"
+        className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-primary/60 cursor-text caret-current"
       />
     </label>
   )

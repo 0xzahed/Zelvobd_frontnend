@@ -21,7 +21,7 @@ export default function GlobalError({
             <div className="mt-5">
               <button
                 onClick={reset}
-                className="h-10 rounded-full bg-[#306FD7] px-5 text-sm font-semibold text-white"
+                className="h-10 rounded-full bg-primary px-5 text-sm font-semibold text-white"
               >
                 Reload app
               </button>

@@ -61,7 +61,7 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
   return (
     <label className="block text-sm">
       <span className="mb-1 block text-foreground">
-        {label} {required && <span className="text-[#FF3B3B]">*</span>}
+        {label} {required && <span className="text-accent">*</span>}
       </span>
       <div className="overflow-hidden rounded-md border border-border bg-background">
         <div ref={hostRef} className="min-h-40" />

@@ -26,13 +26,13 @@ export function CategoryProductsSections() {
               </h2>
               <Link
                 href={`/category/${category.slug}`}
-                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#306FD7] md:text-xs"
+                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs"
               >
                 See All <ChevronRight className="h-3 w-3" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
               {items.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

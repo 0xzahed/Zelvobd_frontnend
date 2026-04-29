@@ -137,7 +137,7 @@ export default function AdminSliders() {
           <h2 className="text-sm text-foreground">Banner List</h2>
           <button
             onClick={openCreate}
-            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-[#306FD7] px-4 text-sm text-[#306FD7] transition hover:bg-[#306FD7] hover:text-white"
+            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-primary px-4 text-sm text-primary transition hover:bg-primary hover:text-white"
           >
             <Plus className="h-4 w-4" /> Add Banner
           </button>
@@ -167,7 +167,7 @@ export default function AdminSliders() {
                 className="grid grid-cols-[90px_1fr_100px_120px] items-center gap-3 border-b border-border py-3 text-center text-sm"
               >
                 <div className="flex justify-center">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-md bg-[#F5F6FA]">
+                  <div className="relative h-14 w-14 overflow-hidden rounded-md bg-surface">
                     {s.image ? (
                       <Image
                         src={s.image || "/placeholder.svg"}
@@ -180,7 +180,7 @@ export default function AdminSliders() {
                     ) : (
                       <div
                         className="absolute inset-0"
-                        style={{ backgroundColor: s.bg || "#306FD7" }}
+                        style={{ backgroundColor: s.bg || "var(--primary)" }}
                       />
                     )}
                   </div>
@@ -201,14 +201,14 @@ export default function AdminSliders() {
                   <button
                     onClick={() => openEdit(s)}
                     aria-label="Edit"
-                    className="text-[#306FD7] transition hover:opacity-80"
+                    className="text-primary transition hover:opacity-80"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteSlider(s)}
                     aria-label="Delete"
-                    className="text-[#E14949] transition hover:opacity-80"
+                    className="text-destructive transition hover:opacity-80"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -270,7 +270,7 @@ export default function AdminSliders() {
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                 placeholder="Title"
-                className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-[#306FD7]"
+                className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-primary"
                 required
               />
 
@@ -292,7 +292,7 @@ export default function AdminSliders() {
                   type="checkbox"
                   checked={draft.inHomePage}
                   onChange={(e) => setDraft({ ...draft, inHomePage: e.target.checked })}
-                  className="h-4 w-4 rounded border-border text-[#306FD7] focus:ring-[#306FD7]/20"
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary/20"
                 />
                 Show on Home Page
               </label>
@@ -307,7 +307,7 @@ export default function AdminSliders() {
                     className="sr-only"
                     onChange={(e) => handleImagePick(e.target.files?.[0])}
                   />
-                  <div className="relative grid min-h-35 place-items-center rounded-md border-2 border-dashed border-[#306FD7] bg-[#EEF0FB]/60 p-4 transition hover:bg-[#EEF0FB]">
+                  <div className="relative grid min-h-35 place-items-center rounded-md border-2 border-dashed border-primary bg-secondary/60 p-4 transition hover:bg-secondary">
                     {draft.image ? (
                       <div className="relative h-full w-full">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -322,8 +322,8 @@ export default function AdminSliders() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-1 text-center">
-                        <ImagePlus className="h-6 w-6 text-[#306FD7]" />
-                        <span className="text-sm text-[#306FD7]">
+                        <ImagePlus className="h-6 w-6 text-primary" />
+                        <span className="text-sm text-primary">
                           Click to upload image
                         </span>
                         <span className="text-[11px] text-muted-foreground">
@@ -340,7 +340,7 @@ export default function AdminSliders() {
                 <button
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
-                  className="inline-flex h-10 min-w-30 items-center justify-center rounded-md bg-[#306FD7] px-6 text-sm text-white transition hover:bg-[#2E55C9] disabled:opacity-70"
+                  className="inline-flex h-10 min-w-30 items-center justify-center rounded-md bg-primary px-6 text-sm text-white transition hover:bg-primary/90 disabled:opacity-70"
                 >
                   {createMutation.isPending || updateMutation.isPending ? "Submitting..." : "Submit"}
                 </button>

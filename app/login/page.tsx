@@ -52,7 +52,7 @@ export default function LoginPage() {
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-[#306FD7] text-lg font-bold text-white">
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary text-lg font-bold text-white">
               E
             </span>
             <span className="text-2xl font-bold text-foreground">EcoMerce</span>
@@ -107,17 +107,17 @@ export default function LoginPage() {
               <input type="checkbox" className="h-4 w-4 rounded border-border" />
               Remember me
             </label>
-            <Link href="/login" className="font-medium text-[#306FD7]">
+            <Link href="/login" className="font-medium text-primary">
               Forgot Password?
             </Link>
           </div>
 
-          {error && <p className="text-xs text-[#FF3B3B]">{error}</p>}
+          {error && <p className="text-xs text-accent">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="h-11 w-full rounded-full bg-[#306FD7] text-sm font-semibold text-white shadow-sm disabled:opacity-70"
+            className="h-11 w-full rounded-full bg-primary text-sm font-semibold text-white shadow-sm disabled:opacity-70"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

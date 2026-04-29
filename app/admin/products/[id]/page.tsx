@@ -39,7 +39,7 @@ export default function EditProductPage() {
   if (isLoading) {
     return (
       <div className="flex h-64 flex-col items-center justify-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         <p className="text-sm text-muted-foreground">Loading product details...</p>
       </div>
     )
@@ -51,7 +51,7 @@ export default function EditProductPage() {
         <p className="text-sm text-muted-foreground">Failed to load product or product not found.</p>
         <button 
           onClick={() => router.push("/admin/products")}
-          className="mt-4 rounded-full bg-[#EEF0FB] px-4 py-2 text-sm font-semibold text-[#306FD7] hover:bg-[#E0E6F8]"
+          className="mt-4 rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-primary hover:bg-secondary/70"
         >
           Go Back
         </button>

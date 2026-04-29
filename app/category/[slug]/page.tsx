@@ -22,7 +22,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
     return (
       <AppShell>
         <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       </AppShell>
     )
@@ -63,7 +63,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>
           </div>
           {items.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
               {items.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

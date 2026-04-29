@@ -45,7 +45,7 @@ export function MobileHeader() {
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
           <Link href="/" className="flex shrink-0 items-center gap-1.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#306FD7] text-sm font-bold text-white">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
               E
             </span>
             {!searchOpen && <span className="text-lg font-bold text-foreground">EcoMerce</span>}
@@ -78,7 +78,7 @@ export function MobileHeader() {
               <button
                 onClick={openSearch}
                 aria-label="Open search"
-                className="grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-[#EEF0FB]"
+                className="grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
               >
                 <Search className="h-5 w-5" />
               </button>
@@ -87,11 +87,11 @@ export function MobileHeader() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-[#EEF0FB]"
+              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCount > 0 && (
-                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#306FD7] px-1 text-[10px] font-bold text-white">
+                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
                   {totalCount}
                 </span>
               )}

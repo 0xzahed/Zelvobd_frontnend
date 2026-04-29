@@ -16,8 +16,8 @@ export default async function CheckoutSuccessPage({
       <div className="mx-auto flex max-w-md flex-col items-center gap-5 py-8 text-center md:py-16">
         {/* Animated success tick */}
         <div className="relative">
-          <div className="absolute inset-0 z-0 animate-ping rounded-full bg-[#22C55E]/30" />
-          <div className="relative grid h-20 w-20 place-items-center rounded-full bg-[#22C55E] text-white">
+          <div className="absolute inset-0 z-0 animate-ping rounded-full bg-success/30" />
+          <div className="relative grid h-20 w-20 place-items-center rounded-full bg-success text-white">
             <Check className="h-10 w-10" strokeWidth={3} />
           </div>
         </div>
@@ -37,7 +37,7 @@ export default async function CheckoutSuccessPage({
           </div>
           <CopyCode code={code} />
           {maskedPhone && (
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#EEF0FB] px-3 py-1 text-[11px] font-medium text-[#306FD7]">
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-[11px] font-medium text-primary">
               <MessageSquare className="h-3 w-3" />
               SMS sent to {maskedPhone}
             </div>
@@ -47,7 +47,7 @@ export default async function CheckoutSuccessPage({
         <div className="flex w-full flex-col gap-2">
           <Link
             href="/more"
-            className="block w-full rounded-full bg-[#306FD7] py-3 text-center text-sm font-semibold text-white"
+            className="block w-full rounded-full bg-primary py-3 text-center text-sm font-semibold text-white"
           >
             Track My Orders
           </Link>

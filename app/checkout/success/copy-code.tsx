@@ -24,7 +24,7 @@ export function CopyCode({ code }: { code: string }) {
     >
       {code}
       {copied ? (
-        <Check className="h-4 w-4 text-[#22C55E]" />
+        <Check className="h-4 w-4 text-success" />
       ) : (
         <Copy className="h-4 w-4 text-muted-foreground" />
       )}

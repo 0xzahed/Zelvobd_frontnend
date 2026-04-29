@@ -182,7 +182,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sections = groupBySection(MENU)
 
   return (
-    <div className="min-h-dvh overflow-x-hidden bg-[#F5F7FB]">
+    <div className="min-h-dvh overflow-x-hidden bg-surface">
       {open && (
         <button
           type="button"
@@ -194,16 +194,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed inset-y-0 left-0 z-40 w-70 transform border-r border-border/60 bg-[#FAFAFB] transition-transform md:w-64 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-70 transform border-r border-border/60 bg-surface-elevated transition-transform md:w-64 md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-16 items-center justify-between px-4">
           <Link href="/admin" prefetch={false} className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#306FD7] text-xs font-semibold text-white shadow-sm">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-xs font-semibold text-white shadow-sm">
               <ShoppingBag className="h-4 w-4" />
             </span>
-            <span className="text-2xl font-semibold text-[#202125]">Ecarto</span>
+            <span className="text-2xl font-semibold text-foreground">Ecarto</span>
           </Link>
           <button onClick={() => setOpen(false)} className="md:hidden" aria-label="Close menu">
             <X className="h-5 w-5" />
@@ -239,14 +239,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           className={cx(
                             "flex items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
                             active
-                              ? "border border-border/70 bg-white text-[#202125] shadow-sm"
-                              : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
+                              ? "border border-border/70 bg-white text-foreground shadow-sm"
+                              : "text-muted-foreground hover:bg-surface hover:text-foreground",
                           )}
                         >
                           <Icon
                             className={cx(
                               "h-4 w-4 shrink-0",
-                              active ? "text-[#306FD7]" : "text-muted-foreground",
+                              active ? "text-primary" : "text-muted-foreground",
                             )}
                           />
                           <span className="flex-1">{item.label}</span>
@@ -267,14 +267,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                         className={cx(
                           "flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
                           groupActive
-                            ? "border border-border/70 bg-white text-[#202125] shadow-sm"
-                            : "text-muted-foreground hover:bg-[#F5F7FB] hover:text-foreground",
+                            ? "border border-border/70 bg-white text-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-surface hover:text-foreground",
                         )}
                       >
                         <Icon
                           className={cx(
                             "h-4 w-4 shrink-0",
-                            groupActive ? "text-[#306FD7]" : "text-muted-foreground",
+                            groupActive ? "text-primary" : "text-muted-foreground",
                           )}
                         />
                         <span className="flex-1 text-left">{item.label}</span>
@@ -298,7 +298,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                                   className={cx(
                                     "flex items-center rounded-sm px-3 py-1.5 text-[13px] font-normal transition",
                                     active
-                                      ? "bg-white text-[#202125] shadow-sm"
+                                      ? "bg-white text-foreground shadow-sm"
                                       : "text-muted-foreground hover:text-foreground",
                                   )}
                                 >
@@ -319,7 +319,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="px-4 pb-4">
           <div className="rounded-2xl border border-border/70 bg-white p-3 shadow-sm">
             <div className="flex items-center gap-2.5 rounded-xl border border-border/60 p-2">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-[#EEF0FB] text-xs font-semibold text-[#306FD7]">
+              <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-xs font-semibold text-primary">
                 {admin?.email?.[0]?.toUpperCase() || "A"}
               </div>
               <div className="min-w-0 flex-1">
@@ -330,14 +330,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </div>
-            <button className="mt-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-[#F5F7FB]">
+            <button className="mt-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-surface">
               <Settings2 className="h-4 w-4" /> Settings
             </button>
             <button
               type="button"
               onClick={() => void handleLogout()}
               disabled={loggingOut}
-              className="mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-[#F5F7FB] disabled:opacity-60"
+              className="mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-surface disabled:opacity-60"
             >
               <LogOut className="h-4 w-4" /> {loggingOut ? "Logging out..." : "Logout"}
             </button>
@@ -346,10 +346,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Top bar */}
-      <header className="sticky top-0 z-20 ml-0 flex h-14 items-center justify-between border-b border-border/70 bg-[#FAFAFB]/95 px-3 backdrop-blur md:ml-64 md:h-16 md:px-6">
+      <header className="sticky top-0 z-20 ml-0 flex h-14 items-center justify-between border-b border-border/70 bg-surface-elevated/95 px-3 backdrop-blur md:ml-64 md:h-16 md:px-6">
         <button
           onClick={() => setOpen(true)}
-          className="grid h-9 w-9 place-items-center rounded-md hover:bg-[#F5F7FB] md:hidden"
+          className="grid h-9 w-9 place-items-center rounded-md hover:bg-surface md:hidden"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />

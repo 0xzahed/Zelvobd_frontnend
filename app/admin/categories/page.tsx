@@ -170,7 +170,7 @@ export default function AdminCategoriesPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search categories..."
-              className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-[#306FD7]/60"
+              className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-primary/60"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function AdminCategoriesPage() {
             <h2 className="text-base text-foreground md:text-lg"></h2>
             <button
               onClick={openAdd}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#306FD7] px-4 text-sm text-white transition hover:bg-[#2E57D6]"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-sm text-white transition hover:bg-primary/90"
             >
               <Plus className="h-4 w-4" />
               Add Category
@@ -189,7 +189,7 @@ export default function AdminCategoriesPage() {
 
         {/* Table */}
         <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
-          <div className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-border/60 bg-[#F7F9FD] px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground md:grid-cols-[48px_1fr_1fr_auto]">
+          <div className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-border/60 bg-secondary px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground md:grid-cols-[48px_1fr_1fr_auto]">
             <span className="hidden md:block" aria-hidden />
             <span className="md:text-left">Title</span>
             <span className="hidden text-muted-foreground md:block">Slug</span>
@@ -205,7 +205,7 @@ export default function AdminCategoriesPage() {
             {filtered.map((cat) => (
               <li
                 key={cat.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3 transition hover:bg-[#F7F9FD] md:grid-cols-[48px_1fr_1fr_auto]"
+                className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3 transition hover:bg-secondary md:grid-cols-[48px_1fr_1fr_auto]"
               >
                 <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
                   <Image
@@ -238,21 +238,21 @@ export default function AdminCategoriesPage() {
                   <button
                     onClick={() => void openView(cat)}
                     aria-label={`View ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-foreground transition hover:bg-[#EEF0FB]"
+                    className="grid h-8 w-8 place-items-center rounded-md text-foreground transition hover:bg-secondary"
                   >
                     <Eye className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => openEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-[#306FD7] transition hover:bg-[#EEF0FB]"
+                    className="grid h-8 w-8 place-items-center rounded-md text-primary transition hover:bg-secondary"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(cat)}
                     aria-label={`Delete ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-[#FF3B3B] transition hover:bg-[#FF3B3B]/10"
+                    className="grid h-8 w-8 place-items-center rounded-md text-accent transition hover:bg-accent/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -276,7 +276,7 @@ export default function AdminCategoriesPage() {
             <button
               onClick={closeModal}
               aria-label="Close"
-              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-[#EEF0FB]"
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
             >
               <X className="h-4 w-4" />
             </button>
@@ -293,7 +293,7 @@ export default function AdminCategoriesPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Title"
-                className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-[#306FD7]/60"
+                className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-primary/60"
               />
             </div>
 
@@ -312,7 +312,7 @@ export default function AdminCategoriesPage() {
               <button
                 type="button"
                 onClick={() => imgInputRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-[#306FD7]/40 bg-[#EEF0FB]/60 py-6 text-center transition hover:border-[#306FD7]/70 hover:bg-[#EEF0FB]"
+                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-primary/40 bg-secondary/60 py-6 text-center transition hover:border-primary/70 hover:bg-secondary"
               >
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -323,8 +323,8 @@ export default function AdminCategoriesPage() {
                   />
                 ) : (
                   <>
-                    <ImagePlus className="h-5 w-5 text-[#306FD7]" />
-                    <span className="text-sm text-[#306FD7]">
+                    <ImagePlus className="h-5 w-5 text-primary" />
+                    <span className="text-sm text-primary">
                       Click to upload image
                     </span>
                     <span className="text-[11px] text-muted-foreground">
@@ -340,7 +340,7 @@ export default function AdminCategoriesPage() {
               <button
                 onClick={submit}
                 disabled={!name.trim()}
-                className="h-11 min-w-40 rounded-full bg-[#306FD7] px-8 text-sm text-white transition hover:bg-[#2E57D6] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-11 min-w-40 rounded-full bg-primary px-8 text-sm text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Submit
               </button>
@@ -361,7 +361,7 @@ export default function AdminCategoriesPage() {
             <button
               onClick={() => setViewOpen(false)}
               aria-label="Close"
-              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-[#EEF0FB]"
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
             >
               <X className="h-4 w-4" />
             </button>
@@ -375,7 +375,7 @@ export default function AdminCategoriesPage() {
 
             {!viewLoading && viewCategory && (
               <div className="mt-5 space-y-4">
-                <div className="mx-auto h-36 w-36 overflow-hidden rounded-xl border border-border/60 bg-[#F7F9FD]">
+                <div className="mx-auto h-36 w-36 overflow-hidden rounded-xl border border-border/60 bg-secondary">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={viewCategory.imageUrl || "/placeholder.svg"}
@@ -383,7 +383,7 @@ export default function AdminCategoriesPage() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="space-y-2 rounded-xl border border-border/60 bg-[#F7F9FD] p-4 text-sm">
+                <div className="space-y-2 rounded-xl border border-border/60 bg-secondary p-4 text-sm">
                   <p className="text-foreground">
                     <span className="mr-2 font-semibold">Title:</span>
                     {viewCategory.title}

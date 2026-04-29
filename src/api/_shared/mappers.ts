@@ -100,5 +100,5 @@ export const mapBanner = (banner: any): Slider => ({
   cta: "Shop now",
   link: banner.url || "/",
   image: toAbsoluteUploadUrl(banner.imageUrl),
-  bg: "#EAF0FF",
+  bg: "var(--secondary)",
 })

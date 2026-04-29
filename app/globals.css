@@ -14,7 +14,7 @@
   --popover-foreground: #1a1a2e;
   --primary: #306fd7;
   --primary-foreground: #ffffff;
-  --secondary: #f4f6fd;
+  --secondary: #eef0fb;
   --secondary-foreground: #1a1a2e;
   --muted: #f4f6fd;
   --muted-foreground: #6b7280;
@@ -22,6 +22,10 @@
   --accent-foreground: #ffffff;
   --success: #22c55e;
   --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --surface: #f5f7fb;
+  --surface-elevated: #fafafb;
   --destructive: #ff3b3b;
   --destructive-foreground: #ffffff;
   --border: #e5e7f2;
@@ -46,6 +50,10 @@
   --primary-foreground: #ffffff;
   --secondary: #1f2142;
   --secondary-foreground: #f5f6fb;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --surface: #14152b;
+  --surface-elevated: #1a1b2e;
   --muted: #1f2142;
   --muted-foreground: #9ca3af;
   --accent: #ff3b3b;
@@ -79,6 +87,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -106,7 +118,7 @@
   }
   html,
   body {
-    background-color: var(--background);
+    background-color: var(--card);
     color: var(--foreground);
   }
   body {

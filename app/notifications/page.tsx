@@ -10,5 +10,5 @@ export default function NotificationsPage() {
   const [items, setItems] = useState<Notification[]>([])
   const markAll = () => setItems((list) => list.map((n) => ({ ...n, unread: false })))
 
-  return <AppShell><BackHeader title="Notifications" right={<button onClick={markAll} aria-label="Mark all as read" className="grid h-10 w-10 place-items-center rounded-full bg-card text-[#306FD7] shadow-card"><Bell className="h-4 w-4" /></button>} /><div className="space-y-2 py-4 md:py-6">{items.length===0?<div className="rounded-2xl bg-card p-10 text-center text-sm text-muted-foreground">No notifications available.</div>:null}</div></AppShell>
+  return <AppShell><BackHeader title="Notifications" right={<button onClick={markAll} aria-label="Mark all as read" className="grid h-10 w-10 place-items-center rounded-full bg-card text-primary shadow-card"><Bell className="h-4 w-4" /></button>} /><div className="space-y-2 py-4 md:py-6">{items.length===0?<div className="rounded-2xl bg-card p-10 text-center text-sm text-muted-foreground">No notifications available.</div>:null}</div></AppShell>
 }

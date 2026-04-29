@@ -88,7 +88,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               onClick={handleConfirm}
               className={cn(
                 options.variant === "danger" &&
-                  "bg-[#FF3B3B] text-white hover:bg-[#E63232] focus-visible:ring-[#FF3B3B]/40",
+                  "bg-accent text-white hover:bg-accent/90 focus-visible:ring-accent/40",
               )}
             >
               {options.confirmText}

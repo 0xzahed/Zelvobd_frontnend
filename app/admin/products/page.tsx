@@ -58,7 +58,7 @@ export default function AdminProductsPage() {
           </div>
           <Link
             href="/admin/products/new"
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-[#306FD7] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#2E55C9]"
+            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" /> Add
           </Link>
@@ -69,7 +69,7 @@ export default function AdminProductsPage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-245 text-left text-sm">
             <thead>
-              <tr className="border-b border-border bg-[#EEF0FB]/50 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr className="border-b border-border bg-secondary/50 text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-medium">Product</th>
                 <th className="px-5 py-3 font-medium">Category</th>
                 <th className="px-5 py-3 font-medium">Sub Category</th>
@@ -85,7 +85,7 @@ export default function AdminProductsPage() {
                 <tr>
                   <td colSpan={8} className="px-5 py-12 text-center">
                     <div className="flex flex-col items-center justify-center gap-2">
-                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#306FD7] border-t-transparent" />
+                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                        <p className="text-xs text-muted-foreground">Loading products...</p>
                     </div>
                   </td>
@@ -99,10 +99,10 @@ export default function AdminProductsPage() {
                 </tr>
               )}
               {!isLoading && filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/60 last:border-b-0 transition hover:bg-[#F7F9FD]/50">
+                <tr key={p.id} className="border-b border-border/60 last:border-b-0 transition hover:bg-secondary/50">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-[#EEF0FB]">
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-secondary">
                         <Image
                           src={p.images?.[0] || "/placeholder.svg"}
                           alt={p.name}
@@ -126,7 +126,7 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="px-5 py-3 font-medium text-foreground">{formatBDT(p.price)}</td>
                   <td className="px-5 py-3">
-                    <span className="rounded-md bg-[#FF3B3B]/10 px-2 py-0.5 text-[11px] font-semibold text-[#FF3B3B]">
+                    <span className="rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
                       -{p.discount}%
                     </span>
                   </td>
@@ -134,7 +134,7 @@ export default function AdminProductsPage() {
                     <span
                       className={cx(
                         "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                        p.stock ? "bg-green-50 text-[#22C55E]" : "bg-red-50 text-[#FF3B3B]",
+                        p.stock ? "bg-green-50 text-success" : "bg-red-50 text-accent",
                       )}
                     >
                       {p.stock ? "In Stock" : "Out of Stock"}
@@ -143,17 +143,17 @@ export default function AdminProductsPage() {
                   <td className="px-5 py-3">
                     <div className="flex gap-1">
                       {p.isTrending && (
-                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-[#306FD7]">
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
                           Trending
                         </span>
                       )}
                       {p.isFlashSale && (
-                        <span className="rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-semibold text-[#FF3B3B]">
+                        <span className="rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-semibold text-accent">
                           Flash
                         </span>
                       )}
                       {p.isFreeDelivery && (
-                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-[#22C55E]">
+                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-success">
                           Free
                         </span>
                       )}
@@ -165,7 +165,7 @@ export default function AdminProductsPage() {
                         href={`/admin/products/${p.id}`}
                         aria-label="Edit"
                         title="Edit"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-foreground transition hover:bg-[#306FD7] hover:text-white"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </Link>
@@ -174,7 +174,7 @@ export default function AdminProductsPage() {
                         disabled={copyMutation.isPending}
                         aria-label="Copy"
                         title="Duplicate"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-[#306FD7] transition hover:bg-[#306FD7] hover:text-white disabled:opacity-50"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </button>
@@ -183,7 +183,7 @@ export default function AdminProductsPage() {
                         disabled={deleteMutation.isPending}
                         aria-label="Delete"
                         title="Delete"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B] transition hover:bg-[#FF3B3B] hover:text-white disabled:opacity-50"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

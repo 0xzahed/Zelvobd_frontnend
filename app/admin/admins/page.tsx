@@ -197,7 +197,7 @@ export default function AdminsPage() {
         </div>
         <button
           onClick={openAdd}
-          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#306FD7] px-4 text-sm font-semibold text-white"
+          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-semibold text-white"
         >
           <Plus className="h-4 w-4" /> Add Admin
         </button>
@@ -206,7 +206,7 @@ export default function AdminsPage() {
       <div className="overflow-hidden rounded-lg bg-card shadow-card">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-[#F7F9FD] text-xs uppercase text-muted-foreground">
+            <thead className="bg-secondary text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-semibold">Email</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -223,8 +223,8 @@ export default function AdminsPage() {
                       onClick={() => toggleActive(a.id)}
                       className={
                         a.active
-                          ? "inline-flex rounded-full bg-[#22C55E]/10 px-2 py-0.5 text-xs font-semibold text-[#22C55E]"
-                          : "inline-flex rounded-full bg-[#6B7280]/10 px-2 py-0.5 text-xs font-semibold text-[#6B7280]"
+                          ? "inline-flex rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success"
+                          : "inline-flex rounded-full bg-muted-foreground/10 px-2 py-0.5 text-xs font-semibold text-muted-foreground"
                       }
                     >
                       {a.active ? "Active" : "Inactive"}
@@ -237,7 +237,7 @@ export default function AdminsPage() {
                         onClick={() => openEdit(a)}
                         aria-label="Edit"
                         title="Edit"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#EEF0FB] text-foreground"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-foreground"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -246,7 +246,7 @@ export default function AdminsPage() {
                         aria-label="Delete"
                         title="Delete"
                         disabled={a.id === currentAdmin?.id}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-[#FF3B3B]/10 text-[#FF3B3B] disabled:opacity-40"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-accent/10 text-accent disabled:opacity-40"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -289,7 +289,7 @@ export default function AdminsPage() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close"
-                className="grid h-8 w-8 place-items-center rounded-full hover:bg-[#EEF0FB]"
+                className="grid h-8 w-8 place-items-center rounded-full hover:bg-secondary"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -302,7 +302,7 @@ export default function AdminsPage() {
                   required
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm cursor-text caret-current"
+                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm cursor-text caret-current"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -315,7 +315,7 @@ export default function AdminsPage() {
                   required={!form.id}
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-[#F7F9FD] px-3 py-2 text-sm cursor-text caret-current"
+                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm cursor-text caret-current"
                   placeholder="••••••••"
                 />
               </div>
@@ -331,14 +331,14 @@ export default function AdminsPage() {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-full bg-[#EEF0FB] px-4 py-2 text-sm font-semibold text-foreground"
+                  className="rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-foreground"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-full bg-[#306FD7] px-4 py-2 text-sm font-semibold text-white"
+                  className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
                 >
                   {saving ? "Saving..." : form.id ? "Save Changes" : "Add Admin"}
                 </button>
