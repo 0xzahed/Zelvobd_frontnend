@@ -138,7 +138,7 @@ export function useProducts(query?: Record<string, unknown>) {
     queryKey: [...PRODUCT_KEYS.all, query],
     queryFn: async () => {
       const res = await getProducts(query || { limit: 100 })
-      return (res?.data || []).map(mapProduct)
+      return (res?.data?.products || []).map(mapProduct)
     },
   })
 }
