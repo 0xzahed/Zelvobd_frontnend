@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const getFlashSaleCampaignDetails = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/flash-sales/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/flash-sales/${id}`, {
     method: "GET",
     headers: { ...authHeaders() },
   })

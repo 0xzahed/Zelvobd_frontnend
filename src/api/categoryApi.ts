@@ -1,3 +1,4 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 const parseJsonSafe = async (response: Response) => {
@@ -28,7 +29,7 @@ const buildQueryUrl = (path: string, query?: Record<string, unknown>) => {
 }
 
 export const getCategories = async (query?: Record<string, unknown>) => {
-  const response = await fetch(buildQueryUrl("/categories", query).toString(), {
+  const response = await adminFetch(buildQueryUrl("/categories", query).toString(), {
     method: "GET",
     headers: { ...authHeaders() },
   })
@@ -39,7 +40,7 @@ export const getCategories = async (query?: Record<string, unknown>) => {
 }
 
 export const getCategoryDetails = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/categories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/categories/${id}`, {
     method: "GET",
     headers: { ...authHeaders() },
   })
@@ -50,7 +51,7 @@ export const getCategoryDetails = async (id: string) => {
 }
 
 export const createCategory = async (formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/categories`, {
+  const response = await adminFetch(`${BASE_URL}/categories`, {
     method: "POST",
     headers: { ...authHeaders() },
     body: formData,
@@ -62,7 +63,7 @@ export const createCategory = async (formData: FormData) => {
 }
 
 export const updateCategory = async (id: string, formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/categories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/categories/${id}`, {
     method: "PATCH",
     headers: { ...authHeaders() },
     body: formData,
@@ -74,7 +75,7 @@ export const updateCategory = async (id: string, formData: FormData) => {
 }
 
 export const deleteCategory = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/categories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/categories/${id}`, {
     method: "DELETE",
     headers: { ...authHeaders() },
   })
@@ -85,7 +86,7 @@ export const deleteCategory = async (id: string) => {
 }
 
 export const getSubCategories = async (query?: Record<string, unknown>) => {
-  const response = await fetch(buildQueryUrl("/subcategories", query).toString(), {
+  const response = await adminFetch(buildQueryUrl("/subcategories", query).toString(), {
     method: "GET",
     headers: { ...authHeaders() },
   })
@@ -96,7 +97,7 @@ export const getSubCategories = async (query?: Record<string, unknown>) => {
 }
 
 export const getSubCategoryDetails = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/subcategories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/subcategories/${id}`, {
     method: "GET",
     headers: { ...authHeaders() },
   })
@@ -107,7 +108,7 @@ export const getSubCategoryDetails = async (id: string) => {
 }
 
 export const createSubCategory = async (formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/subcategories`, {
+  const response = await adminFetch(`${BASE_URL}/subcategories`, {
     method: "POST",
     headers: { ...authHeaders() },
     body: formData,
@@ -119,7 +120,7 @@ export const createSubCategory = async (formData: FormData) => {
 }
 
 export const updateSubCategory = async (id: string, formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/subcategories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/subcategories/${id}`, {
     method: "PATCH",
     headers: { ...authHeaders() },
     body: formData,
@@ -131,7 +132,7 @@ export const updateSubCategory = async (id: string, formData: FormData) => {
 }
 
 export const deleteSubCategory = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/subcategories/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/subcategories/${id}`, {
     method: "DELETE",
     headers: { ...authHeaders() },
   })

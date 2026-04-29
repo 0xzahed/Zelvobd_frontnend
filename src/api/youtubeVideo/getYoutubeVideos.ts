@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const getYoutubeVideos = async () => {
-  const response = await fetch(`${BASE_URL}/youtube-videos`, {
+  const response = await adminFetch(`${BASE_URL}/youtube-videos`, {
     method: "GET",
     headers: { ...authHeaders() },
   })

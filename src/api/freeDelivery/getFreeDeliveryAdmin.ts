@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const getFreeDeliveryAdmin = async () => {
-  const response = await fetch(`${BASE_URL}/free-delivery/admin`, {
+  const response = await adminFetch(`${BASE_URL}/free-delivery/admin`, {
     method: "GET",
     headers: { ...authHeaders() },
   })
