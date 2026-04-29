@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const copyProduct = async (id: string) => {
-  const response = await fetch(`${BASE_URL}/products/${id}/copy`, {
+  const response = await adminFetch(`${BASE_URL}/products/${id}/copy`, {
     method: "POST",
     headers: { ...authHeaders() },
   })

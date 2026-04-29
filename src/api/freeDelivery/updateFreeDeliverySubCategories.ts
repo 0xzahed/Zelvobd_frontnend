@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const updateFreeDeliverySubCategories = async (body: Record<string, unknown>) => {
-  const response = await fetch(`${BASE_URL}/free-delivery/sub-categories`, {
+  const response = await adminFetch(`${BASE_URL}/free-delivery/sub-categories`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

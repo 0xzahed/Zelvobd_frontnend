@@ -1,7 +1,8 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const updateBanner = async (id: string, formData: FormData) => {
-  const response = await fetch(`${BASE_URL}/banners/${id}`, {
+  const response = await adminFetch(`${BASE_URL}/banners/${id}`, {
     method: "PATCH",
     headers: { ...authHeaders() },
     body: formData,

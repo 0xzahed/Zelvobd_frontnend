@@ -1,3 +1,4 @@
+import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
 export const getActiveFlashSaleProducts = async (query?: Record<string, unknown>) => {
@@ -10,7 +11,7 @@ export const getActiveFlashSaleProducts = async (query?: Record<string, unknown>
     })
   }
 
-  const response = await fetch(url.toString(), {
+  const response = await adminFetch(url.toString(), {
     method: "GET",
     headers: { ...authHeaders() },
   })
