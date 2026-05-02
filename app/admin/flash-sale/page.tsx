@@ -1,315 +1,258 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { CalendarDays, Clock3, ImagePlus, Search, Tag } from "lucide-react"
-import { createFlashSaleCampaign } from "@/src/api/flashSale/createFlashSaleCampaign"
-import { getFlashSaleCampaigns } from "@/src/api/flashSale/getFlashSaleCampaigns"
-import { updateFlashSaleCampaignTime } from "@/src/api/flashSale/updateFlashSaleCampaignTime"
-import { updateFlashSaleCampaignProducts } from "@/src/api/flashSale/updateFlashSaleCampaignProducts"
-import { deleteFlashSaleCampaign } from "@/src/api/flashSale/deleteFlashSaleCampaign"
-import { useAdminStore } from "@/lib/admin-store"
-import { notify } from "@/lib/notify"
+import { useState } from "react"
+import Link from "next/link"
+import { CalendarDays, MoreVertical, Plus, Tag, Trash, Edit, Clock } from "lucide-react"
+import { format } from "date-fns"
 
-const FLASH_SALE_BG_STORAGE_KEY = "flash-sale-bg-image"
+import { useFlashSales, useCreateFlashSale, useDeleteFlashSale } from "@/src/hooks/api/useFlashSales"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useConfirm } from "@/components/ui/confirm-dialog"
+import { Badge } from "@/components/ui/badge"
 
-export default function AdminFlashSalePage() {
-  const { products } = useAdminStore()
-  const [campaignId, setCampaignId] = useState("")
-  const [selected, setSelected] = useState<string[]>([])
-  const [initialSelected, setInitialSelected] = useState<string[]>([])
-  const [startsAt, setStartsAt] = useState("")
-  const [endsAt, setEndsAt] = useState("")
-  const [backgroundImage, setBackgroundImage] = useState("")
-  const [query, setQuery] = useState("")
-  const [saving, setSaving] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const bgFileInputRef = useRef<HTMLInputElement | null>(null)
+export default function AdminFlashSaleListPage() {
+  const { data, isLoading } = useFlashSales(1, 100)
+  const campaigns = data?.campaigns || []
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await getFlashSaleCampaigns({ limit: 1 })
-        const first = res?.data?.campaigns?.[0]
-        if (first) {
-          const selectedProductIds = (first.products || []).map((p: { productId: string }) => p.productId)
-          setCampaignId(first.id || "")
-          setStartsAt(first.startAt?.slice(0, 16) || "")
-          setEndsAt(first.endAt?.slice(0, 16) || "")
-          setSelected(selectedProductIds)
-          setInitialSelected(selectedProductIds)
-          setBackgroundImage(first.bgImage || first.backgroundImage || "")
-        }
-      } catch (error) {
-        setSelected([])
-        notify.error({ title: "Failed to load flash sale", message: getErrorMessage(error) })
-      } finally {
-        const storedBg = localStorage.getItem(FLASH_SALE_BG_STORAGE_KEY)
-        if (storedBg) setBackgroundImage(storedBg)
-        setLoading(false)
-      }
-    }
-    void load()
-  }, [])
+  const [createOpen, setCreateOpen] = useState(false)
 
-  const filteredProducts = useMemo(() => {
-    const lc = query.toLowerCase().trim()
-    if (!lc) return products
-    return products.filter((p) => p.name.toLowerCase().includes(lc))
-  }, [products, query])
-  const statusLabel = campaignId ? "SCHEDULED" : "DRAFT"
+  const createMutation = useCreateFlashSale()
+  const deleteMutation = useDeleteFlashSale()
+  const confirm = useConfirm()
 
-  const toggleProduct = (id: string) => {
-    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  const [formData, setFormData] = useState({
+    title: "",
+    startAt: "",
+    endAt: "",
+    discountType: "PERCENT" as "PERCENT" | "TAKA",
+    discountValue: "",
+  })
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!formData.startAt || !formData.endAt) return
+    
+    await createMutation.mutateAsync({
+      title: formData.title,
+      startAt: new Date(formData.startAt).toISOString(),
+      endAt: new Date(formData.endAt).toISOString(),
+      discountType: formData.discountType,
+      discountValue: Number(formData.discountValue),
+      productIds: [],
+    })
+    
+    setCreateOpen(false)
+    setFormData({ title: "", startAt: "", endAt: "", discountType: "PERCENT", discountValue: "" })
   }
 
-  const handleBackgroundPick = (file: File | null | undefined) => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const next = String(reader.result || "")
-      setBackgroundImage(next)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const save = async () => {
-    if (!startsAt) {
-      notify.warning({ title: "Start time required", message: "Please select start time." })
-      return
-    }
-
-    if (!endsAt) {
-      notify.warning({ title: "End time required", message: "Please select end time." })
-      return
-    }
-
-    const startDate = new Date(startsAt)
-    const endDate = new Date(endsAt)
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-      notify.warning({ title: "Invalid date", message: "Please select valid start/end date-time." })
-      return
-    }
-
-    if (endDate <= startDate) {
-      notify.warning({ title: "Invalid range", message: "End time must be after start time." })
-      return
-    }
-
-    try {
-      setSaving(true)
-      localStorage.setItem(FLASH_SALE_BG_STORAGE_KEY, backgroundImage.trim())
-      if (campaignId) {
-        if (selected.length === 0) {
-          await deleteFlashSaleCampaign(campaignId)
-          setCampaignId("")
-          notify.success({ title: "Flash sale removed", message: "Campaign deleted successfully." })
-          return
-        }
-        await updateFlashSaleCampaignTime(campaignId, {
-          startAt: startDate.toISOString(),
-          endAt: endDate.toISOString(),
-        })
-
-        const initialSet = new Set(initialSelected)
-        const selectedSet = new Set(selected)
-        const addProductIds = selected.filter((id) => !initialSet.has(id))
-        const removeProductIds = initialSelected.filter((id) => !selectedSet.has(id))
-
-        if (addProductIds.length > 0 || removeProductIds.length > 0) {
-          await updateFlashSaleCampaignProducts(campaignId, {
-            ...(addProductIds.length > 0 ? { addProductIds } : {}),
-            ...(removeProductIds.length > 0 ? { removeProductIds } : {}),
-          })
-        }
-
-        setInitialSelected(selected)
-        notify.success({ title: "Flash sale updated", message: "Campaign updated successfully." })
-      } else {
-        const createRes = await createFlashSaleCampaign({
-          title: "Flash Sale Campaign",
-          startAt: startDate.toISOString(),
-          endAt: endDate.toISOString(),
-          discountType: "PERCENT",
-          discountValue: 10,
-          productIds: selected,
-        })
-        setCampaignId(createRes?.data?.id || "")
-        setInitialSelected(selected)
-        notify.success({ title: "Flash sale created", message: "Campaign created successfully." })
-      }
-    } catch (error) {
-      notify.error({ title: "Save failed", message: getErrorMessage(error) })
-    } finally {
-      setSaving(false)
+  const handleDelete = async (id: string) => {
+    const confirmed = await confirm({
+      title: "Delete Flash Sale",
+      message: "Are you sure you want to delete this campaign? This will remove the discount from all associated products. This action cannot be undone.",
+      confirmText: "Delete Campaign",
+      variant: "danger"
+    })
+    
+    if (confirmed) {
+      await deleteMutation.mutateAsync(id)
     }
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-5 bg-slate-50/40 p-3 md:p-5">
-      <header className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h1 className="text-4xl font-black lowercase tracking-tight text-slate-900">upcomming</h1>
-        <div className="mt-2 flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{statusLabel}</span>
-          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">10% OFF</span>
-        </div>
-      </header>
-
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Campaign Details</h2>
-        <div className="my-4 h-px bg-slate-200" />
-
-        <div className="grid gap-3 md:grid-cols-3">
-          <label className="block">
-            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <CalendarDays className="h-4 w-4" /> Start Time
-            </span>
-            <div className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4">
-              <input
-                type="datetime-local"
-                value={startsAt}
-                onChange={(e) => setStartsAt(e.target.value)}
-                className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
-              />
-            </div>
-          </label>
-
-          <label className="block">
-            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <Clock3 className="h-4 w-4" /> End Time
-            </span>
-            <div className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4">
-              <input
-                type="datetime-local"
-                value={endsAt}
-                onChange={(e) => setEndsAt(e.target.value)}
-                className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
-              />
-            </div>
-          </label>
-
-          <div className="block">
-            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <Tag className="h-4 w-4" /> Total Products
-            </span>
-            <div className="flex h-11 items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-base font-bold text-slate-900">
-              {selected.length}
-            </div>
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Flash Sales</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your store's flash sale campaigns and limited-time offers.
+          </p>
         </div>
 
-        <button
-          onClick={() => void save()}
-          disabled={saving || loading}
-          className="mt-4 h-12 w-full rounded-2xl bg-slate-200 text-base font-semibold text-slate-700 transition hover:bg-slate-300 disabled:opacity-60"
-        >
-          {saving ? "Saving..." : "Edit Time"}
-        </button>
-      </section>
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add New Campaign
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <form onSubmit={handleCreate}>
+              <DialogHeader>
+                <DialogTitle>Create Flash Sale</DialogTitle>
+                <DialogDescription>
+                  Set up a new flash sale campaign. You can add products to it later.
+                </DialogDescription>
+              </DialogHeader>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Manage Products</h2>
-            <p className="text-sm text-slate-500">Add or remove products from this campaign.</p>
-          </div>
-          <button
-            onClick={() => void save()}
-            disabled={saving || loading}
-            className="h-11 rounded-2xl bg-blue-400 px-6 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
-          >
-            {saving ? "Saving..." : "Save Products"}
-          </button>
-        </div>
-        <div className="my-4 h-px bg-slate-200" />
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Campaign Title</Label>
+                  <Input 
+                    id="title" 
+                    required 
+                    value={formData.title} 
+                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g., Eid Special Flash Sale"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startAt">Start Time</Label>
+                    <Input 
+                      id="startAt" 
+                      type="datetime-local" 
+                      required 
+                      value={formData.startAt}
+                      onChange={e => setFormData({ ...formData, startAt: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endAt">End Time</Label>
+                    <Input 
+                      id="endAt" 
+                      type="datetime-local" 
+                      required 
+                      value={formData.endAt}
+                      onChange={e => setFormData({ ...formData, endAt: e.target.value })}
+                    />
+                  </div>
+                </div>
 
-        <p className="mb-3 text-sm font-semibold text-foreground">Background image (optional)</p>
-
-        <div className="flex flex-col gap-3 md:flex-row">
-          <button
-            type="button"
-            onClick={() => bgFileInputRef.current?.click()}
-            className="grid h-20 w-full place-items-center rounded-2xl border border-border bg-secondary text-center md:w-31.5"
-          >
-            <div>
-              <ImagePlus className="mx-auto mb-1 h-5 w-5 text-primary" />
-              <p className="text-xs text-muted-foreground">Upload / paste URL below</p>
-            </div>
-          </button>
-
-          <div className="flex-1">
-            {backgroundImage ? (
-              <div className="relative h-28 w-full overflow-hidden rounded-xl border border-border bg-secondary">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={backgroundImage}
-                  alt="Flash sale background preview"
-                  className="h-full w-full object-cover"
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="discountType">Discount Type</Label>
+                    <Select 
+                      value={formData.discountType} 
+                      onValueChange={(val: any) => setFormData({ ...formData, discountType: val })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PERCENT">Percentage (%)</SelectItem>
+                        <SelectItem value="TAKA">Flat Amount (৳)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="discountValue">Discount Value</Label>
+                    <Input 
+                      id="discountValue" 
+                      type="number" 
+                      min="1"
+                      required 
+                      value={formData.discountValue}
+                      onChange={e => setFormData({ ...formData, discountValue: e.target.value })}
+                      placeholder="e.g. 10"
+                    />
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="grid h-28 w-full place-items-center rounded-xl border border-dashed border-border bg-secondary text-xs text-muted-foreground">
-                No image selected
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending}>
+                  {createMutation.isPending ? "Creating..." : "Create Campaign"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {isLoading ? (
+        <div className="flex h-40 items-center justify-center text-muted-foreground">
+          Loading campaigns...
+        </div>
+      ) : campaigns.length === 0 ? (
+        <div className="flex h-64 flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-card/50 text-muted-foreground">
+          <Tag className="h-8 w-8 opacity-20" />
+          <p>No flash sales created yet.</p>
+          <Button variant="outline" className="mt-2" onClick={() => setCreateOpen(true)}>
+            Create your first campaign
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {campaigns.map((campaign) => (
+            <div key={campaign.id} className="group relative rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground line-clamp-1" title={campaign.title}>{campaign.title}</h3>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Badge variant={
+                      campaign.status === "ACTIVE" ? "default" :
+                      campaign.status === "SCHEDULED" ? "secondary" : "outline"
+                    }>
+                      {campaign.status}
+                    </Badge>
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                      {campaign.discountType === "PERCENT" ? `${campaign.discountValue}% OFF` : `৳${campaign.discountValue} OFF`}
+                    </Badge>
+                  </div>
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/admin/flash-sale/${campaign.id}`} className="cursor-pointer">
+                        <Edit className="mr-2 h-4 w-4" /> Manage
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-destructive focus:text-destructive cursor-pointer"
+                      onClick={() => handleDelete(campaign.id)}
+                    >
+                      <Trash className="mr-2 h-4 w-4" /> Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-            )}
-            <p className="mt-1 text-xs text-muted-foreground">
-              Recommended size: 1600 x 500 px (JPG/PNG/WebP). Shown behind Flash Sale on home page.
-            </p>
-          </div>
-        </div>
 
-        <input
-          ref={bgFileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => handleBackgroundPick(e.target.files?.[0])}
-        />
-
-        <p className="mt-3 text-sm text-slate-500">{filteredProducts.length} Products Found</p>
-        <div className="mb-3 mt-3 flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-foreground">Select products</h2>
-          <div className="flex h-10 items-center gap-2 rounded-full border border-border bg-background px-3">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-52 bg-transparent text-sm outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="max-h-90 space-y-2 overflow-y-auto pr-1">
-          {filteredProducts.map((p) => (
-            <label
-              key={p.id}
-              className="flex cursor-pointer items-center justify-between rounded-xl border border-border bg-background px-3 py-2"
-            >
-              <span className="line-clamp-1 text-sm text-foreground">{p.name}</span>
-              <input
-                type="checkbox"
-                checked={selected.includes(p.id)}
-                onChange={() => toggleProduct(p.id)}
-                className="h-4 w-4 accent-primary"
-              />
-            </label>
+              <div className="mt-6 space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 opacity-70" />
+                  <span>{format(new Date(campaign.startAt), "MMM d, yyyy h:mm a")}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 opacity-70" />
+                  <span>{format(new Date(campaign.endAt), "MMM d, yyyy h:mm a")}</span>
+                </div>
+                <div className="flex items-center gap-2 pt-2 border-t mt-3">
+                  <span className="font-medium text-foreground">{campaign.productCount}</span> 
+                  <span>products selected</span>
+                </div>
+              </div>
+            </div>
           ))}
-          {filteredProducts.length === 0 && (
-            <p className="rounded-xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-              No products found.
-            </p>
-          )}
         </div>
-      </section>
+      )}
     </div>
   )
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error && typeof error === "object") {
-    const maybe = error as { message?: unknown; error?: unknown }
-    if (typeof maybe.message === "string" && maybe.message.trim()) return maybe.message
-    if (typeof maybe.error === "string" && maybe.error.trim()) return maybe.error
-  }
-  return "Please try again."
 }
