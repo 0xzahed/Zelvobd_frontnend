@@ -51,8 +51,10 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       {/* Title */}
       <h3
         className={cx(
-          "mt-3 line-clamp-1 font-semibold text-foreground",
-          compact ? "text-sm" : "text-base md:text-xl",
+          "mt-3 font-semibold leading-tight text-foreground break-words",
+          compact
+            ? "min-h-9 line-clamp-2 text-sm"
+            : "min-h-10 line-clamp-2 text-base md:min-h-7 md:line-clamp-1 md:text-xl",
         )}
       >
         {product.name}

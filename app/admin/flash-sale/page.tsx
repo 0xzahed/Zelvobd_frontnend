@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { CalendarDays, ImagePlus, Search } from "lucide-react"
+import { CalendarDays, Clock3, ImagePlus, Search, Tag } from "lucide-react"
 import { createFlashSaleCampaign } from "@/src/api/flashSale/createFlashSaleCampaign"
 import { getFlashSaleCampaigns } from "@/src/api/flashSale/getFlashSaleCampaigns"
 import { updateFlashSaleCampaignTime } from "@/src/api/flashSale/updateFlashSaleCampaignTime"
@@ -17,6 +17,7 @@ export default function AdminFlashSalePage() {
   const [campaignId, setCampaignId] = useState("")
   const [selected, setSelected] = useState<string[]>([])
   const [initialSelected, setInitialSelected] = useState<string[]>([])
+  const [startsAt, setStartsAt] = useState("")
   const [endsAt, setEndsAt] = useState("")
   const [backgroundImage, setBackgroundImage] = useState("")
   const [query, setQuery] = useState("")
@@ -32,6 +33,7 @@ export default function AdminFlashSalePage() {
         if (first) {
           const selectedProductIds = (first.products || []).map((p: { productId: string }) => p.productId)
           setCampaignId(first.id || "")
+          setStartsAt(first.startAt?.slice(0, 16) || "")
           setEndsAt(first.endAt?.slice(0, 16) || "")
           setSelected(selectedProductIds)
           setInitialSelected(selectedProductIds)
@@ -54,6 +56,7 @@ export default function AdminFlashSalePage() {
     if (!lc) return products
     return products.filter((p) => p.name.toLowerCase().includes(lc))
   }, [products, query])
+  const statusLabel = campaignId ? "SCHEDULED" : "DRAFT"
 
   const toggleProduct = (id: string) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
@@ -70,14 +73,25 @@ export default function AdminFlashSalePage() {
   }
 
   const save = async () => {
+    if (!startsAt) {
+      notify.warning({ title: "Start time required", message: "Please select start time." })
+      return
+    }
+
     if (!endsAt) {
       notify.warning({ title: "End time required", message: "Please select end time." })
       return
     }
 
+    const startDate = new Date(startsAt)
     const endDate = new Date(endsAt)
-    if (Number.isNaN(endDate.getTime())) {
-      notify.warning({ title: "Invalid date", message: "Please select a valid end date/time." })
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+      notify.warning({ title: "Invalid date", message: "Please select valid start/end date-time." })
+      return
+    }
+
+    if (endDate <= startDate) {
+      notify.warning({ title: "Invalid range", message: "End time must be after start time." })
       return
     }
 
@@ -92,7 +106,7 @@ export default function AdminFlashSalePage() {
           return
         }
         await updateFlashSaleCampaignTime(campaignId, {
-          startAt: new Date().toISOString(),
+          startAt: startDate.toISOString(),
           endAt: endDate.toISOString(),
         })
 
@@ -113,7 +127,7 @@ export default function AdminFlashSalePage() {
       } else {
         const createRes = await createFlashSaleCampaign({
           title: "Flash Sale Campaign",
-          startAt: new Date().toISOString(),
+          startAt: startDate.toISOString(),
           endAt: endDate.toISOString(),
           discountType: "PERCENT",
           discountValue: 10,
@@ -131,42 +145,83 @@ export default function AdminFlashSalePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground">Flash Sale</h1>
-          <p className="text-sm text-muted-foreground">
-            Pick featured products and set the countdown end time.
-          </p>
+    <div className="mx-auto w-full max-w-5xl space-y-5 bg-slate-50/40 p-3 md:p-5">
+      <header className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h1 className="text-4xl font-black lowercase tracking-tight text-slate-900">upcomming</h1>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{statusLabel}</span>
+          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">10% OFF</span>
         </div>
+      </header>
 
-        <div className="flex items-end gap-3">
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Campaign Details</h2>
+        <div className="my-4 h-px bg-slate-200" />
+
+        <div className="grid gap-3 md:grid-cols-3">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Ends at
+            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <CalendarDays className="h-4 w-4" /> Start Time
             </span>
-            <div className="flex h-11 items-center gap-2 rounded-full border border-border bg-card px-4">
+            <div className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4">
+              <input
+                type="datetime-local"
+                value={startsAt}
+                onChange={(e) => setStartsAt(e.target.value)}
+                className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
+              />
+            </div>
+          </label>
+
+          <label className="block">
+            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <Clock3 className="h-4 w-4" /> End Time
+            </span>
+            <div className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4">
               <input
                 type="datetime-local"
                 value={endsAt}
                 onChange={(e) => setEndsAt(e.target.value)}
-                className="w-52.5 bg-transparent text-sm outline-none"
+                className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
               />
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
             </div>
           </label>
 
+          <div className="block">
+            <span className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <Tag className="h-4 w-4" /> Total Products
+            </span>
+            <div className="flex h-11 items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-base font-bold text-slate-900">
+              {selected.length}
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={() => void save()}
+          disabled={saving || loading}
+          className="mt-4 h-12 w-full rounded-2xl bg-slate-200 text-base font-semibold text-slate-700 transition hover:bg-slate-300 disabled:opacity-60"
+        >
+          {saving ? "Saving..." : "Edit Time"}
+        </button>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Manage Products</h2>
+            <p className="text-sm text-slate-500">Add or remove products from this campaign.</p>
+          </div>
           <button
             onClick={() => void save()}
             disabled={saving || loading}
-            className="h-11 rounded-full bg-primary px-7 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
+            className="h-11 rounded-2xl bg-blue-400 px-6 text-sm font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
           >
-            {saving ? "Saving..." : "Save changes"}
+            {saving ? "Saving..." : "Save Products"}
           </button>
         </div>
-      </header>
+        <div className="my-4 h-px bg-slate-200" />
 
-      <section className="rounded-3xl border border-border bg-card p-4">
         <p className="mb-3 text-sm font-semibold text-foreground">Background image (optional)</p>
 
         <div className="flex flex-col gap-3 md:flex-row">
@@ -210,11 +265,8 @@ export default function AdminFlashSalePage() {
           onChange={(e) => handleBackgroundPick(e.target.files?.[0])}
         />
 
-        <p className="mt-3 text-sm text-muted-foreground">{selected.length} products selected</p>
-      </section>
-
-      <section className="rounded-3xl border border-border bg-card p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="mt-3 text-sm text-slate-500">{filteredProducts.length} Products Found</p>
+        <div className="mb-3 mt-3 flex items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-foreground">Select products</h2>
           <div className="flex h-10 items-center gap-2 rounded-full border border-border bg-background px-3">
             <Search className="h-4 w-4 text-muted-foreground" />

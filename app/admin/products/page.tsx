@@ -46,8 +46,8 @@ export default function AdminProductsPage() {
           <h2 className="text-lg font-bold text-foreground">Products</h2>
           <p className="text-xs text-muted-foreground">{products.length} total</p>
         </div>
-        <div className="flex flex-1 items-center gap-2 md:flex-none">
-          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-sm bg-card px-3 shadow-sm md:w-72 md:flex-none">
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end md:w-auto">
+          <div className="flex h-10 min-w-0 w-full items-center gap-2 rounded-sm bg-card px-3 shadow-sm sm:w-72">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -58,7 +58,7 @@ export default function AdminProductsPage() {
           </div>
           <Link
             href="/admin/products/new"
-            className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:w-auto"
           >
             <Plus className="h-4 w-4" /> Add
           </Link>

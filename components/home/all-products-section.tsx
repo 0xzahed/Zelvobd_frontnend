@@ -20,7 +20,7 @@ export function AllProductsSection() {
 
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
         {products.map((p) => (
-          <div key={p.id} className="w-[calc((100%-0.75rem)/2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
+          <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}

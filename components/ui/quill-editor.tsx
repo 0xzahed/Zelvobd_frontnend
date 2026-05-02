@@ -12,12 +12,35 @@ type QuillEditorProps = {
 }
 
 const TOOLBAR = [
-  [{ header: [1, 2, 3, false] }],
+  [{ size: ["12px", "14px", "16px", "18px", "20px", "24px", "32px", "48px"] }],
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
   ["bold", "italic", "underline", "strike"],
-  [{ list: "ordered" }, { list: "bullet" }],
   [{ color: [] }, { background: [] }],
-  ["link", "blockquote", "code-block"],
+  [{ script: "sub" }, { script: "super" }],
+  [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
+  [{ align: [] }],
+  ["link", "blockquote", "code-block", "image", "video"],
   ["clean"],
+]
+
+const FORMATS = [
+  "size",
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "color",
+  "background",
+  "script",
+  "list",
+  "indent",
+  "align",
+  "blockquote",
+  "code-block",
+  "link",
+  "image",
+  "video",
 ]
 
 const getPlainText = (html: string) => {
@@ -33,12 +56,16 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
 
   useEffect(() => {
     if (!hostRef.current || quillRef.current) return
+    const Size = Quill.import("attributors/style/size")
+    Size.whitelist = ["12px", "14px", "16px", "18px", "20px", "24px", "32px", "48px"]
+    Quill.register(Size, true)
     const quill = new Quill(hostRef.current, {
       theme: "snow",
       placeholder: placeholder || "",
       modules: {
         toolbar: TOOLBAR,
       },
+      formats: FORMATS,
     })
     quillRef.current = quill
 
@@ -59,22 +86,22 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
   }, [value])
 
   return (
-    <label className="block text-sm">
-      <span className="mb-1 block text-foreground">
+    <div className="text-sm">
+      <label className="mb-1 block text-foreground">
         {label} {required && <span className="text-accent">*</span>}
-      </span>
-      <div className="overflow-hidden rounded-md border border-border bg-background">
+      </label>
+      <div className="relative overflow-hidden rounded-md border border-border bg-background">
         <div ref={hostRef} className="min-h-40" />
+        {required && (
+          <input
+            tabIndex={-1}
+            readOnly
+            required
+            value={getPlainText(value)}
+            className="pointer-events-none absolute h-0 w-0 opacity-0"
+          />
+        )}
       </div>
-      {required && (
-        <input
-          tabIndex={-1}
-          readOnly
-          required
-          value={getPlainText(value)}
-          className="pointer-events-none absolute h-0 w-0 opacity-0"
-        />
-      )}
-    </label>
+    </div>
   )
 }
