@@ -7,15 +7,30 @@ import Link from "next/link"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useConfirm } from "@/components/ui/confirm-dialog"
-import { useProducts, useDeleteProduct, useCopyProduct } from "@/src/hooks/api/useProducts"
+import {
+  useProducts,
+  useDeleteProduct,
+  useCopyProduct,
+  useCreateProduct,
+} from "@/src/hooks/api/useProducts"
+import { ProductForm } from "@/components/admin/product-form"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function AdminProductsPage() {
   const { data: products = [], isLoading } = useProducts()
   const deleteMutation = useDeleteProduct()
   const copyMutation = useCopyProduct()
+  const createMutation = useCreateProduct()
   const confirm = useConfirm()
 
   const [q, setQ] = useState("")
+  const [addOpen, setAddOpen] = useState(false)
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
@@ -31,6 +46,29 @@ export default function AdminProductsPage() {
 
   const handleCopy = (id: string) => {
     copyMutation.mutate(id)
+  }
+
+  const handleCreate = (
+    product: Product,
+    descriptionDelta: any,
+    extraDescriptionDelta: any,
+    categoryId: string,
+    subCategoryId: string,
+  ) => {
+    createMutation.mutate(
+      {
+        product,
+        descriptionDelta,
+        extraDescriptionDelta,
+        categoryId,
+        subCategoryId,
+      },
+      {
+        onSuccess: () => {
+          setAddOpen(false)
+        },
+      },
+    )
   }
 
   const filtered = useMemo(() => {
@@ -56,14 +94,29 @@ export default function AdminProductsPage() {
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <Link
-            href="/admin/products/new"
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
             className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:w-auto"
           >
             <Plus className="h-4 w-4" /> Add
-          </Link>
+          </button>
         </div>
       </div>
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>New Product</DialogTitle>
+            <DialogDescription>Add a new product to the catalog.</DialogDescription>
+          </DialogHeader>
+          <ProductForm
+            onSave={handleCreate}
+            onCancel={() => setAddOpen(false)}
+            isSaving={createMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
         <div className="overflow-x-auto">
