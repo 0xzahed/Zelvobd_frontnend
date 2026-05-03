@@ -39,8 +39,9 @@ export const mapSubCategory = (subCategory: any) => ({
 
 export const mapProduct = (product: any): Product => {
   const firstVariant = product.firstVariant || product.variants?.[0]
-  const price = Number(firstVariant?.discountedPrice || 0)
-  const cutPrice = Number(firstVariant?.actualPrice || 0)
+  const isFlashSale = Boolean(product.isFlashSale)
+  const price = isFlashSale && firstVariant?.flashSalePrice != null ? Number(firstVariant.flashSalePrice) : Number(firstVariant?.discountedPrice || 0)
+  const cutPrice = isFlashSale && firstVariant?.flashSalePrice != null ? Number(firstVariant?.discountedPrice || 0) : Number(firstVariant?.actualPrice || 0)
 
   const imageCandidates = uniqueNonEmpty([
     ...(product.variants || []).map((v: any) => toAbsoluteUploadUrl(v.imageUrl)),
@@ -72,24 +73,24 @@ export const mapProduct = (product: any): Product => {
     description: product.descriptionHtml || "",
     extraDescription: product.extraDescriptionHtml || undefined,
     isTrending: false,
-    isFlashSale: false,
+    isFlashSale,
+    flashSaleEndsAt: product.flashSaleEndsAt || undefined,
     isFreeDelivery: Boolean(product.isFreeDelivery),
-    stock: Number(product.stock || 0),
+    stock: Boolean(product.stock),
+    availability: Boolean(product.availability),
     whatsapp: "+8801700000000",
     weight: product.weight || undefined,
     video: product.videoUrl ? toAbsoluteUploadUrl(product.videoUrl) : undefined,
-    size: firstVariant?.size || undefined,
-    quantity: undefined,
     material: product.material || undefined,
-    color: firstVariant?.color || undefined,
     status: product.status || undefined,
     createdAt: product.createdAt || undefined,
     variants: (product.variants || []).map((variant: any) => ({
       id: variant.id,
-      name: `${variant.color} / ${variant.size}`,
-      price: Number(variant.discountedPrice || 0),
-      cutPrice: Number(variant.actualPrice || 0),
-      stock: Number(product.stock || 0),
+      color: variant.color || "",
+      size: variant.size || "",
+      actualPrice: Number(variant.actualPrice || 0),
+      discountedPrice: Number(variant.discountedPrice || 0),
+      flashSalePrice: variant.flashSalePrice != null ? Number(variant.flashSalePrice) : undefined,
       image: toAbsoluteUploadUrl(variant.imageUrl),
     })),
   }

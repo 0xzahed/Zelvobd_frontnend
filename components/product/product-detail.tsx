@@ -300,11 +300,16 @@ export function ProductDetail({ product }: { product: Product }) {
               {product.name}
             </h1>
             <div className="flex items-center justify-between pt-1">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline flex-wrap gap-2">
                 <span className="text-2xl font-medium text-[#292929]">{formatBDT(product.price)}</span>
                 {product.cutPrice > product.price && (
                   <span className="text-sm text-muted-foreground line-through">
                     {formatBDT(product.cutPrice)}
+                  </span>
+                )}
+                {product.isFlashSale && (
+                  <span className="ml-1 rounded bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
+                    ⚡ Flash Sale
                   </span>
                 )}
               </div>
