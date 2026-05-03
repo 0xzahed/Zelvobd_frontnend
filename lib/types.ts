@@ -4,6 +4,7 @@ export type ProductVariant = {
   size: string
   actualPrice: number
   discountedPrice: number
+  flashSalePrice?: number
   image?: string
 }
 
@@ -28,6 +29,7 @@ export type Product = {
   extraDescription?: string
   isTrending: boolean
   isFlashSale: boolean
+  flashSaleEndsAt?: string
   isFreeDelivery?: boolean
   stock: boolean
   availability: boolean

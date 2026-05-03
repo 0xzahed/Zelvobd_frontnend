@@ -29,14 +29,14 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         "group relative flex snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
         compact
           ? "w-40 shrink-0 sm:w-44"
-          : "w-full p-2.5 md:h-[320px] md:max-w-[900px] md:p-2",
+          : "w-full p-2.5 md:h-80 md:max-w-225 md:p-2",
       )}
     >
       {/* Image */}
       <div
         className={cx(
           "relative w-full overflow-hidden rounded-xl bg-card",
-          compact ? "aspect-square" : "aspect-[5/4] md:aspect-auto md:flex-1 md:min-h-0",
+          compact ? "aspect-square" : "aspect-5/4 md:aspect-auto md:flex-1 md:min-h-0",
         )}
       >
         <Image
@@ -51,7 +51,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       {/* Title */}
       <h3
         className={cx(
-          "mt-3 font-semibold leading-tight text-foreground break-words",
+          "mt-3 font-semibold leading-tight text-foreground wrap-break-word",
           compact
             ? "min-h-9 line-clamp-2 text-sm"
             : "min-h-10 line-clamp-2 text-base md:min-h-7 md:line-clamp-1 md:text-xl",
@@ -71,7 +71,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       </div>
 
       {/* Keep a fixed row so card height stays consistent on mobile */}
-      <div className="mt-1 min-h-4 flex items-center gap-1.5 overflow-hidden">
+      <div className="mt-1 min-h-4 flex items-center flex-wrap gap-1.5 overflow-hidden">
         {product.cutPrice > product.price && (
           <span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground line-through">
             {formatBDT(product.cutPrice)}
@@ -80,6 +80,11 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         {savings > 0 && (
           <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 md:text-[11px]">
             {formatBDT(savings)} OFF
+          </span>
+        )}
+        {product.isFlashSale && (
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold text-destructive md:text-[11px]">
+            ⚡ Flash Sale
           </span>
         )}
       </div>
