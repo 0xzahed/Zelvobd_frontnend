@@ -74,7 +74,7 @@ export default function AdminProductsPage() {
   const filtered = useMemo(() => {
     const lc = q.toLowerCase().trim()
     if (!lc) return products
-    return products.filter((p) => p.name.toLowerCase().includes(lc) || p.brand.toLowerCase().includes(lc))
+    return products.filter((p: any) => p.name.toLowerCase().includes(lc) || p.brand.toLowerCase().includes(lc))
   }, [products, q])
 
   return (
@@ -151,7 +151,7 @@ export default function AdminProductsPage() {
                   </td>
                 </tr>
               )}
-              {!isLoading && filtered.map((p) => (
+              {!isLoading && filtered.map((p: any) => (
                 <tr key={p.id} className="border-b border-border/60 last:border-b-0 transition hover:bg-secondary/50">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
