@@ -29,6 +29,7 @@ import {
 import { useAuth } from "@/contexts/auth-context"
 import { cx } from "@/lib/format"
 import { notify } from "@/lib/notify"
+import { useConfirm } from "@/components/ui/confirm-dialog"
 
 type NavChild = { href: string; label: string }
 
@@ -107,6 +108,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { admin, isAdmin, authLoading, logoutAdmin } = useAuth()
+  const confirm = useConfirm()
   const [open, setOpen] = useState(false)
   const [ready, setReady] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
@@ -155,6 +157,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const handleLogout = async () => {
     if (loggingOut) return
+
+    const approved = await confirm({
+      title: "Logout?",
+      message: "Do you want to sign out now?",
+      confirmText: "Logout",
+      cancelText: "Cancel",
+      variant: "danger",
+    })
+    if (!approved) return
 
     try {
       setLoggingOut(true)
@@ -319,28 +330,25 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </div>
             ))}
           </nav>
-          <div className="mt-auto px-4 pb-4">
-            <div className="rounded-2xl border border-border/70 bg-white p-3 shadow-sm">
-              <div className="flex items-center gap-2.5 rounded-xl border border-border/60 p-2">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-xs font-semibold text-primary">
+          <div className="mt-auto px-3 pb-4">
+            <div className="border-t border-border/70 pt-3">
+              <div className="flex items-center gap-3 rounded-sm px-3 py-2.5">
+                <div className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-xs font-semibold text-primary">
                   {admin?.email?.[0]?.toUpperCase() || "A"}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">
+                  <p className="truncate text-[13px] font-semibold text-foreground">
                     {admin?.email || "Administrator"}
                   </p>
                   <p className="text-[11px] text-muted-foreground">Administrator</p>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </div>
-              <button className="mt-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-surface">
-                <Settings2 className="h-4 w-4" /> Settings
-              </button>
               <button
                 type="button"
                 onClick={() => void handleLogout()}
                 disabled={loggingOut}
-                className="mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-foreground hover:bg-surface disabled:opacity-60"
+                className="flex w-full items-center gap-2 rounded-sm px-3 py-2.5 text-[13px] text-foreground hover:bg-surface disabled:opacity-60"
               >
                 <LogOut className="h-4 w-4" /> {loggingOut ? "Logging out..." : "Logout"}
               </button>
@@ -359,20 +367,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Menu className="h-5 w-5" />
         </button>
         <p className="hidden text-sm font-semibold text-foreground md:block">Dashboard</p>
-        <div className="ml-auto hidden items-center gap-2 md:flex">
-          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
-            <CirclePlus className="h-4 w-4" />
-          </button>
-          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
-            <CircleDollarSign className="h-4 w-4" />
-          </button>
-          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
-            <Bell className="h-4 w-4" />
-          </button>
-          <button className="grid h-8 w-8 place-items-center rounded-md border border-border bg-white text-muted-foreground">
-            <ShieldAlert className="h-4 w-4" />
-          </button>
-        </div>
       </header>
 
       <main className="ml-0 p-3 sm:p-4 md:ml-64 md:p-6">{children}</main>

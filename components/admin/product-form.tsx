@@ -23,6 +23,7 @@ type Props = {
   ) => void
   onCancel: () => void
   isSaving?: boolean
+  variant?: "card" | "plain"
 }
 
 function makeVariantId() {
@@ -39,7 +40,7 @@ const htmlToPlainText = (html: string) => {
   return (doc.body.textContent || "").replace(/\u00a0/g, " ").trim()
 }
 
-export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
+export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "card" }: Props) {
   const { data: categories = [] } = useCategories()
   
   const [name, setName] = useState(initial?.name ?? "")
@@ -164,11 +165,13 @@ export function ProductForm({ initial, onSave, onCancel, isSaving }: Props) {
     onSave(product, descriptionDelta, extraDescriptionDelta, categoryId, subCategoryId)
   }
 
+  const formClassName =
+    variant === "plain"
+      ? "flex w-full flex-col overflow-hidden rounded-lg bg-transparent"
+      : "flex w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm border border-border/40"
+
   return (
-    <form
-      onSubmit={submit}
-      className="flex w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm border border-border/40"
-    >
+    <form onSubmit={submit} className={formClassName}>
       <div className="flex-1 space-y-5 p-5 md:p-6">
         {/* Category & Sub-category */}
         <div className="grid gap-4 md:grid-cols-2">

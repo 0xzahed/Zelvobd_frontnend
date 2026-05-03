@@ -84,8 +84,8 @@ export default function AdminProductsPage() {
           <h2 className="text-lg font-bold text-foreground">Products</h2>
           <p className="text-xs text-muted-foreground">{products.length} total</p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end md:w-auto">
-          <div className="flex h-10 min-w-0 w-full items-center gap-2 rounded-sm bg-card px-3 shadow-sm sm:w-72">
+        <div className="flex w-full items-center gap-2">
+          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -97,7 +97,7 @@ export default function AdminProductsPage() {
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:w-auto"
+            className="inline-flex h-10 flex-[1] items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -105,7 +105,7 @@ export default function AdminProductsPage() {
       </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-5xl">
+        <DialogContent className="no-scrollbar max-h-[85dvh] overflow-y-auto overflow-x-hidden sm:max-w-5xl">
           <DialogHeader>
             <DialogTitle>New Product</DialogTitle>
             <DialogDescription>Add a new product to the catalog.</DialogDescription>
@@ -114,6 +114,7 @@ export default function AdminProductsPage() {
             onSave={handleCreate}
             onCancel={() => setAddOpen(false)}
             isSaving={createMutation.isPending}
+            variant="plain"
           />
         </DialogContent>
       </Dialog>
