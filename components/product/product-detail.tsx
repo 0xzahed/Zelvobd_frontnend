@@ -421,7 +421,10 @@ export function ProductDetail({ product }: { product: Product }) {
           {product.description && (
             <div className="border-t border-border/40 pt-3">
               <h3 className="mb-2 text-xs font-medium text-foreground">Description</h3>
-              <p className="text-xs leading-relaxed text-muted-foreground md:text-sm">{product.description}</p>
+              <div
+                className="text-xs leading-relaxed text-muted-foreground md:text-sm"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             </div>
           )}
 

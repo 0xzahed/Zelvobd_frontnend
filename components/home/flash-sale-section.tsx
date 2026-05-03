@@ -24,7 +24,12 @@ export function FlashSaleSection() {
           getAllActiveFlashSaleProducts({ limit: 12 }),
           getActiveFlashSaleCampaign().catch(() => null),
         ])
-        setItems((res?.data?.products || []).map(mapProduct))
+        setItems(
+          (res?.data?.products || []).map((product: any) => ({
+            ...mapProduct(product),
+            isFlashSale: true,
+          })),
+        )
 
         const campaign = campaignRes?.data?.campaigns?.[0] || campaignRes?.data || {}
         const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""

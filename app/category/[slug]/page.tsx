@@ -63,7 +63,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>
           </div>
           {items.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 items-stretch gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
               {items.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

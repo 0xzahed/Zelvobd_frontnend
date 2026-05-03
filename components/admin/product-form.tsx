@@ -170,9 +170,19 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
       ? "flex w-full flex-col overflow-hidden rounded-lg bg-transparent"
       : "flex w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm border border-border/40"
 
+  const contentClassName =
+    variant === "plain"
+      ? "flex-1 space-y-4 p-3 sm:p-5"
+      : "flex-1 space-y-5 p-5 md:p-6"
+
+  const footerClassName =
+    variant === "plain"
+      ? "flex justify-end gap-3 border-t border-border/30 bg-transparent px-3 py-3 sm:px-5"
+      : "flex justify-end gap-3 border-t border-border/40 bg-card px-6 py-4"
+
   return (
     <form onSubmit={submit} className={formClassName}>
-      <div className="flex-1 space-y-5 p-5 md:p-6">
+      <div className={contentClassName}>
         {/* Category & Sub-category */}
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -409,7 +419,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-border/40 bg-card px-6 py-4">
+      <div className={footerClassName}>
         <button
           type="button"
           onClick={onCancel}

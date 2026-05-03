@@ -13,7 +13,6 @@ type QuillEditorProps = {
 
 const TOOLBAR = [
   [{ size: ["12px", "14px", "16px", "18px", "20px", "24px", "32px", "48px"] }],
-  [{ header: [1, 2, 3, 4, 5, 6, false] }],
   ["bold", "italic", "underline", "strike"],
   [{ color: [] }, { background: [] }],
   [{ script: "sub" }, { script: "super" }],
@@ -25,7 +24,6 @@ const TOOLBAR = [
 
 const FORMATS = [
   "size",
-  "header",
   "bold",
   "italic",
   "underline",
