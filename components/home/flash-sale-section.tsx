@@ -33,12 +33,11 @@ export function FlashSaleSection() {
 
         const campaign = campaignRes?.data?.campaigns?.[0] || campaignRes?.data || {}
         const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""
-        const storedBg = localStorage.getItem(FLASH_SALE_BG_STORAGE_KEY) || ""
-        setBackgroundImage(apiBg || storedBg)
+
+        setBackgroundImage(apiBg)
       } catch {
         setItems([])
-        const storedBg = localStorage.getItem(FLASH_SALE_BG_STORAGE_KEY) || ""
-        setBackgroundImage(storedBg)
+        setBackgroundImage("")
       }
     }
     void load()
