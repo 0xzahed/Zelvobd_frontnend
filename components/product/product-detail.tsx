@@ -52,13 +52,22 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
   // Update image when active variant changes
   useEffect(() => {
-    if (activeVariant && activeVariant.image) {
-      const imgIdx = allImages.indexOf(activeVariant.image)
-      if (imgIdx !== -1) {
-        setActiveImageIndex(imgIdx)
+    if (activeVariant) {
+      if (activeVariant.image) {
+        const imgIdx = allImages.indexOf(activeVariant.image)
+        if (imgIdx !== -1) {
+          setActiveImageIndex(imgIdx)
+        }
       }
+
+      const categorySlug = product.categorySlug || 'all'
+      const subCategorySlug = product.subCategorySlug || 'all'
+      const productSlug = product.slug || product.id
+      const newUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}/${activeVariant.id}`
+      
+      window.history.replaceState(null, '', newUrl)
     }
-  }, [activeVariant, allImages])
+  }, [activeVariant, allImages, product.categorySlug, product.subCategorySlug, product.slug, product.id])
 
   const handleColorChange = (c: string) => {
     setSelectedColor(c)

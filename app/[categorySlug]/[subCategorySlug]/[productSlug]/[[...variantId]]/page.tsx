@@ -7,7 +7,7 @@ export default async function ProductDetailPage(props: {
     categorySlug: string
     subCategorySlug: string
     productSlug: string
-    variantId: string
+    variantId?: string[]
   }>
 }) {
   const params = await props.params;
@@ -19,6 +19,8 @@ export default async function ProductDetailPage(props: {
     notFound()
   }
 
+  const initialVariantId = params.variantId?.[0] || undefined;
+
   // 2. Validate that the URL segments match the product
   // Note: the backend uses subCategoryName, categorySlug, etc. 
   // if you want to strictly validate URL structure vs data, you could do it here.
@@ -26,7 +28,7 @@ export default async function ProductDetailPage(props: {
   return (
     <main className="min-h-screen bg-background md:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
-        <ProductDetail product={product} initialVariantId={params.variantId} />
+        <ProductDetail product={product} initialVariantId={initialVariantId} />
       </div>
     </main>
   )

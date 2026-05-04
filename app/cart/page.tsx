@@ -109,7 +109,7 @@ export default function CartPage() {
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col">
                         <Link
-                          href={`/${p.categorySlug || 'all'}/${p.subCategorySlug || 'all'}/${p.slug || p.id}/${p.variants?.[0]?.id || 'default'}`}
+                          href={`/${p.categorySlug || 'all'}/${p.subCategorySlug || 'all'}/${p.slug || p.id}`}
                           className="line-clamp-1 text-base font-semibold text-foreground"
                         >
                           {p.name}

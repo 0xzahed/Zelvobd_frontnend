@@ -25,8 +25,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
   const categorySlug = product.categorySlug || 'uncategorized'
   const subCategorySlug = product.subCategorySlug || 'all'
   const productSlug = product.slug || product.id
-  const variantId = product.variants?.[0]?.id || 'default'
-  const productUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}/${variantId}`
+  const productUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}`
 
   return (
     <Link
