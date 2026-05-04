@@ -2,14 +2,13 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, Flame, Truck } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
 
 export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
   const { addItem } = useCart()
-
   const src =
     product.images?.[0] ||
     `/placeholder.svg?height=400&width=400&query=${encodeURIComponent(product.name)}`
@@ -44,16 +43,16 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           compact ? "aspect-square" : "aspect-5/4 md:aspect-auto md:flex-1 md:min-h-0",
         )}
       >
-        <div className="absolute right-2 top-2 z-10 flex flex-col items-end gap-1">
+        <div className="absolute right-0.5 top-0.5 z-10 flex flex-row items-center gap-1">
           {product.isFlashSale && (
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-destructive/10 px-1.5 py-0.5 text-[9px] font-semibold text-destructive md:text-[10px]">
-              Flash Sale
-            </span>
+            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-destructive/10 md:h-8 md:w-8">
+              <Flame className="h-4 w-4 text-destructive md:h-5 md:w-5" />
+            </div>
           )}
           {product.isFreeDelivery && (
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 md:text-[10px]">
-              Free Delivery
-            </span>
+            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 md:h-8 md:w-8">
+              <Truck className="h-4 w-4 text-emerald-700 md:h-5 md:w-5" />
+            </div>
           )}
         </div>
         <Image
@@ -89,14 +88,14 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         </div>
 
         {/* Keep a fixed row so card height stays consistent on mobile */}
-        <div className="mt-1 min-h-4 flex items-center flex-wrap gap-1.5 overflow-hidden">
+        <div className="mt-1 min-h-4 flex items-center gap-1 overflow-hidden whitespace-nowrap">
           {product.cutPrice > product.price && (
             <span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground line-through">
               {formatBDT(product.cutPrice)}
             </span>
           )}
           {savings > 0 && (
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 md:text-[11px]">
+            <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 md:px-2 md:text-[11px]">
               {formatBDT(savings)} OFF
             </span>
           )}
@@ -104,7 +103,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
 
         {/* Actions */}
         <div className="mt-auto flex items-center gap-2 pt-2.5">
-          <span className="flex h-9 flex-1 items-center justify-center rounded-full border border-border text-sm font-medium text-foreground transition-colors group-hover:bg-muted/50">
+          <span className="flex h-9 flex-1 items-center justify-center rounded-full border border-border text-sm font-medium text-foreground transition-colors duration-200 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
             Shop Now
           </span>
           <button

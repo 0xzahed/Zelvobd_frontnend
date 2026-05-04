@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { LottieIcon } from "@/components/ui/lottie-icon"
@@ -62,7 +61,7 @@ export function FlashSaleSection() {
           <div className="flex shrink-0 items-center gap-1"><LottieIcon src="/fire-animaiton.json" className="block h-5 w-5 md:h-6 md:w-6" ariaLabel="Flash sale" /><h2 className="text-sm font-medium text-foreground md:text-base">Flash Sale</h2></div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />
-          <Link href="/offers" className="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs">See All <ChevronRight className="h-3 w-3" /></Link>
+          <Link href="/offers" className="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs">See All</Link>
         </div>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">

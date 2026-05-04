@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
 import { useProducts } from "@/lib/use-store-data"
 import { ProductCard } from "@/components/ui/product-card"
 
@@ -14,12 +13,14 @@ export function FreeDeliveryBanner() {
     <section className="space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-medium text-foreground md:text-xl">Free Delivery</h2>
-        <Link
-          href="/free-delivery"
-          className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs"
-        >
-          See All <ChevronRight className="h-3 w-3" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/free-delivery"
+            className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs"
+          >
+            See All
+          </Link>
+        </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">

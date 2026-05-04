@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { cx } from "@/lib/format"
 
 const VISIBLE_THUMBS = 4
@@ -60,7 +60,12 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
   return (
     <div className="space-y-3">
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-white">
+      <button
+        type="button"
+        onClick={() => setZoomOpen(true)}
+        aria-label="View image"
+        className="relative block w-full aspect-square overflow-hidden rounded-lg bg-white"
+      >
         <Image
           src={images[activeImageIndex] || "/placeholder.svg"}
           alt={productName}
@@ -69,15 +74,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
           className="object-cover"
           priority
         />
-        <button
-          type="button"
-          onClick={() => setZoomOpen(true)}
-          aria-label="View image"
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-foreground shadow-md transition hover:bg-white"
-        >
-          <Maximize2 className="h-4 w-4" />
-        </button>
-      </div>
+      </button>
 
       {/* Thumbnails */}
       {images.length > 1 && (

@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} bg-card`}>
-      <body className="font-sans antialiased bg-card text-foreground">
+      <body className="font-sans antialiased bg-card text-foreground" suppressHydrationWarning>
         <Providers>{children}</Providers>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

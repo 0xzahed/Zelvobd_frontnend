@@ -26,7 +26,7 @@ export default async function ProductDetailPage(props: {
   // if you want to strictly validate URL structure vs data, you could do it here.
   
   return (
-    <main className="min-h-screen bg-background md:p-6 lg:p-8">
+    <main className="min-h-screen bg-white px-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
       <div className="mx-auto max-w-7xl">
         <ProductDetail product={product} initialVariantId={initialVariantId} />
       </div>

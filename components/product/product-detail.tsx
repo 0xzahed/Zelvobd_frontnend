@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ShoppingCart } from "lucide-react"
-import type { Product, ProductVariant } from "@/lib/types"
+import type { Product } from "@/lib/types"
 import { useCart } from "@/contexts/cart-context"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { ProductGallery } from "./detail/product-gallery"
@@ -175,16 +175,18 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       </div>
 
       {/* Mobile fixed bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 flex gap-2 bg-transparent p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
         <button
+          type="button"
           onClick={handleBuy}
-          className="h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md"
+          className="relative z-10 h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md"
         >
           Buy Now
         </button>
         <button
+          type="button"
           onClick={handleAdd}
-          className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
+          className="relative z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
         >
           Add to Cart
         </button>

@@ -70,15 +70,15 @@ export function ProductInfo({
   const cutPrice = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.discountedPrice : (activeVariant?.actualPrice || product.cutPrice)
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 md:space-y-6">
       {/* Title & Pricing */}
       <div className="space-y-1">
-        <h1 className="text-pretty text-2xl font-medium leading-snug text-[#292929]">
+        <h1 className="break-words text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
           {product.name}
         </h1>
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-baseline flex-wrap gap-2">
-            <span className="text-2xl font-medium text-[#292929]">{formatBDT(price)}</span>
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div className="min-w-0 flex items-baseline flex-wrap gap-2">
+            <span className="text-xl font-medium text-[#292929] md:text-2xl">{formatBDT(price)}</span>
             {cutPrice > price && (
               <span className="text-sm text-muted-foreground line-through">
                 {formatBDT(cutPrice)}
@@ -90,8 +90,9 @@ export function ProductInfo({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-3">
             <button
+              type="button"
               onClick={() => onQtyChange(Math.max(1, qty - 1))}
               aria-label="Decrease"
               className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
@@ -100,6 +101,7 @@ export function ProductInfo({
             </button>
             <span className="w-5 text-center text-sm font-medium">{qty}</span>
             <button
+              type="button"
               onClick={() => onQtyChange(qty + 1)}
               aria-label="Increase"
               className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
@@ -122,11 +124,12 @@ export function ProductInfo({
       {uniqueColors.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-medium text-foreground">Color</p>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
               return (
                 <button
+                  type="button"
                   key={c}
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
@@ -142,7 +145,7 @@ export function ProductInfo({
                     style={{ backgroundColor: colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="truncate text-xs">{c}</span>
+                  <span className="min-w-0 truncate text-xs">{c}</span>
                 </button>
               )
             })}
@@ -159,6 +162,7 @@ export function ProductInfo({
               const selected = selectedSize === s
               return (
                 <button
+                  type="button"
                   key={s}
                   onClick={() => onSizeChange(s)}
                   className={cx(
@@ -178,10 +182,10 @@ export function ProductInfo({
 
       {/* Description */}
       {product.description && (
-        <div className="border-t border-border/40 pt-3">
+        <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-xs font-medium text-foreground">Description</h3>
           <div
-            className="text-xs leading-relaxed text-muted-foreground md:text-sm prose-sm prose-p:my-1 prose-ul:my-1"
+            className="max-w-none break-words text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
@@ -189,10 +193,10 @@ export function ProductInfo({
 
       {/* Extra Description */}
       {product.extraDescription && (
-        <div className="border-t border-border/40 pt-3">
+        <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-xs font-medium text-foreground">More Information</h3>
           <div
-            className="text-xs leading-relaxed text-muted-foreground md:text-sm prose-sm prose-p:my-1 prose-ul:my-1"
+            className="max-w-none break-words text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.extraDescription }}
           />
         </div>
