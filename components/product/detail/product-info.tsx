@@ -1,0 +1,202 @@
+"use client"
+
+import Link from "next/link"
+import { ListChecks, Minus, Plus } from "lucide-react"
+import { cx, formatBDT } from "@/lib/format"
+import type { Product, ProductVariant } from "@/lib/types"
+
+function colorToHex(name: string): string {
+  const key = name.toLowerCase()
+  const map: Record<string, string> = {
+    black: "#111827",
+    "black titanium": "#1f2937",
+    white: "#F3F4F6",
+    "white titanium": "#E5E7EB",
+    silver: "#C0C4CC",
+    gold: "#E9C687",
+    "rose gold": "#E6B8A2",
+    blue: "#2563EB",
+    "blue titanium": "#4A5A70",
+    "midnight blue": "#1E3A5F",
+    "natural titanium": "#A9A299",
+    "desert titanium": "#C8B5A3",
+    red: "#DC2626",
+    green: "#16A34A",
+    pink: "#F472B6",
+    purple: "#8B5CF6",
+    gray: "#6B7280",
+    grey: "#6B7280",
+    brown: "#8B5E3C",
+    beige: "#D6C6A8",
+    navy: "#1E3A8A",
+    graphite: "#3A3A3A",
+    midnight: "#1B1F2A",
+  }
+  if (map[key]) return map[key]
+  for (const k of Object.keys(map)) {
+    if (key.includes(k)) return map[k]
+  }
+  return "#9CA3AF"
+}
+
+interface ProductInfoProps {
+  product: Product
+  activeVariant: ProductVariant | null
+  uniqueColors: string[]
+  uniqueSizes: string[]
+  selectedColor: string
+  selectedSize: string
+  onColorChange: (color: string) => void
+  onSizeChange: (size: string) => void
+  qty: number
+  onQtyChange: (qty: number) => void
+}
+
+export function ProductInfo({
+  product,
+  activeVariant,
+  uniqueColors,
+  uniqueSizes,
+  selectedColor,
+  selectedSize,
+  onColorChange,
+  onSizeChange,
+  qty,
+  onQtyChange,
+}: ProductInfoProps) {
+  // If activeVariant is missing, fallback to product level pricing (from mapper)
+  const isFlashSale = product.isFlashSale
+  const price = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.flashSalePrice : (activeVariant?.discountedPrice || product.price)
+  const cutPrice = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.discountedPrice : (activeVariant?.actualPrice || product.cutPrice)
+
+  return (
+    <div className="space-y-5">
+      {/* Title & Pricing */}
+      <div className="space-y-1">
+        <h1 className="text-pretty text-2xl font-medium leading-snug text-[#292929]">
+          {product.name}
+        </h1>
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-baseline flex-wrap gap-2">
+            <span className="text-2xl font-medium text-[#292929]">{formatBDT(price)}</span>
+            {cutPrice > price && (
+              <span className="text-sm text-muted-foreground line-through">
+                {formatBDT(cutPrice)}
+              </span>
+            )}
+            {isFlashSale && (
+              <span className="ml-1 rounded bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
+                ⚡ Flash Sale
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onQtyChange(Math.max(1, qty - 1))}
+              aria-label="Decrease"
+              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <span className="w-5 text-center text-sm font-medium">{qty}</span>
+            <button
+              onClick={() => onQtyChange(qty + 1)}
+              aria-label="Increase"
+              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+        {product.brand && (
+          <p className="text-xs text-muted-foreground">
+            by{" "}
+            <Link href="#" className="font-medium text-primary">
+              {product.brand}
+            </Link>
+          </p>
+        )}
+      </div>
+
+      {/* Colors */}
+      {uniqueColors.length > 0 && (
+        <div>
+          <p className="mb-2 text-xs font-medium text-foreground">Color</p>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+            {uniqueColors.map((c) => {
+              const selected = selectedColor === c
+              return (
+                <button
+                  key={c}
+                  onClick={() => onColorChange(c)}
+                  aria-pressed={selected}
+                  className={cx(
+                    "flex items-center gap-2 rounded-full border bg-transparent px-2 py-1.5 text-left transition",
+                    selected
+                      ? "border-primary text-primary"
+                      : "border-border/60 text-foreground hover:border-border",
+                  )}
+                >
+                  <span
+                    className="h-6 w-6 shrink-0 rounded-full border border-border/40"
+                    style={{ backgroundColor: colorToHex(c) }}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate text-xs">{c}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Sizes */}
+      {uniqueSizes.length > 0 && (
+        <div>
+          <p className="mb-2 text-xs font-medium text-foreground">Size</p>
+          <div className="flex flex-wrap gap-2">
+            {uniqueSizes.map((s) => {
+              const selected = selectedSize === s
+              return (
+                <button
+                  key={s}
+                  onClick={() => onSizeChange(s)}
+                  className={cx(
+                    "rounded-full border bg-transparent px-3 py-1 text-xs transition",
+                    selected
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-border/60 text-foreground hover:border-border",
+                  )}
+                >
+                  {s}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Description */}
+      {product.description && (
+        <div className="border-t border-border/40 pt-3">
+          <h3 className="mb-2 text-xs font-medium text-foreground">Description</h3>
+          <div
+            className="text-xs leading-relaxed text-muted-foreground md:text-sm prose-sm prose-p:my-1 prose-ul:my-1"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        </div>
+      )}
+
+      {/* Extra Description */}
+      {product.extraDescription && (
+        <div className="border-t border-border/40 pt-3">
+          <h3 className="mb-2 text-xs font-medium text-foreground">More Information</h3>
+          <div
+            className="text-xs leading-relaxed text-muted-foreground md:text-sm prose-sm prose-p:my-1 prose-ul:my-1"
+            dangerouslySetInnerHTML={{ __html: product.extraDescription }}
+          />
+        </div>
+      )}
+    </div>
+  )
+}

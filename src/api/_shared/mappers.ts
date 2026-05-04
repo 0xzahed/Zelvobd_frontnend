@@ -92,6 +92,7 @@ export const mapProduct = (product: any): Product => {
       discountedPrice: Number(variant.discountedPrice || 0),
       flashSalePrice: variant.flashSalePrice != null ? Number(variant.flashSalePrice) : undefined,
       image: toAbsoluteUploadUrl(variant.imageUrl),
+      barcodeUrl: toAbsoluteUploadUrl(variant.barcodeUrl),
     })),
   }
 }

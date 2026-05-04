@@ -6,6 +6,7 @@ export type ProductVariant = {
   discountedPrice: number
   flashSalePrice?: number
   image?: string
+  barcodeUrl?: string
 }
 
 export type Product = {

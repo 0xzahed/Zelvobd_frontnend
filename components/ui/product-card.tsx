@@ -22,9 +22,15 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     addItem({ productId: product.id, quantity: 1 })
   }
 
+  const categorySlug = product.categorySlug || 'uncategorized'
+  const subCategorySlug = product.subCategorySlug || 'all'
+  const productSlug = product.slug || product.id
+  const variantId = product.variants?.[0]?.id || 'default'
+  const productUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}/${variantId}`
+
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={productUrl}
       className={cx(
         "group relative flex h-full snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
         compact
