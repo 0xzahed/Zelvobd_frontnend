@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ShoppingCart } from "lucide-react"
 import type { Product } from "@/lib/types"
@@ -37,11 +37,13 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const [selectedColor, setSelectedColor] = useState<string>(initialVariant?.color || uniqueColors[0] || "")
   const [selectedSize, setSelectedSize] = useState<string>(initialVariant?.size || uniqueSizes[0] || "")
   
-  // Keep gallery image in sync
-  const allImages = Array.from(new Set([
-    ...product.images, 
-    ...variants.map(v => v.image).filter(Boolean)
-  ])) as string[]
+  // Keep gallery image in sync (memoized so its reference is stable across renders)
+  const allImages = useMemo(() => (
+    Array.from(new Set([
+      ...product.images,
+      ...variants.map(v => v.image).filter(Boolean),
+    ])) as string[]
+  ), [product.images, variants])
   
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
@@ -50,24 +52,22 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     v => v.color === selectedColor && v.size === selectedSize
   ) || variants.find(v => v.color === selectedColor) || null
 
-  // Update image when active variant changes
+  // Update image index when the active variant changes
   useEffect(() => {
-    if (activeVariant) {
-      if (activeVariant.image) {
-        const imgIdx = allImages.indexOf(activeVariant.image)
-        if (imgIdx !== -1) {
-          setActiveImageIndex(imgIdx)
-        }
-      }
+    if (!activeVariant?.image) return
+    const imgIdx = allImages.indexOf(activeVariant.image)
+    if (imgIdx !== -1) setActiveImageIndex(imgIdx)
+  }, [activeVariant?.id, activeVariant?.image, allImages])
 
-      const categorySlug = product.categorySlug || 'all'
-      const subCategorySlug = product.subCategorySlug || 'all'
-      const productSlug = product.slug || product.id
-      const newUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}/${activeVariant.id}`
-      
-      window.history.replaceState(null, '', newUrl)
-    }
-  }, [activeVariant, allImages, product.categorySlug, product.subCategorySlug, product.slug, product.id])
+  // Keep URL in sync with the active variant
+  useEffect(() => {
+    if (!activeVariant) return
+    const categorySlug = product.categorySlug || 'all'
+    const subCategorySlug = product.subCategorySlug || 'all'
+    const productSlug = product.slug || product.id
+    const newUrl = `/${categorySlug}/${subCategorySlug}/${productSlug}/${activeVariant.id}`
+    window.history.replaceState(null, '', newUrl)
+  }, [activeVariant?.id, product.categorySlug, product.subCategorySlug, product.slug, product.id])
 
   const handleColorChange = (c: string) => {
     setSelectedColor(c)
@@ -75,6 +75,26 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     const availableSizesForColor = variants.filter(v => v.color === c).map(v => v.size)
     if (availableSizesForColor.length > 0 && !availableSizesForColor.includes(selectedSize)) {
       setSelectedSize(availableSizesForColor[0])
+    }
+  }
+
+  // When a thumbnail is clicked, update the main image and, if that image
+  // belongs to another variant, switch the selected color/size to match —
+  // mirroring the behavior of clicking a color swatch.
+  const handleImageChange = (index: number) => {
+    setActiveImageIndex(index)
+    const img = allImages[index]
+    if (!img) return
+    const variantForImage = variants.find(v => v.image === img)
+    if (!variantForImage) return
+    if (variantForImage.color && variantForImage.color !== selectedColor) {
+      setSelectedColor(variantForImage.color)
+      const availableSizesForColor = variants
+        .filter(v => v.color === variantForImage.color)
+        .map(v => v.size)
+      if (availableSizesForColor.length > 0 && !availableSizesForColor.includes(selectedSize)) {
+        setSelectedSize(availableSizesForColor[0])
+      }
     }
   }
 
@@ -130,7 +150,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           images={allImages}
           productName={product.name}
           activeImageIndex={activeImageIndex}
-          onImageChange={setActiveImageIndex}
+          onImageChange={handleImageChange}
         />
 
         {/* Right Column: Info & Actions */}
