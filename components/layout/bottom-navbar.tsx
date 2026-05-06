@@ -68,6 +68,8 @@ export function BottomNavbar() {
           width: 100%;
           height: var(--nav-height);
           background: var(--card);
+          border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+          box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.08);
           display: flex;
           /* Carve a circular gap at top-center the size of the indicator's outer
              ring so the page shows through where the ring used to sit. */
@@ -161,6 +163,7 @@ export function BottomNavbar() {
           align-items: center;
           border-radius: 50%;
           border: 6px solid transparent;
+          box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
           pointer-events: auto;
         }
 

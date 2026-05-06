@@ -6,10 +6,15 @@ import { ArrowLeft, ShoppingCart } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { useCart } from "@/contexts/cart-context"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
+import { ProductCard } from "@/components/ui/product-card"
+import { getProducts } from "@/src/api/products/getProducts"
+import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { ProductShareModal } from "./detail/product-share-modal"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
+
+const TRENDING_PRODUCT_STORAGE_KEY = "admin-trending-product-ids"
 
 interface ProductDetailProps {
   product: Product
@@ -22,6 +27,8 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
   const [cartOpen, setCartOpen] = useState(false)
   const [qty, setQty] = useState(1)
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
 
   const variants = product.variants ?? []
   const uniqueColors = Array.from(new Set(variants.map(v => v.color).filter(Boolean)))
@@ -112,10 +119,54 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     router.push("/cart")
   }
 
+  useEffect(() => {
+    let cancelled = false
+
+    const loadSections = async () => {
+      try {
+        const res = await getProducts({ limit: 100 })
+        const allProducts = (res?.data?.products || []).map(mapProduct) as Product[]
+        const currentSubCategory = product.subCategorySlug || ""
+
+        const related = allProducts
+          .filter((p) => p.id !== product.id && currentSubCategory && p.subCategorySlug === currentSubCategory)
+          .slice(0, 10)
+
+        const storedIdsRaw =
+          typeof window !== "undefined"
+            ? JSON.parse(localStorage.getItem(TRENDING_PRODUCT_STORAGE_KEY) || "[]")
+            : []
+        const selectedIds: string[] = Array.isArray(storedIdsRaw) ? storedIdsRaw : []
+        const byId = new Map(allProducts.map((p) => [p.id, p]))
+        const trending = selectedIds
+          .map((id) => byId.get(id))
+          .filter((p): p is Product => Boolean(p))
+          .filter((p) => p.id !== product.id)
+          .slice(0, 10)
+
+        if (!cancelled) {
+          setRelatedProducts(related)
+          setTrendingProducts(trending)
+        }
+      } catch {
+        if (!cancelled) {
+          setRelatedProducts([])
+          setTrendingProducts([])
+        }
+      }
+    }
+
+    void loadSections()
+
+    return () => {
+      cancelled = true
+    }
+  }, [product.id, product.subCategorySlug])
+
   return (
     <div className="pb-28 md:pb-8">
       {/* Mobile sub-header */}
-      <div className="-mx-4 flex items-center justify-between bg-card px-4 py-2 md:hidden">
+      <div className="-mx-4 mt-2 flex items-center justify-between bg-card px-4 py-2 md:hidden">
         <button
           onClick={() => router.back()}
           aria-label="Back"
@@ -211,6 +262,38 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           Add to Cart
         </button>
       </div>
+
+      {relatedProducts.length > 0 && (
+        <section className="mt-8 space-y-3">
+          <h2 className="text-base font-medium text-foreground md:text-xl">Related Products</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+            {relatedProducts.map((p) => (
+              <div
+                key={p.id}
+                className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]"
+              >
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {trendingProducts.length > 0 && (
+        <section className="mt-8 space-y-3">
+          <h2 className="text-base font-medium text-foreground md:text-xl">Trending Products</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+            {trendingProducts.map((p) => (
+              <div
+                key={p.id}
+                className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]"
+              >
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <CartBottomSheet open={cartOpen} onClose={() => setCartOpen(false)} />
       <WhatsAppFab number={product.whatsapp} />

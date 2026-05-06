@@ -13,22 +13,22 @@ export function CategoriesSection() {
     <section className="space-y-3">
       <h2 className="text-base font-medium text-foreground md:text-xl">Categories</h2>
 
-      <div className="grid grid-cols-3 gap-2 md:hidden">
+      <div className="grid grid-cols-3 gap-1 md:hidden">
         {mobileCategories.map((c) => (
-          <div key={c.id} className="w-full">
+          <div key={c.id} className="mx-auto w-[90%]">
             <CategoryCard category={c} />
           </div>
         ))}
         {showMore && (
-          <div className="w-full">
+          <div className="mx-auto w-[90%]">
             <MoreCategoriesCard extras={categories.slice(mobileMax - 1)} />
           </div>
         )}
       </div>
 
-      <div className="hidden gap-2 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory md:flex">
+      <div className="hidden gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory md:flex">
         {categories.map((c) => (
-          <div key={c.id} className="w-27.5 shrink-0 snap-start lg:w-30">
+          <div key={c.id} className="w-18 shrink-0 snap-start lg:w-20">
             <CategoryCard category={c} />
           </div>
         ))}

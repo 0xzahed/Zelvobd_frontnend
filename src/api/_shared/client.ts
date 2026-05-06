@@ -1,5 +1,3 @@
-import { notify } from "@/lib/notify"
-
 export const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.VITE_API_BASE_URL ||
@@ -14,13 +12,28 @@ export const authHeaders = (): Record<string, string> => {
 }
 
 export const handleApiError = (err: unknown, fallback = "Something went wrong"): void => {
+  const message =
+    err && typeof err === "object"
+      ? ((err as Record<string, unknown>).message as string) ||
+        ((err as Record<string, unknown>).error as string) ||
+        fallback
+      : typeof err === "string"
+        ? err
+        : fallback
+
+  // Keep this module server-safe; only load toast helper in the browser.
+  if (typeof window !== "undefined") {
+    import("@/lib/notify")
+      .then(({ notify }) => notify.error(message))
+      .catch(() => console.error(message))
+    return
+  }
+
   if (err && typeof err === "object") {
-    const e = err as Record<string, unknown>
-    const message = (e.message as string) || (e.error as string) || fallback
-    notify.error(message)
+    console.error(message)
   } else if (typeof err === "string") {
-    notify.error(err)
+    console.error(err)
   } else {
-    notify.error(fallback)
+    console.error(fallback)
   }
 }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { LottieIcon } from "@/components/ui/lottie-icon"
@@ -57,11 +56,10 @@ export function FlashSaleSection() {
         }
       >
         {backgroundImage && <div className="absolute inset-0 bg-black/25" />}
-        <div className="relative z-10 flex items-center gap-2 p-3 md:p-4">
+        <div className="relative z-10 flex min-h-16 items-center gap-2 p-4 md:min-h-20 md:p-5">
           <div className="flex shrink-0 items-center gap-1"><LottieIcon src="/fire-animaiton.json" className="block h-5 w-5 md:h-6 md:w-6" ariaLabel="Flash sale" /><h2 className="text-sm font-medium text-foreground md:text-base">Flash Sale</h2></div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />
-          <Link href="/offers" className="inline-flex shrink-0 items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs">See All</Link>
         </div>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">

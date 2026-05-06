@@ -12,8 +12,11 @@ export function ProductCard({ product, compact = false }: { product: Product; co
   const src =
     product.images?.[0] ||
     `/placeholder.svg?height=400&width=400&query=${encodeURIComponent(product.name)}`
-
   const savings = product.cutPrice > product.price ? product.cutPrice - product.price : 0
+  const discountPercent =
+    product.cutPrice > product.price && product.cutPrice > 0
+      ? Math.round((savings / product.cutPrice) * 100)
+      : 0
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -43,7 +46,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           compact ? "aspect-square" : "aspect-5/4 md:aspect-auto md:flex-1 md:min-h-0",
         )}
       >
-        <div className="absolute right-0.5 top-0.5 z-10 flex flex-row items-center gap-1">
+        <div className="absolute right-0.5 top-0.5 z-10 flex flex-col items-center gap-1">
           {product.isFlashSale && (
             <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-destructive/10 md:h-8 md:w-8">
               <Flame className="h-4 w-4 text-destructive md:h-5 md:w-5" />
@@ -64,14 +67,14 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         />
       </div>
 
-      <div className="mt-3 flex flex-1 flex-col">
+      <div className="mt-3 flex min-w-0 flex-1 flex-col">
         {/* Title */}
         <h3
           className={cx(
-            "font-semibold leading-tight text-foreground wrap-break-word",
+            "block w-full truncate whitespace-nowrap font-semibold leading-tight text-foreground",
             compact
-              ? "min-h-9 line-clamp-2 text-sm"
-              : "min-h-10 line-clamp-2 text-base md:min-h-7 md:line-clamp-1 md:text-xl",
+              ? "text-sm"
+              : "text-base md:text-xl",
           )}
         >
           {product.name}
@@ -80,7 +83,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         {/* Current price */}
         <div
           className={cx(
-            "mt-1 font-medium text-foreground",
+            "mt-1 truncate whitespace-nowrap font-medium text-foreground",
             compact ? "text-[15px]" : "text-[15px] md:text-xl",
           )}
         >
@@ -94,9 +97,9 @@ export function ProductCard({ product, compact = false }: { product: Product; co
               {formatBDT(product.cutPrice)}
             </span>
           )}
-          {savings > 0 && (
+          {discountPercent > 0 && (
             <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 md:px-2 md:text-[11px]">
-              {formatBDT(savings)} OFF
+              {discountPercent}% OFF
             </span>
           )}
         </div>

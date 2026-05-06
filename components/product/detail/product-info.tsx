@@ -137,14 +137,14 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex items-center gap-2 rounded-full border bg-transparent px-2 py-1.5 text-left transition",
+                    "flex min-h-11 items-center gap-2.5 rounded-full border bg-transparent px-3 py-2.5 text-left transition md:min-h-12",
                     selected
                       ? "border-primary text-primary"
                       : "border-border/60 text-foreground hover:border-border",
                   )}
                 >
                   <span
-                    className="h-6 w-6 shrink-0 rounded-full border border-border/40"
+                    className="h-9 w-9 shrink-0 rounded-full border border-border/40 md:h-10 md:w-10"
                     style={{ backgroundColor: colorToHex(c) }}
                     aria-hidden="true"
                   />
