@@ -20,6 +20,14 @@ function colorToHex(name: string): string {
     "midnight blue": "#1E3A5F",
     "natural titanium": "#A9A299",
     "desert titanium": "#C8B5A3",
+    moonstone: "#A8B0B9",
+    jade: "#3A8F6B",
+    obsidian: "#111827",
+    porcelain: "#F1EEE8",
+    graphite: "#3A3A3A",
+    coral: "#F0746E",
+    lemongrass: "#A9B85A",
+    sky: "#7CB6E8",
     red: "#DC2626",
     green: "#16A34A",
     pink: "#F472B6",
@@ -82,11 +90,6 @@ export function ProductInfo({
             {cutPrice > price && (
               <span className="text-sm text-muted-foreground line-through">
                 {formatBDT(cutPrice)}
-              </span>
-            )}
-            {isFlashSale && (
-              <span className="ml-1 rounded bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
-                ⚡ Flash Sale
               </span>
             )}
           </div>

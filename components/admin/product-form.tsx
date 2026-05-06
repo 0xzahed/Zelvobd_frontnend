@@ -247,7 +247,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
 
         {/* Material & Weight */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Text label="Material" value={material} onChange={setMaterial} placeholder="Material" required />
+          <Text label="Material" value={material} onChange={setMaterial} placeholder="Material" />
           <Text label="Weight" value={weight} onChange={setWeight} placeholder="e.g., 500g, 1.2kg" />
         </div>
 
