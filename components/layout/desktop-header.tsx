@@ -84,7 +84,7 @@ export function DesktopHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 hidden border-b border-border/50 bg-background/90 backdrop-blur md:block">
+      <header className="sticky top-0 z-40 hidden border-b border-border/40 bg-white shadow-[0_2px_10px_rgba(15,23,42,0.08)] md:block">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6">
           {/* Brand */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
