@@ -27,7 +27,7 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-lg shadow-card"
+      className="relative w-full overflow-hidden rounded-sm shadow-card"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
