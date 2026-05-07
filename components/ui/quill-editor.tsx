@@ -190,7 +190,7 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
         {label} {required && <span className="text-accent">*</span>}
       </label>
       <div className="relative overflow-hidden rounded-md border border-border bg-background">
-        <div ref={hostRef} className="min-h-[250px]" />
+        <div ref={hostRef} className="min-h-62.5" />
         {required && (
           <input
             tabIndex={-1}
