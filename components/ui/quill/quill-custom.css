@@ -1,0 +1,86 @@
+/* quill-custom.css */
+
+/* Fix Font Size Labels in Toolbar */
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {
+  content: '12px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+  content: '14px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {
+  content: '16px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+  content: '18px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before {
+  content: '20px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="24px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="24px"]::before {
+  content: '24px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="32px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="32px"]::before {
+  content: '32px';
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="48px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="48px"]::before {
+  content: '48px';
+}
+
+/* Fix Font Family Labels in Toolbar */
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Roboto"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Roboto"]::before {
+  content: 'Roboto';
+  font-family: 'Roboto', sans-serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Poppins"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Poppins"]::before {
+  content: 'Poppins';
+  font-family: 'Poppins', sans-serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Montserrat"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Montserrat"]::before {
+  content: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Open Sans"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Open Sans"]::before {
+  content: 'Open Sans';
+  font-family: 'Open Sans', sans-serif;
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Lato"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Lato"]::before {
+  content: 'Lato';
+  font-family: 'Lato', sans-serif;
+}
+
+/* Base styles for the editor */
+.ql-editor {
+  font-family: inherit;
+}
+
+/* Ensure SVG icons render cleanly inside Quill */
+.ql-editor .lucide-icon-inline svg {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1.25em;
+  width: 1.25em;
+}
+
+/* Remove standard image icon from toolbar if we added it manually */
+.ql-toolbar button.ql-image {
+  /* We will override this in JS */
+}
+
+/* Custom Icon Button styling */
+.ql-toolbar button.ql-lucideIcon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
