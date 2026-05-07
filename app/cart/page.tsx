@@ -22,7 +22,9 @@ import { useCart } from "@/contexts/cart-context";
 import { formatBDT } from "@/lib/format";
 import { useProducts } from "@/lib/use-store-data";
 
-const BD_API_BASE = "https://bdapis.com/api/v1.2";
+const BD_API_BASE = "https://bdapi.vercel.app/api/v.1";
+
+type District = { id: string; district: string };
 
 export default function CartPage() {
   const router = useRouter();
@@ -34,14 +36,14 @@ export default function CartPage() {
     phone: "",
     email: "",
     address: "",
-    division: "",
-    upazila: "",
+    district: "",
+    union: "",
     notes: "",
   });
-  const [divisions, setDivisions] = useState<string[]>([]);
-  const [upazilas, setUpazilas] = useState<string[]>([]);
-  const [divisionLoading, setDivisionLoading] = useState(false);
-  const [upazilaLoading, setUpazilaLoading] = useState(false);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [unions, setUnions] = useState<string[]>([]);
+  const [districtLoading, setDistrictLoading] = useState(false);
+  const [unionLoading, setUnionLoading] = useState(false);
 
   const enriched = items
     .map((item) => {
@@ -110,6 +112,8 @@ export default function CartPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const selectedDistrict = districts.find((d) => d.district === form.district);
+
   const onCheckout = () => {
     try {
       sessionStorage.setItem("checkout_form_draft", JSON.stringify(form));
@@ -119,23 +123,23 @@ export default function CartPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const loadDivisions = async () => {
+    const loadDistricts = async () => {
       try {
-        setDivisionLoading(true);
-        const res = await fetch(`${BD_API_BASE}/divisions`);
+        setDistrictLoading(true);
+        const res = await fetch(`${BD_API_BASE}/district`);
         const json = await res.json();
         const rows = Array.isArray(json?.data) ? json.data : [];
-        const list = rows
-          .map((item: { division?: string }) => item?.division)
-          .filter((v: string | undefined): v is string => Boolean(v));
-        if (!cancelled) setDivisions(list);
+        const list: District[] = rows
+          .filter((item: { id?: string; name?: string }) => item?.id && item?.name)
+          .map((item: { id: string; name: string }) => ({ id: item.id, district: item.name }));
+        if (!cancelled) setDistricts(list);
       } catch {
-        if (!cancelled) setDivisions([]);
+        if (!cancelled) setDistricts([]);
       } finally {
-        if (!cancelled) setDivisionLoading(false);
+        if (!cancelled) setDistrictLoading(false);
       }
     };
-    void loadDivisions();
+    void loadDistricts();
     return () => {
       cancelled = true;
     };
@@ -143,37 +147,40 @@ export default function CartPage() {
 
   useEffect(() => {
     let cancelled = false;
-    const loadUpazilas = async () => {
-      if (!form.division) {
-        setUpazilas([]);
+    const loadUnions = async () => {
+      if (!selectedDistrict) {
+        setUnions([]);
         return;
       }
       try {
-        setUpazilaLoading(true);
-        const res = await fetch(
-          `${BD_API_BASE}/division/${encodeURIComponent(form.division.toLowerCase())}`,
+        setUnionLoading(true);
+        const upRes = await fetch(`${BD_API_BASE}/upazilla/${encodeURIComponent(selectedDistrict.id)}`);
+        const upJson = await upRes.json();
+        const upazillas: { id: string }[] = Array.isArray(upJson?.data) ? upJson.data : [];
+        const results = await Promise.all(
+          upazillas.map((u) =>
+            fetch(`${BD_API_BASE}/union/${encodeURIComponent(u.id)}`)
+              .then((r) => r.json())
+              .then((j) => (Array.isArray(j?.data) ? j.data : []))
+              .catch(() => [])
+          )
         );
-        const json = await res.json();
-        const rows = Array.isArray(json?.data) ? json.data : [];
-        const next = Array.from(
-          new Set(
-            rows.flatMap((item: { upazilla?: string[] }) =>
-              Array.isArray(item?.upazilla) ? item.upazilla : [],
-            ),
-          ),
-        );
-        if (!cancelled) setUpazilas(next);
+        const list: string[] = results
+          .flat()
+          .map((item: { name?: string }) => item?.name)
+          .filter((v): v is string => Boolean(v));
+        if (!cancelled) setUnions(list);
       } catch {
-        if (!cancelled) setUpazilas([]);
+        if (!cancelled) setUnions([]);
       } finally {
-        if (!cancelled) setUpazilaLoading(false);
+        if (!cancelled) setUnionLoading(false);
       }
     };
-    void loadUpazilas();
+    void loadUnions();
     return () => {
       cancelled = true;
     };
-  }, [form.division]);
+  }, [selectedDistrict]);
 
   return (
     <AppShell>
@@ -370,38 +377,38 @@ export default function CartPage() {
                     className="w-full resize-none rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm outline-none"
                   />
                   <select
-                    value={form.division}
+                    value={form.district}
                     onChange={(e) => {
-                      const division = e.target.value;
-                      setForm((prev) => ({ ...prev, division, upazila: "" }));
+                      const district = e.target.value;
+                      setForm((prev) => ({ ...prev, district, union: "" }));
                     }}
                     className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
                   >
                     <option value="">
-                      {divisionLoading ? "Loading divisions..." : "Select Division"}
+                      {districtLoading ? "Loading districts..." : "Select District"}
                     </option>
-                    {divisions.map((division) => (
-                      <option key={division} value={division}>
-                        {division}
+                    {districts.map((d) => (
+                      <option key={d.id} value={d.district}>
+                        {d.district}
                       </option>
                     ))}
                   </select>
                   <select
-                    value={form.upazila}
-                    onChange={(e) => updateForm("upazila", e.target.value)}
-                    disabled={!form.division || upazilaLoading}
+                    value={form.union}
+                    onChange={(e) => updateForm("union", e.target.value)}
+                    disabled={!form.district || unionLoading}
                     className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <option value="">
-                      {!form.division
-                        ? "Select Division First"
-                        : upazilaLoading
-                          ? "Loading upazila..."
-                          : "Select Upazila"}
+                      {!form.district
+                        ? "Select District First"
+                        : unionLoading
+                          ? "Loading unions..."
+                          : "Select Union"}
                     </option>
-                    {upazilas.map((upazila) => (
-                      <option key={upazila} value={upazila}>
-                        {upazila}
+                    {unions.map((union) => (
+                      <option key={union} value={union}>
+                        {union}
                       </option>
                     ))}
                   </select>
