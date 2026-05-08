@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquare,
   Search,
   Settings2,
   ShieldAlert,
@@ -80,6 +81,7 @@ const MENU: NavItem[] = [
     ],
   },
   { section: "Sales", label: "Customers", icon: Users, href: "/admin/customers" },
+  { section: "Support", label: "Live Chat", icon: MessageSquare, href: "/admin/chat" },
   { section: "System", label: "Admins", icon: ShieldCheck, href: "/admin/admins" },
   { section: "System", label: "Settings", icon: Settings, href: "/admin/settings" },
 ]

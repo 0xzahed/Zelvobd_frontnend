@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { ChevronDown, Mail, MessageCircle, Phone, Search } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
@@ -49,7 +50,9 @@ export default function HelpPage() {
         </div>
 
         <section className="grid grid-cols-3 gap-3">
-          <QuickAction icon={MessageCircle} label="Live Chat" />
+          <Link href="/chat" className="contents">
+            <QuickAction icon={MessageCircle} label="Live Chat" />
+          </Link>
           <QuickAction icon={Phone} label="Call Us" />
           <QuickAction icon={Mail} label="Email" />
         </section>
