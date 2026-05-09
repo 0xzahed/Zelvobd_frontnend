@@ -5,11 +5,8 @@ import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { LottieIcon } from "@/components/ui/lottie-icon"
 import { getAllActiveFlashSaleProducts } from "@/src/api/flashSale/getAllActiveFlashSaleProducts"
-import { getActiveFlashSaleCampaign } from "@/src/api/flashSale/getActiveFlashSaleCampaign"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import type { Product } from "@/lib/types"
-
-const FLASH_SALE_BG_STORAGE_KEY = "flash-sale-bg-image"
 
 export function FlashSaleSection() {
   const [items, setItems] = useState<Product[]>([])
@@ -18,10 +15,7 @@ export function FlashSaleSection() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [res, campaignRes] = await Promise.all([
-          getAllActiveFlashSaleProducts({ limit: 12 }),
-          getActiveFlashSaleCampaign().catch(() => null),
-        ])
+        const res = await getAllActiveFlashSaleProducts({ limit: 12 })
         setItems(
           (res?.data?.products || []).map((product: any) => ({
             ...mapProduct(product),
@@ -29,7 +23,7 @@ export function FlashSaleSection() {
           })),
         )
 
-        const campaign = campaignRes?.data?.campaigns?.[0] || campaignRes?.data || {}
+        const campaign = res?.data?.campaigns?.[0] || {}
         const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""
 
         setBackgroundImage(apiBg)

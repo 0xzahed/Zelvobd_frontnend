@@ -38,7 +38,7 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="relative flex aspect-[16/8] w-full shrink-0 items-center overflow-hidden bg-foreground md:aspect-[16/5]"
+            className="relative flex aspect-16/8 w-full shrink-0 items-center overflow-hidden bg-foreground md:aspect-16/5"
           >
             {slide.image ? (
               // eslint-disable-next-line @next/next/no-img-element

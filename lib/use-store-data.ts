@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { getCategories } from "@/src/api/categoryApi"
 import { getProducts } from "@/src/api/products/getProducts"
 import { getHomePageBanners } from "@/src/api/banner/getHomePageBanners"
-import { getBanners } from "@/src/api/banner/getBanners"
 import { mapBanner, mapCategory, mapProduct } from "@/src/api/_shared/mappers"
 import type { Category, Product, Slider } from "@/lib/types"
 
@@ -16,30 +15,6 @@ let slidersCache: Slider[] | null = null
 let categoriesInFlight: Promise<Category[]> | null = null
 let productsInFlight: Promise<Product[]> | null = null
 let slidersInFlight: Promise<Slider[]> | null = null
-
-const categoryFromProduct = (products: Product[]): Category[] => {
-  const map = new Map<string, Category>()
-
-  products.forEach((product) => {
-    const categorySlug = product.categorySlug || "uncategorized"
-    const categoryName = categorySlug
-      .split("-")
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(" ")
-
-    if (!map.has(categorySlug)) {
-      map.set(categorySlug, {
-        id: `derived-${categorySlug}`,
-        name: categoryName,
-        slug: categorySlug,
-        image: product.images?.[0] || "/placeholder.svg",
-        subCategories: [],
-      })
-    }
-  })
-
-  return Array.from(map.values())
-}
 
 export function useCategories() {
   const pathname = usePathname()
@@ -67,16 +42,8 @@ export function useCategories() {
             const categoryRes = await getCategories({ limit: 100 })
             const mappedCategories = (categoryRes?.data?.categories || []).map(mapCategory)
 
-            if (mappedCategories.length > 0) {
-              categoriesCache = mappedCategories
-              return mappedCategories
-            }
-
-            const productRes = await getProducts({ limit: 100 })
-            const mappedProducts = (productRes?.data?.products || []).map(mapProduct)
-            const derivedCategories = categoryFromProduct(mappedProducts)
-            categoriesCache = derivedCategories
-            return derivedCategories
+            categoriesCache = mappedCategories
+            return mappedCategories
           })().finally(() => {
             categoriesInFlight = null
           })
@@ -178,15 +145,8 @@ export function useSliders() {
             const homeBannerRes = await getHomePageBanners()
             const homeBanners = (homeBannerRes?.data || []).map(mapBanner)
 
-            if (homeBanners.length > 0) {
-              slidersCache = homeBanners
-              return homeBanners
-            }
-
-            const allBannerRes = await getBanners()
-            const allBanners = (allBannerRes?.data || []).map(mapBanner)
-            slidersCache = allBanners
-            return allBanners
+            slidersCache = homeBanners
+            return homeBanners
           })().finally(() => {
             slidersInFlight = null
           })
