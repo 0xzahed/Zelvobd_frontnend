@@ -8,13 +8,12 @@ import { useCart } from "@/contexts/cart-context"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { ProductCard } from "@/components/ui/product-card"
 import { getProducts } from "@/src/api/products/getProducts"
+import { getTrending } from "@/src/api/trending/getTrending"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { ProductShareModal } from "./detail/product-share-modal"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
-
-const TRENDING_PRODUCT_STORAGE_KEY = "admin-trending-product-ids"
 
 interface ProductDetailProps {
   product: Product
@@ -124,24 +123,19 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
     const loadSections = async () => {
       try {
-        const res = await getProducts({ limit: 100 })
-        const allProducts = (res?.data?.products || []).map(mapProduct) as Product[]
-        const currentSubCategory = product.subCategorySlug || ""
+        const [productsRes, trendingRes] = await Promise.all([
+          getProducts({ limit: 100 }),
+          getTrending({ limit: 10 })
+        ])
 
+        const allProducts = (productsRes?.data?.products || []).map(mapProduct) as Product[]
+        const trending = (trendingRes?.data?.products || [])
+          .map(mapProduct)
+          .filter((p: Product) => p.id !== product.id) as Product[]
+
+        const currentSubCategory = product.subCategorySlug || ""
         const related = allProducts
           .filter((p) => p.id !== product.id && currentSubCategory && p.subCategorySlug === currentSubCategory)
-          .slice(0, 10)
-
-        const storedIdsRaw =
-          typeof window !== "undefined"
-            ? JSON.parse(localStorage.getItem(TRENDING_PRODUCT_STORAGE_KEY) || "[]")
-            : []
-        const selectedIds: string[] = Array.isArray(storedIdsRaw) ? storedIdsRaw : []
-        const byId = new Map(allProducts.map((p) => [p.id, p]))
-        const trending = selectedIds
-          .map((id) => byId.get(id))
-          .filter((p): p is Product => Boolean(p))
-          .filter((p) => p.id !== product.id)
           .slice(0, 10)
 
         if (!cancelled) {
@@ -149,10 +143,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           setTrendingProducts(trending)
         }
       } catch {
-        if (!cancelled) {
-          setRelatedProducts([])
-          setTrendingProducts([])
-        }
+        // fail silently
       }
     }
 
@@ -164,57 +155,36 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   }, [product.id, product.subCategorySlug])
 
   return (
-    <div className="pb-28 md:pb-8">
-      {/* Mobile sub-header */}
-      <div className="-mx-4 mt-2 flex items-center justify-between bg-card px-4 py-2 md:hidden">
+    <div className="container pb-20 pt-4 md:pb-10">
+      <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          aria-label="Back"
-          className="grid h-10 w-10 place-items-center rounded-full border border-border/60 bg-card text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-sm"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2">
-          <ProductShareModal 
-            productName={product.name} 
-            variantColor={selectedColor}
-            barcodeUrl={activeVariant?.barcodeUrl} 
-          />
-          <button
-            onClick={() => setCartOpen(true)}
-            aria-label="Open cart"
-            className="relative grid h-10 w-10 place-items-center rounded-full border border-border/60 bg-card text-foreground hover:bg-secondary"
-          >
-            <ShoppingCart className="h-4 w-4" />
+          <ProductShareModal product={product} />
+          <div className="relative">
+            <ShoppingCart className="h-6 w-6" />
             {totalCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {totalCount}
               </span>
             )}
-          </button>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-5 py-3 md:grid-cols-2 md:gap-10 md:py-8">
-        {/* Left Column: Gallery */}
-        <ProductGallery 
+      <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
+        <ProductGallery
           images={allImages}
-          productName={product.name}
           activeImageIndex={activeImageIndex}
           onImageChange={handleImageChange}
         />
 
-        {/* Right Column: Info & Actions */}
-        <div className="flex flex-col relative">
-          <div className="hidden md:block absolute right-0 top-0">
-            <ProductShareModal 
-              productName={product.name} 
-              variantColor={selectedColor}
-              barcodeUrl={activeVariant?.barcodeUrl} 
-            />
-          </div>
-
-          <ProductInfo 
+        <div className="flex flex-col">
+          <ProductInfo
             product={product}
             activeVariant={activeVariant}
             uniqueColors={uniqueColors}
@@ -266,12 +236,9 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       {relatedProducts.length > 0 && (
         <section className="mt-8 space-y-3">
           <h2 className="text-base font-medium text-foreground md:text-xl">Related Products</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
             {relatedProducts.map((p) => (
-              <div
-                key={p.id}
-                className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]"
-              >
+              <div key={p.id}>
                 <ProductCard product={p} />
               </div>
             ))}
@@ -282,12 +249,9 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       {trendingProducts.length > 0 && (
         <section className="mt-8 space-y-3">
           <h2 className="text-base font-medium text-foreground md:text-xl">Trending Products</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
             {trendingProducts.map((p) => (
-              <div
-                key={p.id}
-                className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]"
-              >
+              <div key={p.id}>
                 <ProductCard product={p} />
               </div>
             ))}
