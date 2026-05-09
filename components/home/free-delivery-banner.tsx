@@ -1,13 +1,31 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useProducts } from "@/lib/use-store-data"
+import { getFreeDelivery } from "@/src/api/freeDelivery/getFreeDelivery"
+import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductCard } from "@/components/ui/product-card"
+import type { Product } from "@/lib/types"
 
 export function FreeDeliveryBanner() {
-  const { products, loaded } = useProducts()
+  const [freeDelivery, setFreeDelivery] = useState<Product[]>([])
 
-  const freeDelivery = products.filter((p) => p.isFreeDelivery)
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await getFreeDelivery({ limit: 12 })
+        setFreeDelivery(
+          (res?.data?.products || []).map((product: any) => ({
+            ...mapProduct(product),
+            isFreeDelivery: true,
+          })),
+        )
+      } catch {
+        setFreeDelivery([])
+      }
+    }
+    void load()
+  }, [])
 
   return (
     <section className="space-y-3">

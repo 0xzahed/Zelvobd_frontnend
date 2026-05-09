@@ -1,18 +1,30 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { ChevronRight, Sparkles } from "lucide-react"
-import { useProducts } from "@/lib/use-store-data"
+import { getProducts } from "@/src/api/products/getProducts"
+import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductCard } from "@/components/ui/product-card"
+import type { Product } from "@/lib/types"
 
 const MAX_NEW = 12
 
 export function NewProductsSection() {
-  const { products, loaded } = useProducts()
+  const [newItems, setNewItems] = useState<Product[]>([])
 
-  // "New" = the most recently added products. Since items are appended to the
-  // store, the tail of the array represents the newest ones.
-  const newItems = [...products].reverse().slice(0, MAX_NEW)
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await getProducts({ limit: MAX_NEW, sortBy: "createdAt", sortOrder: "desc" })
+        const products = (res?.data?.products || []).map(mapProduct) as Product[]
+        setNewItems(products)
+      } catch {
+        setNewItems([])
+      }
+    }
+    void load()
+  }, [])
 
   return (
     <section className="space-y-3">
