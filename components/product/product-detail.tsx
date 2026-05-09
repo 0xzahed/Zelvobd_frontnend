@@ -8,13 +8,12 @@ import { useCart } from "@/contexts/cart-context"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { ProductCard } from "@/components/ui/product-card"
 import { getProducts } from "@/src/api/products/getProducts"
+import { getTrending } from "@/src/api/trending/getTrending"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { ProductShareModal } from "./detail/product-share-modal"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
-
-const TRENDING_PRODUCT_STORAGE_KEY = "admin-trending-product-ids"
 
 interface ProductDetailProps {
   product: Product
@@ -124,24 +123,21 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
     const loadSections = async () => {
       try {
-        const res = await getProducts({ limit: 100 })
-        const allProducts = (res?.data?.products || []).map(mapProduct) as Product[]
-        const currentSubCategory = product.subCategorySlug || ""
+        const [relatedRes, trendingRes] = await Promise.all([
+          product.subCategoryId
+            ? getProducts({ subCategoryId: product.subCategoryId, limit: 11 })
+            : Promise.resolve({ data: { products: [] } }),
+          getTrending({ limit: 11 })
+        ])
 
-        const related = allProducts
-          .filter((p) => p.id !== product.id && currentSubCategory && p.subCategorySlug === currentSubCategory)
+        const related = (relatedRes?.data?.products || [])
+          .map(mapProduct)
+          .filter((p: Product) => p.id !== product.id)
           .slice(0, 10)
 
-        const storedIdsRaw =
-          typeof window !== "undefined"
-            ? JSON.parse(localStorage.getItem(TRENDING_PRODUCT_STORAGE_KEY) || "[]")
-            : []
-        const selectedIds: string[] = Array.isArray(storedIdsRaw) ? storedIdsRaw : []
-        const byId = new Map(allProducts.map((p) => [p.id, p]))
-        const trending = selectedIds
-          .map((id) => byId.get(id))
-          .filter((p): p is Product => Boolean(p))
-          .filter((p) => p.id !== product.id)
+        const trending = (trendingRes?.data?.products || [])
+          .map((p: any) => ({ ...mapProduct(p), isTrending: true }))
+          .filter((p: Product) => p.id !== product.id)
           .slice(0, 10)
 
         if (!cancelled) {
@@ -161,7 +157,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     return () => {
       cancelled = true
     }
-  }, [product.id, product.subCategorySlug])
+  }, [product.id, product.subCategoryId])
 
   return (
     <div className="pb-28 md:pb-8">
