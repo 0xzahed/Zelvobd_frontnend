@@ -3,7 +3,7 @@
 import { AppShell } from "@/components/layout/app-shell"
 import { CategoryCard } from "@/components/ui/category-card"
 import { BackHeader } from "@/components/layout/back-header"
-import { AllProductsSection } from "@/components/home/all-products-section"
+import { CategoryProductsSections } from "@/components/home/category-products-sections"
 import { useCategories } from "@/lib/use-store-data"
 
 export default function CategoriesPage() {
@@ -18,7 +18,7 @@ export default function CategoriesPage() {
             <CategoryCard key={c.id} category={c} />
           ))}
         </div>
-        <AllProductsSection />
+        <CategoryProductsSections />
       </div>
     </AppShell>
   )

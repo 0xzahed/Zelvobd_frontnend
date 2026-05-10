@@ -2,21 +2,20 @@
 
 import { notFound } from "next/navigation"
 import { use } from "react"
-import { useCategories, useProducts, useSliders } from "@/lib/use-store-data"
+import { useCategories, useSliders } from "@/lib/use-store-data"
 import type { Slider } from "@/lib/types"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
-import { SubCategoryTile } from "@/components/category/sub-category-tile"
-import { ProductCard } from "@/components/ui/product-card"
+import { SubCategoryCard } from "@/components/ui/category-card"
 import { SliderBanner } from "@/components/ui/slider-banner"
+import { SubCategoryProductsSections } from "@/components/category/sub-category-products-sections"
 
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const { categories, loaded: catsLoaded } = useCategories()
-  const { products, loaded: prodsLoaded } = useProducts()
   const { sliders, loaded: slidersLoaded } = useSliders()
 
-  const loaded = catsLoaded && prodsLoaded && slidersLoaded
+  const loaded = catsLoaded && slidersLoaded
 
   if (!loaded) {
     return (
@@ -36,8 +35,6 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
     .map((id) => sliders.find((s) => s.id === id))
     .filter(Boolean) as Slider[]
 
-  const items = products.filter((p) => p.categorySlug === slug)
-
   return (
     <AppShell>
       <BackHeader title={category.name} />
@@ -48,32 +45,21 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         {category.subCategories.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-base font-medium text-foreground md:text-xl">Browse {category.name}</h2>
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-8 md:gap-2">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-8 md:gap-2">
               {category.subCategories.map((sc) => (
-                <SubCategoryTile key={sc.id} categorySlug={category.slug} sub={sc} />
+                <SubCategoryCard key={sc.id} categorySlug={category.slug} subCategory={sc} />
               ))}
             </div>
           </section>
         )}
 
-        {/* Products */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-medium text-foreground md:text-xl">All Products</h2>
-            <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>
-          </div>
-          {items.length > 0 ? (
-            <div className="grid grid-cols-2 items-stretch gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
-              {items.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl bg-card p-10 text-center">
-              <p className="text-sm text-muted-foreground">No products in this category yet.</p>
-            </div>
-          )}
-        </section>
+        {/* Products by Subcategory */}
+        {category.subCategories.length > 0 && (
+          <SubCategoryProductsSections 
+            categorySlug={category.slug} 
+            subCategories={category.subCategories} 
+          />
+        )}
       </div>
     </AppShell>
   )
