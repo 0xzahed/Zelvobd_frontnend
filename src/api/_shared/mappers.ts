@@ -53,7 +53,6 @@ export const mapProduct = (product: any): Product => {
 
   return {
     id: product.id,
-    slugId: product.slugId || 0,
     name: product.title,
     slug: product.slug || "",
     brand: "",

@@ -166,7 +166,11 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2">
-          <ProductShareModal product={product} />
+          <ProductShareModal 
+            productName={product.name} 
+            variantColor={selectedColor}
+            barcodeUrl={activeVariant?.barcodeUrl} 
+          />
           <div className="relative">
             <ShoppingCart className="h-6 w-6" />
             {totalCount > 0 && (
@@ -181,6 +185,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
         <ProductGallery
           images={allImages}
+          productName={product.name}
           activeImageIndex={activeImageIndex}
           onImageChange={handleImageChange}
         />

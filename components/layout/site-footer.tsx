@@ -42,10 +42,7 @@ const socials = [
 const FOOTER_VISIBLE_PATHS: ReadonlyArray<string> = ["/", "/help"]
 
 export function SiteFooterGate() {
-  // Lazy import inside the function to keep the rest of the module SSR-friendly.
-  // We can't call usePathname here because this file is not a client component.
-  // Instead, render a small client component that owns the conditional logic.
-  return <SiteFooterWhenAllowed />
+  return <SiteFooter />
 }
 
 export function SiteFooter() {

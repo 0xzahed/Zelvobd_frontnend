@@ -20,8 +20,8 @@ export default function SearchPage({
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.brand.toLowerCase().includes(query) ||
-          p.categorySlug.includes(query) ||
-          p.subCategorySlug.includes(query),
+          p.categorySlug?.includes(query) ||
+          p.subCategorySlug?.includes(query),
       )
     : []
 

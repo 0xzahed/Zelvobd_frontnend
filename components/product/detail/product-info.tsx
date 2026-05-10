@@ -37,7 +37,6 @@ function colorToHex(name: string): string {
     brown: "#8B5E3C",
     beige: "#D6C6A8",
     navy: "#1E3A8A",
-    graphite: "#3A3A3A",
     midnight: "#1B1F2A",
   }
   if (map[key]) return map[key]
@@ -81,7 +80,7 @@ export function ProductInfo({
     <div className="space-y-5 md:space-y-6">
       {/* Title & Pricing */}
       <div className="space-y-1">
-        <h1 className="break-words text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
+        <h1 className="wrap-break-word text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
           {product.name}
         </h1>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
@@ -188,7 +187,7 @@ export function ProductInfo({
         <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-xs font-medium text-foreground">Description</h3>
           <div
-            className="max-w-none break-words text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="max-w-none wrap-break-word text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
@@ -199,7 +198,7 @@ export function ProductInfo({
         <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-xs font-medium text-foreground">More Information</h3>
           <div
-            className="max-w-none break-words text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="max-w-none wrap-break-word text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.extraDescription }}
           />
         </div>
