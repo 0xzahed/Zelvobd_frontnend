@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingCart } from "lucide-react"
+import { ArrowLeft, Share2, ShoppingCart } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { useCart } from "@/contexts/cart-context"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
@@ -12,7 +12,6 @@ import { getTrending } from "@/src/api/trending/getTrending"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
-import { ProductShareModal } from "./detail/product-share-modal"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
 
 interface ProductDetailProps {
@@ -118,6 +117,23 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     router.push("/cart")
   }
 
+  const handleShareCopy = async () => {
+    const url = window.location.href
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      const input = document.createElement("textarea")
+      input.value = url
+      input.setAttribute("readonly", "")
+      input.style.position = "absolute"
+      input.style.left = "-9999px"
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand("copy")
+      document.body.removeChild(input)
+    }
+  }
+
   useEffect(() => {
     let cancelled = false
 
@@ -161,18 +177,23 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-sm"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2">
-          <ProductShareModal 
-            productName={product.name} 
-            variantColor={selectedColor}
-            barcodeUrl={activeVariant?.barcodeUrl} 
-          />
+          <button
+            type="button"
+            onClick={handleShareCopy}
+            aria-label="Copy product link"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
           <div className="relative">
-            <ShoppingCart className="h-6 w-6" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground">
+              <ShoppingCart className="h-5 w-5" />
+            </div>
             {totalCount > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {totalCount}

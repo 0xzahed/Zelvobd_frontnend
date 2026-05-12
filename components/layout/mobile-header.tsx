@@ -78,7 +78,7 @@ export function MobileHeader() {
               <button
                 onClick={openSearch}
                 aria-label="Open search"
-                className="grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
+                className="grid h-10 w-10 place-items-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground hover:bg-card"
               >
                 <Search className="h-5 w-5" />
               </button>
@@ -87,7 +87,7 @@ export function MobileHeader() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
+              className="relative grid h-10 w-10 place-items-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground hover:bg-card"
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCount > 0 && (

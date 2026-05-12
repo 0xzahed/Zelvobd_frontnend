@@ -124,10 +124,10 @@ export function DesktopHeader() {
               onClick={() => setSearchOpen((v) => !v)}
               aria-label="Search products"
               aria-expanded={searchOpen}
-              className={`grid h-10 w-10 place-items-center rounded-full transition ${
+              className={`grid h-10 w-10 place-items-center rounded-full border border-gray-200 bg-card shadow-sm transition ${
                 searchOpen
-                  ? "bg-secondary text-primary"
-                  : "text-foreground hover:bg-secondary"
+                  ? "bg-white text-primary"
+                  : "text-foreground hover:bg-card"
               }`}
             >
               <Search className="h-5 w-5" />
@@ -138,7 +138,7 @@ export function DesktopHeader() {
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-secondary"
+              className="relative grid h-10 w-10 place-items-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground hover:bg-card"
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCount > 0 && (
