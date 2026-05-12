@@ -29,7 +29,6 @@ export default function NewProductsPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary md:h-6 md:w-6" />
               <h2 className="text-base font-medium text-foreground md:text-xl">All New Products</h2>
             </div>
             <span className="text-xs text-muted-foreground md:text-sm">{items.length} items</span>

@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react"
 import { useCategories, useProducts } from "@/lib/use-store-data"
 import { ProductCard } from "@/components/ui/product-card"
 
-const MAX_PER_CATEGORY = 8
+const MAX_PER_CATEGORY = 12
 
 export function CategoryProductsSections() {
   const { categories, loaded: catsLoaded } = useCategories()
@@ -14,9 +14,8 @@ export function CategoryProductsSections() {
   return (
     <div className="space-y-6 md:space-y-8">
       {categories.map((category) => {
-        const items = products
-          .filter((p) => p.categorySlug === category.slug)
-          .slice(0, MAX_PER_CATEGORY)
+        const items = products.filter((p) => p.categorySlug === category.slug)
+        const visibleItems = items.slice(0, MAX_PER_CATEGORY)
 
         return (
           <section key={category.id} className="space-y-3">
@@ -33,11 +32,26 @@ export function CategoryProductsSections() {
             </div>
 
             <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-              {items.map((p) => (
+              {visibleItems.map((p) => (
                 <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
                   <ProductCard product={p} />
                 </div>
               ))}
+              {items.length > MAX_PER_CATEGORY && (
+                <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
+                  <Link
+                    href={`/category/${category.slug}`}
+                    className="group flex h-full items-center justify-center rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md"
+                  >
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                      More
+                      <span className="grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white text-foreground shadow-sm transition group-hover:border-primary group-hover:text-primary">
+                        <ChevronRight className="h-4 w-4" />
+                      </span>
+                    </span>
+                  </Link>
+                </div>
+              )}
             </div>
           </section>
         )

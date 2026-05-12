@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
+import { ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { LottieIcon } from "@/components/ui/lottie-icon"
@@ -15,7 +17,7 @@ export function FlashSaleSection() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await getAllActiveFlashSaleProducts({ limit: 12 })
+        const res = await getAllActiveFlashSaleProducts({ limit: 13 })
         setItems(
           (res?.data?.products || []).map((product: any) => ({
             ...mapProduct(product),
@@ -64,11 +66,26 @@ export function FlashSaleSection() {
         </div>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-        {items.map((p) => (
+        {items.slice(0, 12).map((p) => (
           <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <ProductCard product={p} emphasis />
           </div>
         ))}
+        {items.length > 12 && (
+          <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
+            <Link
+              href="/offers"
+              className="group flex h-full items-center justify-center rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md"
+            >
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                More
+                <span className="grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white text-foreground shadow-sm transition group-hover:border-primary group-hover:text-primary">
+                  <ChevronRight className="h-4 w-4" />
+                </span>
+              </span>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   )
