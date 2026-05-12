@@ -10,6 +10,7 @@ import { ProductCard } from "@/components/ui/product-card"
 import { getProducts } from "@/src/api/products/getProducts"
 import { getTrending } from "@/src/api/trending/getTrending"
 import { mapProduct } from "@/src/api/_shared/mappers"
+import { notify } from "@/lib/notify"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
@@ -110,6 +111,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       color: selectedColor, 
       storage: selectedSize // Mapped to storage for backward compatibility with cart if needed
     })
+    notify.success("Added to cart")
   }
 
   const handleBuy = () => {
@@ -121,6 +123,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     const url = window.location.href
     try {
       await navigator.clipboard.writeText(url)
+      notify.success("Link copied")
     } catch {
       const input = document.createElement("textarea")
       input.value = url
@@ -131,6 +134,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       input.select()
       document.execCommand("copy")
       document.body.removeChild(input)
+      notify.success("Link copied")
     }
   }
 

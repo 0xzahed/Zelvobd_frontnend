@@ -6,6 +6,7 @@ import { ShoppingCart, Flame, Truck } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
+import { notify } from "@/lib/notify"
 
 export function ProductCard({
   product,
@@ -30,6 +31,7 @@ export function ProductCard({
     e.preventDefault()
     e.stopPropagation()
     addItem({ productId: product.id, quantity: 1 })
+    notify.success("Added to cart")
   }
 
   const categorySlug = product.categorySlug || 'uncategorized'
