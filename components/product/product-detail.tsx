@@ -30,8 +30,20 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
 
   const variants = product.variants ?? []
-  const uniqueColors = Array.from(new Set(variants.map(v => v.color).filter(Boolean)))
-  const uniqueSizes = Array.from(new Set(variants.map(v => v.size).filter(Boolean)))
+  const uniqueColors = Array.from(
+    new Set(
+      variants
+        .map((v) => (v.color || "").trim())
+        .filter(Boolean),
+    ),
+  )
+  const uniqueSizes = Array.from(
+    new Set(
+      variants
+        .map((v) => (v.size || "").trim())
+        .filter(Boolean),
+    ),
+  )
 
   // Identify initial variant
   let initialVariant = variants[0]
@@ -40,8 +52,12 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     if (found) initialVariant = found
   }
 
-  const [selectedColor, setSelectedColor] = useState<string>(initialVariant?.color || uniqueColors[0] || "")
-  const [selectedSize, setSelectedSize] = useState<string>(initialVariant?.size || uniqueSizes[0] || "")
+  const [selectedColor, setSelectedColor] = useState<string>(
+    initialVariant?.color?.trim() || uniqueColors[0] || (variants.length ? "Default" : "")
+  )
+  const [selectedSize, setSelectedSize] = useState<string>(
+    initialVariant?.size?.trim() || uniqueSizes[0] || (variants.length ? "Standard" : "")
+  )
   
   // Keep gallery image in sync (memoized so its reference is stable across renders)
   const allImages = useMemo(() => (
@@ -195,9 +211,14 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
             <Share2 className="h-5 w-5" />
           </button>
           <div className="relative">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground">
+            <button
+              type="button"
+              onClick={() => router.push("/cart")}
+              aria-label="Go to cart"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground"
+            >
               <ShoppingCart className="h-5 w-5" />
-            </div>
+            </button>
             {totalCount > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {totalCount}

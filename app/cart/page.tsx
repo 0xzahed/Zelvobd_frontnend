@@ -331,6 +331,16 @@ export default function CartPage() {
                             <p className="text-sm font-medium text-primary">
                               {p.brand}
                             </p>
+                            {(item.color || item.storage) && (
+                              <p className="text-xs text-muted-foreground">
+                                {[
+                                  item.color ? `Color: ${item.color}` : null,
+                                  item.storage ? `Size: ${item.storage}` : null,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" • ")}
+                              </p>
+                            )}
                             <p className="mt-1 text-base font-bold text-foreground">
                               {formatBDT(p.price)}
                             </p>
@@ -395,78 +405,7 @@ export default function CartPage() {
                       <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="space-y-3 px-2">
-                    <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4">
-                      <h3 className="text-sm font-semibold text-foreground">Information</h3>
-                      <input
-                        value={form.name}
-                        onChange={(e) => updateForm("name", e.target.value)}
-                        placeholder="Full Name"
-                        className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
-                      />
-                      <input
-                        value={form.phone}
-                        onChange={(e) => updateForm("phone", e.target.value)}
-                        placeholder="Phone Number"
-                        className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
-                      />
-                      <input
-                        value={form.email}
-                        onChange={(e) => updateForm("email", e.target.value)}
-                        placeholder="Email (optional)"
-                        className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
-                      />
-                      <textarea
-                        value={form.address}
-                        onChange={(e) => updateForm("address", e.target.value)}
-                        placeholder="Address"
-                        rows={2}
-                        className="w-full resize-none rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm outline-none"
-                      />
-                      <select
-                        value={form.district}
-                        onChange={(e) => {
-                          const district = e.target.value;
-                          setForm((prev) => ({ ...prev, district, union: "" }));
-                        }}
-                        className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
-                      >
-                        <option value="">
-                          {districtLoading ? "Loading districts..." : "Select District"}
-                        </option>
-                        {districts.map((d) => (
-                          <option key={d.id} value={d.district}>
-                            {d.district}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={form.union}
-                        onChange={(e) => updateForm("union", e.target.value)}
-                        disabled={!form.district || unionLoading}
-                        className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <option value="">
-                          {!form.district
-                            ? "Select District First"
-                            : unionLoading
-                              ? "Loading unions..."
-                              : "Select Union"}
-                        </option>
-                        {unions.map((union) => (
-                          <option key={union} value={union}>
-                            {union}
-                          </option>
-                        ))}
-                      </select>
-                      <textarea
-                        value={form.notes}
-                        onChange={(e) => updateForm("notes", e.target.value)}
-                        placeholder="Order Notes (optional)"
-                        rows={2}
-                        className="w-full resize-none rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm outline-none"
-                      />
-                    </div>
+                  <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Sub Total</span>
                       <span className="font-medium text-foreground">
@@ -489,6 +428,77 @@ export default function CartPage() {
                         {formatBDT(total)}
                       </span>
                     </div>
+                  </div>
+                  <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4">
+                    <h3 className="text-sm font-semibold text-foreground">Information</h3>
+                    <input
+                      value={form.name}
+                      onChange={(e) => updateForm("name", e.target.value)}
+                      placeholder="Full Name"
+                      className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
+                    />
+                    <input
+                      value={form.phone}
+                      onChange={(e) => updateForm("phone", e.target.value)}
+                      placeholder="Phone Number"
+                      className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
+                    />
+                    <input
+                      value={form.email}
+                      onChange={(e) => updateForm("email", e.target.value)}
+                      placeholder="Email (optional)"
+                      className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
+                    />
+                    <textarea
+                      value={form.address}
+                      onChange={(e) => updateForm("address", e.target.value)}
+                      placeholder="Address"
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm outline-none"
+                    />
+                    <select
+                      value={form.district}
+                      onChange={(e) => {
+                        const district = e.target.value;
+                        setForm((prev) => ({ ...prev, district, union: "" }));
+                      }}
+                      className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none"
+                    >
+                      <option value="">
+                        {districtLoading ? "Loading districts..." : "Select District"}
+                      </option>
+                      {districts.map((d) => (
+                        <option key={d.id} value={d.district}>
+                          {d.district}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={form.union}
+                      onChange={(e) => updateForm("union", e.target.value)}
+                      disabled={!form.district || unionLoading}
+                      className="h-10 w-full rounded-lg border border-border/60 bg-transparent px-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="">
+                        {!form.district
+                          ? "Select District First"
+                          : unionLoading
+                            ? "Loading unions..."
+                            : "Select Union"}
+                      </option>
+                      {unions.map((union) => (
+                        <option key={union} value={union}>
+                          {union}
+                        </option>
+                      ))}
+                    </select>
+                    <textarea
+                      value={form.notes}
+                      onChange={(e) => updateForm("notes", e.target.value)}
+                      placeholder="Order Notes (optional)"
+                      rows={2}
+                      className="w-full resize-none rounded-lg border border-border/60 bg-transparent px-3 py-2 text-sm outline-none"
+                    />
                   </div>
                   <button
                     type="button"
