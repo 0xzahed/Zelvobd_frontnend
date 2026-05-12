@@ -44,6 +44,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const { data: categories = [] } = useCategories()
   
   const [name, setName] = useState(initial?.name ?? "")
+  const [brand, setBrand] = useState(initial?.brand ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
   const [descriptionDelta, setDescriptionDelta] = useState<any>(null)
   
@@ -138,7 +139,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
     const product: Product = {
       id: initial?.id ?? `new-${Date.now()}`,
       name: name.trim(),
-      brand: initial?.brand ?? "",
+      brand: brand.trim(),
       description: description.trim(),
       extraDescription: htmlToPlainText(extraDescription) ? extraDescription.trim() : undefined,
       categorySlug: "", // We rely on categoryId now
@@ -219,8 +220,11 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           </div>
         </div>
 
-        {/* Title */}
-        <Text label="Title" value={name} onChange={setName} required placeholder="Product Title" />
+        {/* Title + Brand */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Text label="Title" value={name} onChange={setName} required placeholder="Product Title" />
+          <Text label="Brand" value={brand} onChange={setBrand} placeholder="Brand name" />
+        </div>
 
         {/* Description */}
         <QuillEditor
