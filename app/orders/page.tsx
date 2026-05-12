@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { Search } from "lucide-react"
 import { BackHeader } from "@/components/layout/back-header"
 import { AppShell } from "@/components/layout/app-shell"
 import { formatBDT } from "@/lib/format"
@@ -27,6 +28,7 @@ export default function OrdersPage() {
   const params = useSearchParams()
   const focusCode = params.get("code") || ""
   const [orders, setOrders] = useState<OrderRow[]>([])
+  const [searchInput, setSearchInput] = useState("")
 
   useEffect(() => {
     try {
@@ -51,39 +53,66 @@ export default function OrdersPage() {
     }
   }, [])
 
-  const sortedOrders = useMemo(
-    () =>
-      [...orders].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-    [orders],
-  )
+  const filteredOrders = useMemo(() => {
+    let list = [...orders]
+    
+    // Extract code from search input (could be a link or just a code)
+    const query = searchInput.trim()
+    let searchCode = query
+    if (query.includes("code=")) {
+      searchCode = query.split("code=")[1]?.split("&")[0] || ""
+    }
+
+    if (searchCode) {
+      list = list.filter((o) => o.code.toLowerCase().includes(searchCode.toLowerCase()))
+    } else if (focusCode) {
+      // If no search input, but there's a focusCode from URL
+      // We don't filter, we just want to highlight, but the user might prefer filtering
+      // For now, let's just highlight as per existing logic, or maybe show it at top
+    }
+
+    return list.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+  }, [orders, searchInput, focusCode])
 
   return (
     <AppShell>
       <BackHeader title="My Orders" />
       <div className="py-4 md:py-8">
-        <div className="mb-4 rounded-2xl border border-border/60 bg-card p-4">
-          <p className="text-sm font-semibold text-foreground">Order Status</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(["Pending", "Confirmed", "Cancelled", "Rejected"] as OrderStatus[]).map((status) => (
-              <span
-                key={status}
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[status]}`}
-              >
-                {status}
-              </span>
-            ))}
+        <div className="mb-4 space-y-4">
+          <div className="relative flex items-center">
+            <Search className="absolute left-4 h-4 w-4 text-muted-foreground" />
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Paste Order Link or Code here..."
+              className="h-12 w-full rounded-2xl border border-border/60 bg-card pl-11 pr-4 text-sm outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+
+          <div className="rounded-2xl border border-border/60 bg-card p-4">
+            <p className="text-sm font-semibold text-foreground">Status Legend</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(["Pending", "Confirmed", "Cancelled", "Rejected"] as OrderStatus[]).map((status) => (
+                <span
+                  key={status}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[status]}`}
+                >
+                  {status}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
-        {sortedOrders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <div className="rounded-2xl border border-border/60 bg-card p-8 text-center text-sm text-muted-foreground">
-            No orders found yet.
+            {searchInput ? "No matching order found." : "No orders found yet."}
           </div>
         ) : (
           <div className="space-y-3">
-            {sortedOrders.map((order) => {
+            {filteredOrders.map((order) => {
               const focused = focusCode && focusCode === order.code
               return (
                 <div
