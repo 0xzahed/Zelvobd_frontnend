@@ -36,7 +36,7 @@ export function CountdownTimer({
   const s = Math.floor((remaining % 60000) / 1000)
 
   const boxCls = compact
-    ? "grid h-5 min-w-5 place-items-center rounded bg-foreground px-1 text-[10px] font-bold text-white"
+    ? "grid h-5 min-w-5 place-items-center rounded border border-border/70 bg-white px-1 text-[10px] font-bold text-foreground shadow-sm"
     : "grid h-8 min-w-8 place-items-center rounded-md bg-foreground px-1.5 text-xs font-bold text-white"
 
   const sepCls = compact ? "text-[10px] font-bold text-foreground" : "font-bold text-foreground"

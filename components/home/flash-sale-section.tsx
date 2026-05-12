@@ -50,8 +50,15 @@ export function FlashSaleSection() {
         }
       >
         {backgroundImage && <div className="absolute inset-0 bg-black/25" />}
-        <div className="relative z-10 flex min-h-16 items-center gap-2 p-4 md:min-h-20 md:p-5">
-          <div className="flex shrink-0 items-center gap-1"><LottieIcon src="/fire-animaiton.json" className="block h-5 w-5 md:h-6 md:w-6" ariaLabel="Flash sale" /><h2 className="text-sm font-medium text-foreground md:text-base">Flash Sale</h2></div>
+        <div className="relative z-10 flex min-h-20 items-center gap-2 p-5 md:min-h-24 md:p-6">
+          <div className="flex shrink-0 items-center gap-2">
+            <LottieIcon
+              src="/fire-animaiton.json"
+              className="block h-6 w-6 md:h-7 md:w-7"
+              ariaLabel="Flash sale"
+            />
+            <h2 className="text-base font-semibold text-foreground md:text-lg">Flash Sale</h2>
+          </div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />
         </div>
@@ -59,7 +66,7 @@ export function FlashSaleSection() {
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
         {items.map((p) => (
           <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
-            <ProductCard product={p} />
+            <ProductCard product={p} emphasis />
           </div>
         ))}
       </div>

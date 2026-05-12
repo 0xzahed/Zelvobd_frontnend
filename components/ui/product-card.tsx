@@ -7,7 +7,15 @@ import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
 
-export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+export function ProductCard({
+  product,
+  compact = false,
+  emphasis = false,
+}: {
+  product: Product
+  compact?: boolean
+  emphasis?: boolean
+}) {
   const { addItem } = useCart()
   const src =
     product.images?.[0] ||
@@ -36,7 +44,9 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         "group relative flex h-full snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
         compact
           ? "w-40 shrink-0 sm:w-44"
-          : "w-full p-2.5 md:h-80 md:max-w-225 md:p-2",
+          : emphasis
+            ? "w-full p-4 md:h-96 md:max-w-225"
+            : "w-full p-2.5 md:h-80 md:max-w-225 md:p-2",
       )}
     >
       {/* Image */}
@@ -48,13 +58,23 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       >
         <div className="absolute right-0.5 top-0.5 z-10 flex flex-col items-center gap-1">
           {product.isFlashSale && (
-            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-destructive/10 md:h-8 md:w-8">
-              <Flame className="h-4 w-4 text-destructive md:h-5 md:w-5" />
+            <div
+              className={cx(
+                "grid shrink-0 place-items-center rounded-full bg-destructive/10",
+                emphasis ? "h-9 w-9 md:h-10 md:w-10" : "h-7 w-7 md:h-8 md:w-8",
+              )}
+            >
+              <Flame className={cx("text-destructive", emphasis ? "h-5 w-5 md:h-6 md:w-6" : "h-4 w-4 md:h-5 md:w-5")} />
             </div>
           )}
           {product.isFreeDelivery && (
-            <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-100 md:h-8 md:w-8">
-              <Truck className="h-4 w-4 text-emerald-700 md:h-5 md:w-5" />
+            <div
+              className={cx(
+                "grid shrink-0 place-items-center rounded-full bg-emerald-100",
+                emphasis ? "h-9 w-9 md:h-10 md:w-10" : "h-7 w-7 md:h-8 md:w-8",
+              )}
+            >
+              <Truck className={cx("text-emerald-700", emphasis ? "h-5 w-5 md:h-6 md:w-6" : "h-4 w-4 md:h-5 md:w-5")} />
             </div>
           )}
         </div>
@@ -74,7 +94,9 @@ export function ProductCard({ product, compact = false }: { product: Product; co
             "block w-full truncate whitespace-nowrap font-semibold leading-tight text-foreground",
             compact
               ? "text-sm"
-              : "text-base md:text-xl",
+              : emphasis
+                ? "text-lg md:text-2xl"
+                : "text-base md:text-xl",
           )}
         >
           {product.name}
@@ -84,7 +106,11 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         <div
           className={cx(
             "mt-1 truncate whitespace-nowrap font-medium text-foreground",
-            compact ? "text-[15px]" : "text-[15px] md:text-xl",
+            compact
+              ? "text-[15px]"
+              : emphasis
+                ? "text-base md:text-2xl"
+                : "text-[15px] md:text-xl",
           )}
         >
           {formatBDT(product.price)}
@@ -106,16 +132,24 @@ export function ProductCard({ product, compact = false }: { product: Product; co
 
         {/* Actions */}
         <div className="mt-auto flex items-center gap-2 pt-2.5">
-          <span className="flex h-9 flex-1 items-center justify-center rounded-full border border-border text-sm font-medium text-foreground transition-colors duration-200 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
+          <span
+            className={cx(
+              "flex flex-1 items-center justify-center rounded-full border border-border font-medium text-foreground transition-colors duration-200 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground",
+              emphasis ? "h-10 text-base" : "h-9 text-sm",
+            )}
+          >
             Shop Now
           </span>
           <button
             type="button"
             onClick={handleAdd}
             aria-label="Add to cart"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted"
+            className={cx(
+              "flex shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted",
+              emphasis ? "h-10 w-10" : "h-9 w-9",
+            )}
           >
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart className={cx(emphasis ? "h-5 w-5" : "h-4 w-4")} />
           </button>
         </div>
       </div>
