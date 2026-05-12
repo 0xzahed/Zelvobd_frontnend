@@ -36,11 +36,11 @@ export function CountdownTimer({
   const s = Math.floor((remaining % 60000) / 1000)
 
   const boxCls = compact
-    ? "grid h-5 min-w-5 place-items-center rounded border border-border/70 bg-white px-1 text-[10px] font-bold text-foreground shadow-sm"
-    : "grid h-8 min-w-8 place-items-center rounded-md bg-foreground px-1.5 text-xs font-bold text-white"
+    ? "grid h-7 min-w-7 place-items-center rounded border border-border/70 bg-white px-1.5 text-xs font-bold text-foreground shadow-sm"
+    : "grid h-9 min-w-9 place-items-center rounded-md bg-foreground px-2 text-sm font-bold text-white"
 
-  const sepCls = compact ? "text-[10px] font-bold text-foreground" : "font-bold text-foreground"
-  const gapCls = compact ? "gap-0.5" : "gap-1"
+  const sepCls = compact ? "text-xs font-bold text-foreground" : "text-base font-bold text-foreground"
+  const gapCls = compact ? "gap-1" : "gap-1.5"
 
   return (
     <div className={`flex items-center ${gapCls}`} aria-live="polite">

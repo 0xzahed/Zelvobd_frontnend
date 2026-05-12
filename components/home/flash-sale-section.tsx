@@ -52,14 +52,14 @@ export function FlashSaleSection() {
         }
       >
         {backgroundImage && <div className="absolute inset-0 bg-black/25" />}
-        <div className="relative z-10 flex min-h-20 items-center gap-2 p-5 md:min-h-24 md:p-6">
+        <div className="relative z-10 flex min-h-16 items-center gap-2 p-3 md:min-h-20 md:p-4">
           <div className="flex shrink-0 items-center gap-2">
             <LottieIcon
               src="/fire-animaiton.json"
-              className="block h-6 w-6 md:h-7 md:w-7"
+              className="block h-7 w-7 md:h-9 md:w-9"
               ariaLabel="Flash sale"
             />
-            <h2 className="text-base font-semibold text-foreground md:text-lg">Flash Sale</h2>
+            <h2 className="text-lg font-bold text-foreground md:text-xl">Flash Sale</h2>
           </div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />
