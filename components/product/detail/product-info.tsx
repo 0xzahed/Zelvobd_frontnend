@@ -136,18 +136,18 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex min-h-11 items-center gap-2.5 rounded-full border bg-transparent px-3 py-2.5 text-left transition md:min-h-12",
+                    "flex min-h-12 items-center gap-3 rounded-full border bg-transparent px-2 py-1.5 text-left transition md:min-h-14",
                     selected
                       ? "border-primary text-primary"
                       : "border-border/60 text-foreground hover:border-border",
                   )}
                 >
                   <span
-                    className="h-9 w-9 shrink-0 rounded-full border border-border/40 md:h-10 md:w-10"
+                    className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-12 md:w-12"
                     style={{ backgroundColor: colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 truncate text-sm">{c}</span>
+                  <span className="min-w-0 truncate text-base">{c}</span>
                 </button>
               )
             })}
