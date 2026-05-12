@@ -47,7 +47,7 @@ export function SiteFooterGate() {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-10 border-t border-border/60 bg-card">
+    <footer className="mt-10 border-t border-slate-800 bg-slate-950 text-slate-100">
       <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand */}
@@ -56,23 +56,23 @@ export function SiteFooter() {
               <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
                 E
               </span>
-              <span className="text-xl font-bold text-foreground">EcoMerce</span>
+              <span className="text-xl font-bold text-slate-100">EcoMerce</span>
             </Link>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
               Everyday essentials and the latest tech, delivered fast with care.
             </p>
 
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <ul className="mt-4 space-y-2 text-sm text-slate-400">
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-primary" />
+                <Mail className="h-4 w-4 text-amber-300" />
                 <span>support@ecomerce.app</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-primary" />
+                <Phone className="h-4 w-4 text-amber-300" />
                 <span>+880 1700 000 000</span>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
+                <MapPin className="h-4 w-4 text-amber-300" />
                 <span>Dhaka, Bangladesh</span>
               </li>
             </ul>
@@ -82,13 +82,13 @@ export function SiteFooter() {
           <div className="grid grid-cols-2 gap-6 md:col-span-6 md:grid-cols-3">
             {navGroups.map((group) => (
               <div key={group.title}>
-                <h3 className="mb-3 text-sm font-semibold text-foreground">{group.title}</h3>
+                <h3 className="mb-3 text-sm font-semibold text-slate-100">{group.title}</h3>
                 <ul className="space-y-2">
                   {group.links.map((l) => (
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="text-sm text-muted-foreground transition hover:text-primary"
+                        className="text-sm text-slate-400 transition hover:text-amber-300"
                       >
                         {l.label}
                       </Link>
@@ -101,14 +101,14 @@ export function SiteFooter() {
 
           {/* Socials */}
           <div className="md:col-span-2">
-            <h3 className="mb-3 text-sm font-semibold text-foreground">Follow us</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-100">Follow us</h3>
             <div className="flex gap-2">
               {socials.map(({ Icon, label, href }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground transition hover:border-primary hover:text-primary"
+                  className="grid h-9 w-9 place-items-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-amber-300 hover:text-amber-300"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -117,7 +117,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-5 text-xs text-muted-foreground md:flex-row md:items-center">
+        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-slate-800 pt-5 text-xs text-slate-500 md:flex-row md:items-center">
           <p>© {new Date().getFullYear()} EcoMerce. All rights reserved.</p>
           <p>Made with care for shoppers everywhere.</p>
         </div>
