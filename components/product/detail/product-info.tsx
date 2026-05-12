@@ -125,7 +125,7 @@ export function ProductInfo({
       {/* Colors */}
       {uniqueColors.length > 0 && (
         <div>
-          <p className="mb-2 text-xs font-medium text-foreground">Color</p>
+          <p className="mb-2 text-sm font-medium text-foreground">Color</p>
           <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
@@ -147,7 +147,7 @@ export function ProductInfo({
                     style={{ backgroundColor: colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 truncate text-xs">{c}</span>
+                  <span className="min-w-0 truncate text-sm">{c}</span>
                 </button>
               )
             })}
@@ -158,7 +158,7 @@ export function ProductInfo({
       {/* Sizes */}
       {uniqueSizes.length > 0 && (
         <div>
-          <p className="mb-2 text-xs font-medium text-foreground">Size</p>
+          <p className="mb-2 text-sm font-medium text-foreground">Size</p>
           <div className="flex flex-wrap gap-2">
             {uniqueSizes.map((s) => {
               const selected = selectedSize === s
@@ -168,7 +168,7 @@ export function ProductInfo({
                   key={s}
                   onClick={() => onSizeChange(s)}
                   className={cx(
-                    "rounded-full border bg-transparent px-3 py-1 text-xs transition",
+                    "rounded-full border bg-transparent px-3 py-1 text-sm transition",
                     selected
                       ? "border-primary text-primary bg-primary/5"
                       : "border-border/60 text-foreground hover:border-border",
@@ -185,9 +185,9 @@ export function ProductInfo({
       {/* Description */}
       {product.description && (
         <div className="border-t border-border/40 pt-4">
-          <h3 className="mb-2 text-xs font-medium text-foreground">Description</h3>
+          <h3 className="mb-2 text-sm font-medium text-foreground">Description</h3>
           <div
-            className="max-w-none wrap-break-word text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="max-w-none wrap-break-word text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
@@ -196,9 +196,9 @@ export function ProductInfo({
       {/* Extra Description */}
       {product.extraDescription && (
         <div className="border-t border-border/40 pt-4">
-          <h3 className="mb-2 text-xs font-medium text-foreground">More Information</h3>
+          <h3 className="mb-2 text-sm font-medium text-foreground">More Information</h3>
           <div
-            className="max-w-none wrap-break-word text-sm leading-relaxed text-muted-foreground md:text-sm [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="max-w-none wrap-break-word text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.extraDescription }}
           />
         </div>
