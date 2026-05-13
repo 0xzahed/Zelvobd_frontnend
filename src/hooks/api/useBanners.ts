@@ -46,7 +46,7 @@ export function useCreateBanner() {
     mutationFn: async (payload: CreateBannerPayload) => {
       const formData = new FormData()
       formData.append("title", payload.title)
-      if (payload.subtitle) formData.append("subTitle", payload.subtitle)
+      if (payload.subtitle !== undefined) formData.append("subTitle", payload.subtitle)
       formData.append("url", payload.url)
       formData.append("categoryId", payload.categoryId)
       formData.append("inHomePage", String(payload.inHomePage ?? true))
@@ -71,7 +71,7 @@ export function useUpdateBanner() {
     mutationFn: async (payload: UpdateBannerPayload) => {
       const formData = new FormData()
       if (payload.title) formData.append("title", payload.title)
-      if (payload.subtitle) formData.append("subTitle", payload.subtitle)
+      if (payload.subtitle !== undefined) formData.append("subTitle", payload.subtitle)
       if (payload.url) formData.append("url", payload.url)
       if (payload.categoryId) formData.append("categoryId", payload.categoryId)
       if (payload.inHomePage !== undefined) formData.append("inHomePage", String(payload.inHomePage))
