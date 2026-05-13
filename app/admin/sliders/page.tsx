@@ -189,10 +189,7 @@ export default function AdminSliders() {
                     )}
                   </div>
                 </div>
-                <div className="text-foreground text-left pl-2">
-                  <div className="font-medium">{s.title || "Untitled"}</div>
-                  {s.subtitle && <div className="text-xs text-muted-foreground mt-0.5">{s.subtitle}</div>}
-                </div>
+                <div className="text-foreground text-left pl-2">{s.title || "Untitled"}</div>
                 <div>
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-tight ${
