@@ -239,3 +239,20 @@ export function useCopyProduct() {
     onError: (error) => handleApiError(error),
   })
 }
+
+export function useToggleProductField() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, field, value }: { id: string; field: "stock" | "availability"; value: boolean }) => {
+      const formData = new FormData()
+      formData.append(field, String(value))
+      return updateProduct(id, formData)
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: PRODUCT_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: PRODUCT_KEYS.details(variables.id) })
+      notify.success({ title: "Updated", message: `Product ${variables.field} updated.` })
+    },
+    onError: (error) => handleApiError(error),
+  })
+}

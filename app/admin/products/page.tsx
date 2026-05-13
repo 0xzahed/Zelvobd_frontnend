@@ -12,6 +12,7 @@ import {
   useDeleteProduct,
   useCopyProduct,
   useCreateProduct,
+  useToggleProductField,
 } from "@/src/hooks/api/useProducts"
 import { ProductForm } from "@/components/admin/product-form"
 import {
@@ -21,12 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
 
 export default function AdminProductsPage() {
   const { data: products = [], isLoading } = useProducts()
   const deleteMutation = useDeleteProduct()
   const copyMutation = useCopyProduct()
   const createMutation = useCreateProduct()
+  const toggleMutation = useToggleProductField()
   const confirm = useConfirm()
 
   const [q, setQ] = useState("")
@@ -46,6 +49,10 @@ export default function AdminProductsPage() {
 
   const handleCopy = (id: string) => {
     copyMutation.mutate(id)
+  }
+
+  const handleToggle = (id: string, field: "stock" | "availability", value: boolean) => {
+    toggleMutation.mutate({ id, field, value })
   }
 
   const handleCreate = (
@@ -85,7 +92,7 @@ export default function AdminProductsPage() {
           <p className="text-xs text-muted-foreground">{products.length} total</p>
         </div>
         <div className="flex w-full items-center gap-2">
-          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
+          <div className="flex h-10 min-w-0 flex-3 items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -97,7 +104,7 @@ export default function AdminProductsPage() {
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="inline-flex h-10 flex-[1] items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" /> Add
           </button>
@@ -130,6 +137,7 @@ export default function AdminProductsPage() {
                 <th className="px-5 py-3 font-medium">Price</th>
                 <th className="px-5 py-3 font-medium">Discount</th>
                 <th className="px-5 py-3 font-medium">Stock</th>
+                <th className="px-5 py-3 font-medium">Available</th>
                 <th className="px-5 py-3 font-medium">Flags</th>
                 <th className="px-5 py-3 font-medium text-right">Actions</th>
               </tr>
@@ -137,7 +145,7 @@ export default function AdminProductsPage() {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center">
+                  <td colSpan={9} className="px-5 py-12 text-center">
                     <div className="flex flex-col items-center justify-center gap-2">
                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                        <p className="text-xs text-muted-foreground">Loading products...</p>
@@ -147,7 +155,7 @@ export default function AdminProductsPage() {
               )}
               {!isLoading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">
                     No products found.
                   </td>
                 </tr>
@@ -185,14 +193,18 @@ export default function AdminProductsPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3">
-                    <span
-                      className={cx(
-                        "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-                        p.stock ? "bg-green-50 text-success" : "bg-red-50 text-accent",
-                      )}
-                    >
-                      {p.stock ? "In Stock" : "Out of Stock"}
-                    </span>
+                    <Switch 
+                      checked={Boolean(p.stock)} 
+                      onCheckedChange={(val) => handleToggle(p.id, "stock", val)}
+                      disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "stock"}
+                    />
+                  </td>
+                  <td className="px-5 py-3">
+                    <Switch 
+                      checked={Boolean(p.availability)} 
+                      onCheckedChange={(val) => handleToggle(p.id, "availability", val)}
+                      disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "availability"}
+                    />
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex gap-1">
