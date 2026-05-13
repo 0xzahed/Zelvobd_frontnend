@@ -124,7 +124,6 @@ export default function ScanPage() {
           {/* Header Section */}
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1">
-              <Sparkles className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Smart Recognition</span>
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight text-foreground">Find Instantly</h2>
@@ -134,16 +133,16 @@ export default function ScanPage() {
           {/* Main Visual Content */}
           <div className="relative group">
             {/* Multi-layered border effect */}
-            <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-b from-primary/20 via-border/50 to-secondary/20 blur-[2px] opacity-75 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -inset-1 rounded-[2.5rem] bg-linear-to-b from-primary/20 via-border/50 to-secondary/20 blur-[2px] opacity-75 group-hover:opacity-100 transition-opacity" />
             
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[2.2rem] border-[6px] border-white bg-black shadow-2xl">
+            <div className="relative aspect-4/3 w-full overflow-hidden rounded-[2.2rem] border-[6px] border-white bg-black shadow-2xl">
               {mode === "camera" && (
                 <div className="relative h-full w-full">
                   <div id="reader" className="h-full w-full overflow-hidden"></div>
                   
                   {/* High-detail Scan Frame */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-12">
-                    <div className="relative h-full w-full max-w-[260px] max-h-[160px]">
+                    <div className="relative h-full w-full max-w-65 max-h-40">
                       {/* Precise Corners */}
                       <div className="absolute -top-1 -left-1 h-6 w-6 border-t-4 border-l-4 border-primary rounded-sm" />
                       <div className="absolute -top-1 -right-1 h-6 w-6 border-t-4 border-r-4 border-primary rounded-sm" />
@@ -151,7 +150,7 @@ export default function ScanPage() {
                       <div className="absolute -bottom-1 -right-1 h-6 w-6 border-b-4 border-r-4 border-primary rounded-sm" />
                       
                       {/* Animated Laser with Pulse */}
-                      <div className="absolute left-0 top-0 h-[2px] w-full animate-laser bg-primary shadow-[0_0_15px_rgba(48,111,215,1)]" />
+                      <div className="absolute left-0 top-0 h-0.5 w-full animate-laser bg-primary shadow-[0_0_15px_rgba(48,111,215,1)]" />
                       
                       {/* Subtle Inner Frame */}
                       <div className="absolute inset-0 border border-white/10 rounded-sm" />
@@ -171,13 +170,13 @@ export default function ScanPage() {
               )}
 
               {mode === "upload" && (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-gradient-to-b from-secondary/5 to-secondary/20 p-8">
+                <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-linear-to-b from-secondary/5 to-secondary/20 p-8">
                   <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white shadow-xl text-primary border border-border/50">
                     <ImageIcon className="h-10 w-10" />
                   </div>
                   <div id="upload-reader" className="hidden"></div>
                   <div className="text-center space-y-4">
-                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-xs font-bold text-white shadow-lg shadow-primary/20 transition-all hover:translate-y-[-2px] active:scale-95">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-xs font-bold text-white shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95">
                       <ImageIcon className="h-4 w-4" />
                       Choose from Gallery
                       <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
@@ -187,7 +186,7 @@ export default function ScanPage() {
               )}
 
               {mode === "manual" && (
-                <div className="flex h-full w-full flex-col items-center justify-center p-8 bg-gradient-to-b from-secondary/5 to-secondary/20">
+                <div className="flex h-full w-full flex-col items-center justify-center p-8 bg-linear-to-b from-secondary/5 to-secondary/20">
                   <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg border border-border/50 text-primary">
                     <Type className="h-8 w-8" />
                   </div>
@@ -226,12 +225,6 @@ export default function ScanPage() {
               <ModeTab active={mode === "upload"} onClick={() => setMode("upload")} icon={ImageIcon} label="Upload" />
               <ModeTab active={mode === "manual"} onClick={() => setMode("manual")} icon={Type} label="Manual" />
             </div>
-          </div>
-
-          {/* Floating Hint */}
-          <div className="flex items-center justify-center gap-3 text-muted-foreground/60">
-            <Box className="h-4 w-4" />
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em]">EcoMerce Visual Search</p>
           </div>
         </div>
       </div>
