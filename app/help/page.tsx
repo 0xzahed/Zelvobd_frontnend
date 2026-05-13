@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ChevronDown, MessageCircle, MessagesSquare, Phone } from "lucide-react"
+import { ChevronDown, MessageCircle } from "lucide-react"
+import Image from "next/image"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { cx } from "@/lib/format"
@@ -40,28 +41,62 @@ export default function HelpPage() {
   return (
     <AppShell>
       <BackHeader title="Help Center" />
-      <div className="space-y-6 py-4 md:py-8">
-        <section className="grid grid-cols-3 gap-3 px-1">
-          <Link href="/chat" className="contents">
-            <QuickAction icon={MessageCircle} label="Live Chat" />
-          </Link>
-          <QuickAction icon={MessagesSquare} label="WhatsApp" />
-          <QuickAction icon={Phone} label="Call Us" />
+      <div className="mx-auto max-w-md space-y-5 py-4 md:py-6">
+
+        {/* Hero Avatar */}
+        <div className="flex flex-col items-center gap-3 px-1">
+          <div className="relative h-32 w-32 overflow-hidden rounded-[8px] border border-border/20">
+            <Image
+              src="/call-icon.png"
+              alt="Customer Service"
+              fill
+              className="object-contain p-4"
+            />
+          </div>
+          <p className="text-center text-sm text-muted-foreground">
+            Need help? We are here for you 24/7
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <section className="space-y-3 px-1">
+          <div className="grid grid-cols-2 gap-3">
+            {/* Chat (WhatsApp style) */}
+            <a href="https://wa.me/8801790939394" target="_blank" rel="noopener noreferrer" className="contents">
+              <button className="flex items-center justify-center gap-2 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-[#25D366] transition active:scale-[0.98]">
+                <MessageCircle className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-semibold">Chat</span>
+              </button>
+            </a>
+            {/* Messenger */}
+            <Link href="/chat" className="contents">
+              <button className="flex items-center justify-center gap-2 rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-3 text-blue-500 transition active:scale-[0.98]">
+                <MessageCircle className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-semibold">Messenger</span>
+              </button>
+            </Link>
+          </div>
+          {/* Call - full width red pill */}
+          <a href="tel:+8801790939394" className="contents">
+            <button className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white transition active:scale-[0.98]">
+              Call
+            </button>
+          </a>
         </section>
 
         <section className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-base font-bold text-foreground md:text-xl">Frequently Asked Questions</h2>
+            <h2 className="text-lg font-semibold text-foreground md:text-xl">Frequently Asked Questions</h2>
           </div>
           <ul className="space-y-2.5">
             {faqs.map((f, i) => (
-              <li key={i} className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm">
+              <li key={i} className="overflow-hidden rounded-[6px] border border-border/30 bg-card shadow-sm">
                 <button
                   onClick={() => setOpen((v) => (v === i ? null : i))}
                   className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-muted/30"
                   aria-expanded={open === i}
                 >
-                  <span className="text-sm font-semibold text-foreground">{f.q}</span>
+                  <span className="text-sm font-medium text-foreground">{f.q}</span>
                   <ChevronDown
                     className={cx(
                       "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300",
@@ -69,7 +104,7 @@ export default function HelpPage() {
                     )}
                   />
                 </button>
-                <div 
+                <div
                   className={cx(
                     "grid transition-all duration-300 ease-in-out",
                     open === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
@@ -90,13 +125,3 @@ export default function HelpPage() {
   )
 }
 
-function QuickAction({ icon: Icon, label }: { icon: any; label: string }) {
-  return (
-    <button className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition hover:border-primary/40 hover:bg-primary/[0.02]">
-      <div className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-primary">
-        <Icon className="h-5 w-5" />
-      </div>
-      <span className="text-xs font-bold text-foreground">{label}</span>
-    </button>
-  )
-}

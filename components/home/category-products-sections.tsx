@@ -20,7 +20,7 @@ export function CategoryProductsSections() {
         return (
           <section key={category.id} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-medium text-foreground md:text-xl">
+              <h2 className="text-lg font-semibold text-foreground md:text-xl">
                 {category.name}
               </h2>
               <Link

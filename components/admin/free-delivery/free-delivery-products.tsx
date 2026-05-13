@@ -173,31 +173,31 @@ export function FreeDeliveryProducts({ adminData }: Props) {
       {isProductsLoading ? (
          <div className="flex h-32 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       ) : availableProducts.length === 0 ? (
-         <div className="flex h-32 items-center justify-center rounded-xl border border-dashed text-muted-foreground bg-secondary/20">
+         <div className="flex h-32 items-center justify-center rounded-[8px] border border-dashed text-muted-foreground bg-secondary/20">
            No products found matching filters.
          </div>
       ) : (
-        <div className="space-y-2 max-h-100 overflow-y-auto pr-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 max-h-100 overflow-y-auto pr-2">
           {availableProducts.map((p: any) => {
             const isSelected = stagedProductIds.has(p.id)
             return (
-              <label 
-                key={p.id} 
-                className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-colors hover:bg-secondary/50 ${isSelected ? "border-primary bg-primary/5" : "border-border bg-card"}`}
+              <label
+                key={p.id}
+                className={`flex cursor-pointer flex-col gap-2 rounded-[8px] border p-3 transition-colors hover:bg-secondary/30 ${isSelected ? "border-primary bg-primary/5" : "border-border/40 bg-card shadow-sm"}`}
               >
-                <div>
-                  <p className="font-medium text-sm">{p.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">ID: {p.id}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {isSelected && <Badge className="h-5 rounded-sm px-1.5 text-[10px]">Free Delivery</Badge>}
-                  <input 
-                    type="checkbox" 
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{p.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">ID: {p.id.slice(-6)}</p>
+                  </div>
+                  <input
+                    type="checkbox"
                     checked={isSelected}
                     onChange={() => handleToggleProduct(p.id)}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 shrink-0 accent-primary"
                   />
                 </div>
+                {isSelected && <Badge className="w-fit h-5 rounded-sm px-1.5 text-[10px]">Free Delivery</Badge>}
               </label>
             )
           })}

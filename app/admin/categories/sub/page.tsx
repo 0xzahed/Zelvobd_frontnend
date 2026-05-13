@@ -139,118 +139,83 @@ export default function AdminSubCategoriesPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="rounded-xl bg-card p-4 shadow-card md:p-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex w-full items-center gap-3 md:max-w-lg">
-            {/* Category filter */}
-            <div className="w-44 shrink-0">
-              <AdminSelect
-                value={selectedCategoryId}
-                onChange={(e) => setSelectedCategoryId(e.target.value)}
-                disabled={categories.length === 0}
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </AdminSelect>
-            </div>
-            {/* Search */}
-            <div className="relative w-full">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search sub-category..."
-                className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-primary/60"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 md:gap-4">
-            <h2 className="text-base text-foreground md:text-lg"></h2>
-            <button
-              onClick={openAdd}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-sm text-white transition hover:bg-primary/90"
-            >
-              <Plus className="h-4 w-4" />
-              Add Sub Category
-            </button>
-          </div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-foreground">Sub-Categories</h2>
+          <p className="text-xs text-muted-foreground">{rows.length} total</p>
         </div>
-
-        {/* Table */}
-        <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
-          <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 border-b border-border/60 bg-secondary px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground md:grid-cols-[48px_1fr_1fr_auto]">
-            <span className="hidden md:block" aria-hidden />
-            <span className="md:text-left">Title</span>
-            <span className="text-muted-foreground">Parent</span>
-            <span className="text-right">Actions</span>
+        <div className="flex w-full items-center gap-2">
+          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search sub-categories..."
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
           </div>
+          <button
+            onClick={openAdd}
+            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" /> Add Sub Category
+          </button>
+        </div>
+      </div>
 
-          <ul className="divide-y divide-border/60">
-            {rows.length === 0 && (
-              <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-                {isLoadingSubs
-                  ? "Loading sub-categories..."
-                  : selectedCategoryId
-                  ? "No sub-categories in this category yet."
-                  : "No categories found. Create a category first."}
-              </li>
-            )}
-            {rows.map((sub) => (
-              <li
-                key={sub.id}
-                className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 px-5 py-3 transition hover:bg-secondary md:grid-cols-[48px_1fr_1fr_auto]"
-              >
-                <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
-                  <Image
-                    src={sub.image || "/placeholder.svg"}
-                    alt={sub.name}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                  />
+      {/* Cards */}
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {rows.length === 0 && (
+            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+              {isLoadingSubs
+                ? "Loading sub-categories..."
+                : selectedCategoryId
+                ? "No sub-categories in this category yet."
+                : "No categories found. Create a category first."}
+            </div>
+          )}
+          {rows.map((sub) => (
+            <div
+              key={sub.id}
+              className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden"
+            >
+              <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
+                <Image
+                  src={sub.image || "/placeholder.svg"}
+                  alt={sub.name}
+                  fill
+                  sizes="112px"
+                  className="object-contain p-1.5"
+                />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[120px]">
+                <div className="space-y-1">
+                  <p className="truncate text-sm font-semibold text-foreground">{sub.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{sub.parentName}</p>
                 </div>
-
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
-                    <Image
-                      src={sub.image || "/placeholder.svg"}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <p className="truncate text-sm text-foreground">{sub.name}</p>
-                </div>
-
-                <p className="truncate text-xs text-muted-foreground">{sub.parentName}</p>
-
-                <div className="flex items-center justify-end gap-1.5">
+                <div className="flex w-full gap-1">
                   <button
                     onClick={() => openEdit(sub)}
                     aria-label={`Edit ${sub.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-primary transition hover:bg-secondary"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteSub(sub.parentId, sub)}
                     aria-label={`Delete ${sub.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-accent transition hover:bg-accent/10"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold">Delete</span>
                   </button>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
 
       {/* Modal */}
       {showModal && (

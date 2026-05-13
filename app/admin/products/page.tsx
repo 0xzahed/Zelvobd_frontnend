@@ -106,7 +106,7 @@ export default function AdminProductsPage() {
             onClick={() => setAddOpen(true)}
             className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
-            <Plus className="h-4 w-4" /> Add
+            <Plus className="h-4 w-4" /> Add Product
           </button>
         </div>
       </div>
@@ -126,140 +126,109 @@ export default function AdminProductsPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-245 text-left text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/50 text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-5 py-3 font-medium">Product</th>
-                <th className="px-5 py-3 font-medium">Category</th>
-                <th className="px-5 py-3 font-medium">Sub Category</th>
-                <th className="px-5 py-3 font-medium">Price</th>
-                <th className="px-5 py-3 font-medium">Discount</th>
-                <th className="px-5 py-3 font-medium">Stock</th>
-                <th className="px-5 py-3 font-medium">Available</th>
-                <th className="px-5 py-3 font-medium">Flags</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={9} className="px-5 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                       <p className="text-xs text-muted-foreground">Loading products...</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-              {!isLoading && filtered.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="px-5 py-12 text-center text-muted-foreground">
-                    No products found.
-                  </td>
-                </tr>
-              )}
-              {!isLoading && filtered.map((p: any) => (
-                <tr key={p.id} className="border-b border-border/60 last:border-b-0 transition hover:bg-secondary/50">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-secondary">
-                        <Image
-                          src={p.images?.[0] || "/placeholder.svg"}
-                          alt={p.name}
-                          fill
-                          sizes="40px"
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-muted-foreground">
+      {/* Cards */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {isLoading && (
+          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <p className="text-xs text-muted-foreground">Loading products...</p>
+            </div>
+          </div>
+        )}
+        {!isLoading && filtered.length === 0 && (
+          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+            No products found.
+          </div>
+        )}
+        {!isLoading && filtered.map((p: any) => (
+          <div key={p.id} className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden">
+            <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
+              <Image
+                src={p.images?.[0] || "/placeholder.svg"}
+                alt={p.name}
+                fill
+                sizes="112px"
+                className="object-contain p-1.5"
+                unoptimized
+              />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[140px]">
+              <div>
+                <div className="min-w-0 space-y-1">
+                  <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
+                  <p className="text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
+                  <p className="text-[10px] text-muted-foreground">
                     {p.categoryName || p.categorySlug || "Uncategorized"}
-                  </td>
-                  <td className="px-5 py-3 text-muted-foreground">
-                    {p.subCategoryName || p.subCategorySlug || "No sub-category"}
-                  </td>
-                  <td className="px-5 py-3 font-medium text-foreground">{formatBDT(p.price)}</td>
-                  <td className="px-5 py-3">
-                    <span className="rounded-md bg-accent/10 px-2 py-0.5 text-[11px] font-semibold text-accent">
+                  </p>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-sm font-bold text-foreground">{formatBDT(p.price)}</span>
+                  {p.discount > 0 && (
+                    <span className="rounded bg-accent/10 px-1.5 py-px text-[10px] font-semibold text-accent">
                       -{p.discount}%
                     </span>
-                  </td>
-                  <td className="px-5 py-3">
-                    <Switch 
-                      checked={Boolean(p.stock)} 
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Switch
+                      checked={Boolean(p.stock)}
                       onCheckedChange={(val) => handleToggle(p.id, "stock", val)}
                       disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "stock"}
                     />
-                  </td>
-                  <td className="px-5 py-3">
-                    <Switch 
-                      checked={Boolean(p.availability)} 
+                    Stock
+                  </label>
+                  <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Switch
+                      checked={Boolean(p.availability)}
                       onCheckedChange={(val) => handleToggle(p.id, "availability", val)}
                       disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "availability"}
                     />
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex gap-1">
-                      {p.isTrending && (
-                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                          Trending
-                        </span>
-                      )}
-                      {p.isFlashSale && (
-                        <span className="rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-semibold text-accent">
-                          Flash
-                        </span>
-                      )}
-                      {p.isFreeDelivery && (
-                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-success">
-                          Free
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex justify-end gap-1">
-                      <Link
-                        href={`/admin/products/${p.id}`}
-                        aria-label="Edit"
-                        title="Edit"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Link>
-                      <button
-                        onClick={() => handleCopy(p.id)}
-                        disabled={copyMutation.isPending}
-                        aria-label="Copy"
-                        title="Duplicate"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p)}
-                        disabled={deleteMutation.isPending}
-                        aria-label="Delete"
-                        title="Delete"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    Avail
+                  </label>
+                  {p.isTrending && (
+                    <span className="rounded-full bg-blue-50 px-1.5 py-px text-[9px] font-semibold text-primary">Trend</span>
+                  )}
+                  {p.isFlashSale && (
+                    <span className="rounded-full bg-pink-50 px-1.5 py-px text-[9px] font-semibold text-accent">Flash</span>
+                  )}
+                  {p.isFreeDelivery && (
+                    <span className="rounded-full bg-green-50 px-1.5 py-px text-[9px] font-semibold text-success">Free</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex w-full gap-1 mt-3">
+                <Link
+                  href={`/admin/products/${p.id}`}
+                  aria-label="Edit"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-semibold">Edit</span>
+                </Link>
+                <button
+                  onClick={() => handleCopy(p.id)}
+                  disabled={copyMutation.isPending}
+                  aria-label="Copy"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-semibold">Copy</span>
+                </button>
+                <button
+                  onClick={() => handleDelete(p)}
+                  disabled={deleteMutation.isPending}
+                  aria-label="Delete"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-semibold">Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

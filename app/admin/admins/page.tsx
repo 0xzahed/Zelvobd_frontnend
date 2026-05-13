@@ -187,90 +187,68 @@ export default function AdminsPage() {
   }
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Admin Panel
-          </p>
-          <h2 className="text-xl font-bold text-foreground md:text-2xl">Admins</h2>
+          <h2 className="text-lg font-bold text-foreground">Admins</h2>
+          <p className="text-xs text-muted-foreground">{admins.length} total</p>
         </div>
         <button
           onClick={openAdd}
-          className="inline-flex h-10 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-semibold text-white"
+          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" /> Add Admin
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-card shadow-card">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-secondary text-xs uppercase text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3 font-semibold">Email</th>
-                <th className="px-5 py-3 font-semibold">Status</th>
-                <th className="px-5 py-3 font-semibold">Created</th>
-                <th className="px-5 py-3 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {!loading && admins.map((a) => (
-                <tr key={a.id} className="border-t border-border">
-                  <td className="px-5 py-3 text-muted-foreground">{a.email}</td>
-                  <td className="px-5 py-3">
-                    <button
-                      onClick={() => toggleActive(a.id)}
-                      className={
-                        a.active
-                          ? "inline-flex rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success"
-                          : "inline-flex rounded-full bg-muted-foreground/10 px-2 py-0.5 text-xs font-semibold text-muted-foreground"
-                      }
-                    >
-                      {a.active ? "Active" : "Inactive"}
-                    </button>
-                  </td>
-                  <td className="px-5 py-3 text-muted-foreground">{a.createdAt}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => openEdit(a)}
-                        aria-label="Edit"
-                        title="Edit"
-                        className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-foreground"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(a.id)}
-                        aria-label="Delete"
-                        title="Delete"
-                        disabled={a.id === currentAdmin?.id}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-accent/10 text-accent disabled:opacity-40"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!loading && admins.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-muted-foreground">
-                    No admins yet.
-                  </td>
-                </tr>
-              )}
-              {loading && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-muted-foreground">
-                    Loading admins...
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {!loading && admins.map((a) => (
+          <div key={a.id} className="flex flex-col rounded-[8px] border border-border/40 bg-card p-4 shadow-sm min-h-[120px]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">{a.email}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{a.createdAt}</p>
+              </div>
+              <button
+                onClick={() => toggleActive(a.id)}
+                className={
+                  a.active
+                    ? "inline-flex shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success"
+                    : "inline-flex shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-xs font-semibold text-muted-foreground"
+                }
+              >
+                {a.active ? "Active" : "Inactive"}
+              </button>
+            </div>
+            <div className="mt-3 flex flex-nowrap gap-1.5">
+              <button
+                onClick={() => openEdit(a)}
+                aria-label="Edit"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => onDelete(a.id)}
+                aria-label="Delete"
+                disabled={a.id === currentAdmin?.id}
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-40"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        ))}
+        {!loading && admins.length === 0 && (
+          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+            No admins yet.
+          </div>
+        )}
+        {loading && (
+          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+            Loading admins...
+          </div>
+        )}
       </div>
 
       {open && (

@@ -19,7 +19,7 @@ export function CategoryCard({ category }: { category: Category }) {
           className="object-cover"
         />
       </div>
-      <span className="mt-px shrink-0 truncate px-px text-center text-[9px] font-medium leading-tight text-foreground">
+      <span className="mt-1 shrink-0 truncate px-1 pb-2 text-center text-xs font-medium leading-tight text-foreground">
         {category.name}
       </span>
     </Link>
@@ -41,7 +41,7 @@ export function SubCategoryCard({ subCategory, categorySlug }: { subCategory: an
           className="object-cover"
         />
       </div>
-      <span className="mt-px shrink-0 truncate px-px text-center text-[9px] font-medium leading-tight text-foreground">
+      <span className="mt-1 shrink-0 truncate px-1 pb-2 text-center text-xs font-medium leading-tight text-foreground">
         {subCategory.name}
       </span>
     </Link>

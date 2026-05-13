@@ -129,100 +129,88 @@ export default function AdminSliders() {
 
   return (
     <div className="space-y-4">
-      {/* Page title */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-        <h1 className="text-base text-foreground">Banner List</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-foreground">Banners</h2>
+          <p className="text-xs text-muted-foreground">{sliders.length} total</p>
+        </div>
+        <button
+          onClick={openCreate}
+          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+        >
+          <Plus className="h-4 w-4" /> Add Banner
+        </button>
       </div>
 
-      {/* Card */}
-      <div className="rounded-lg bg-card p-4 shadow-card md:p-5">
-        {/* Top bar */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm text-foreground">Banner List</h2>
-          <button
-            onClick={openCreate}
-            className="inline-flex h-10 items-center gap-1.5 rounded-md border border-primary px-4 text-sm text-primary transition hover:bg-primary hover:text-white"
-          >
-            <Plus className="h-4 w-4" /> Add Banner
-          </button>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <div className="min-w-125">
-          <div className="grid grid-cols-[90px_1fr_100px_120px] items-center gap-3 border-b border-border py-3 text-center text-xs text-muted-foreground">
-            <div>Image</div>
-            <div className="text-left pl-2">Title</div>
-            <div>Home Page</div>
-            <div>Action</div>
-          </div>
+      {/* Cards */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {isLoadingBanners ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">
+            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
               Loading banners...
             </div>
           ) : sliders.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">
+            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
               No banners added yet.
             </div>
           ) : (
             sliders.map((s: Slider & { categoryId?: string, inHomePage?: boolean }) => (
               <div
                 key={s.id}
-                className="grid grid-cols-[90px_1fr_100px_120px] items-center gap-3 border-b border-border py-3 text-center text-sm"
+                className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden"
               >
-                <div className="flex justify-center">
-                  <div className="relative h-14 w-14 overflow-hidden rounded-md bg-surface">
-                    {s.image ? (
-                      <Image
-                        src={s.image || "/placeholder.svg"}
-                        alt={s.title || "Banner"}
-                        fill
-                        sizes="56px"
-                        className="object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <div
-                        className="absolute inset-0"
-                        style={{ backgroundColor: s.bg || "var(--primary)" }}
-                      />
-                    )}
+                <div className="relative h-28 w-20 shrink-0 overflow-hidden ml-1 my-1 rounded-[6px] border border-border/40 bg-surface">
+                  {s.image ? (
+                    <Image
+                      src={s.image || "/placeholder.svg"}
+                      alt={s.title || "Banner"}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div
+                      className="absolute inset-0"
+                      style={{ backgroundColor: s.bg || "var(--primary)" }}
+                    />
+                  )}
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[120px]">
+                  <div>
+                    <p className="truncate text-sm font-semibold text-foreground">{s.title || "Untitled"}</p>
+                    <div className="mt-1">
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-tight ${
+                          s.inHomePage
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        {s.inHomePage ? "Home" : "Hidden"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="text-foreground text-left pl-2">{s.title || "Untitled"}</div>
-                <div>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-tight ${
-                      s.inHomePage
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-slate-100 text-slate-600"
-                    }`}
-                  >
-                    {s.inHomePage ? "Yes" : "No"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-center gap-4">
-                  <button
-                    onClick={() => openEdit(s)}
-                    aria-label="Edit"
-                    className="text-primary transition hover:opacity-80"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSlider(s)}
-                    aria-label="Delete"
-                    className="text-destructive transition hover:opacity-80"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  <div className="flex flex-nowrap gap-1">
+                    <button
+                      onClick={() => openEdit(s)}
+                      aria-label="Edit"
+                      className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-primary transition hover:bg-primary hover:text-white"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSlider(s)}
+                      aria-label="Delete"
+                      className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           )}
-          </div>
         </div>
-      </div>
 
       {/* Modal */}
       {open && (

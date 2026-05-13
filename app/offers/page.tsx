@@ -7,6 +7,7 @@ import { BackHeader } from "@/components/layout/back-header"
 import { useBanners } from "@/src/hooks/api/useBanners"
 import { formatRelativeTime } from "@/lib/format"
 import type { Slider } from "@/lib/types"
+import { MessageSquare } from "lucide-react"
 
 export default function OffersPage() {
   const { data: banners = [], isLoading } = useBanners()
@@ -14,40 +15,54 @@ export default function OffersPage() {
   return (
     <AppShell>
       <BackHeader title="Offers" />
-      <div className="space-y-6 py-4 md:space-y-8 md:py-6">
+
+      <div className="mx-auto max-w-md space-y-0 py-2">
         {isLoading ? (
           <div className="flex items-center justify-center h-40">
             <span className="text-muted-foreground text-sm">Loading offers...</span>
           </div>
         ) : banners.length > 0 ? (
           banners.map((slide: Slider) => (
-            <div key={slide.id} className="flex flex-col gap-3">
-              <div>
-                <h3 className="text-lg font-bold text-foreground">{slide.title || "Untitled"}</h3>
-                {slide.subtitle && <p className="text-sm text-foreground">{slide.subtitle}</p>}
+            <Link
+              key={slide.id}
+              href={slide.link}
+              className="flex gap-3 border-b border-border/30 px-4 py-4 transition-colors active:bg-muted/30"
+            >
+              {/* Icon badge */}
+              <div className="shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <MessageSquare className="h-5 w-5" />
+                </div>
               </div>
 
-              <Link href={slide.link} className="relative block w-full overflow-hidden rounded-lg shadow-card transition-transform hover:-translate-y-0.5">
-                <div className="relative flex aspect-16/8 w-full items-center overflow-hidden md:aspect-16/5" style={{ background: `linear-gradient(120deg, ${slide.bg}, ${slide.bg}cc 60%, var(--foreground) 120%)` }}>
-                  <Image
-                    src={slide.image || "/placeholder.svg"}
-                    alt={slide.title || "Offer Banner"}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/10" />
-                  <div className="absolute bottom-8 left-5 z-10 md:bottom-12 md:left-10">
-                    <span className="inline-flex h-9 items-center justify-center rounded-full bg-white px-4 text-[13px] font-semibold text-primary shadow-sm md:h-11 md:px-6 md:text-sm">Shop Now</span>
-                  </div>
-                </div>
-              </Link>
+              {/* Content */}
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <h3 className="text-[15px] font-medium leading-snug text-foreground">
+                  {slide.title || "Untitled"}
+                </h3>
+                {slide.subtitle && (
+                  <p className="text-sm leading-snug text-muted-foreground line-clamp-2">
+                    {slide.subtitle}
+                  </p>
+                )}
 
-              <p className="text-xs text-muted-foreground">
-                {formatRelativeTime(slide.createdAt)}
-              </p>
-              
-              <hr className="mt-2 border-t border-border" />
-            </div>
+                {/* Image card */}
+                {slide.image && (
+                  <div className="relative mt-1.5 aspect-[16/9] w-full overflow-hidden rounded-lg border border-border/20">
+                    <Image
+                      src={slide.image}
+                      alt={slide.title || "Offer"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+
+                <p className="text-xs text-muted-foreground pt-1">
+                  {formatRelativeTime(slide.createdAt)}
+                </p>
+              </div>
+            </Link>
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-10 text-center">

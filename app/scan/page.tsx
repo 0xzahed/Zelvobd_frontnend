@@ -121,7 +121,7 @@ export default function ScanPage() {
         <div className="relative z-10 w-full max-w-md space-y-10">
           {/* Header Section */}
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-[6px] bg-primary/5 px-3 py-1">
+            <div className="inline-flex items-center gap-2 rounded-[8px] bg-primary/5 px-3 py-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Smart Recognition</span>
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight text-foreground">Find Instantly</h2>
@@ -130,7 +130,7 @@ export default function ScanPage() {
 
           {/* Main Visual Content */}
           <div className="relative">
-            <div className="relative aspect-4/3 w-full overflow-hidden rounded-[6px] border border-border/30 bg-background shadow-sm">
+            <div className="relative w-full overflow-hidden rounded-[8px] border border-border/30 bg-background shadow-sm" style={{ height: "280px" }}>
               {mode === "camera" && (
                 <div className="relative h-full w-full bg-gray-100">
                   <div id="reader" className="h-full w-full overflow-hidden"></div>
@@ -154,7 +154,7 @@ export default function ScanPage() {
 
                   {!hasCamera && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/90 p-8 text-center">
-                      <div className="mb-4 rounded-[6px] bg-destructive/10 p-3 text-destructive">
+                      <div className="mb-4 rounded-[8px] bg-destructive/10 p-3 text-destructive">
                         <AlertCircle className="h-6 w-6" />
                       </div>
                       <p className="text-sm font-bold text-foreground">Camera Unavailable</p>
@@ -166,12 +166,12 @@ export default function ScanPage() {
 
               {mode === "upload" && (
                 <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-background p-8">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-[6px] bg-secondary/10 text-primary">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-[8px] bg-secondary/10 text-primary">
                     <ImageIcon className="h-10 w-10" />
                   </div>
                   <div id="upload-reader" className="hidden"></div>
                   <div className="text-center space-y-4">
-                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-[6px] bg-primary px-8 py-3.5 text-xs font-bold text-white transition-all active:scale-95">
+                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-[8px] bg-primary px-8 py-3.5 text-xs font-bold text-white transition-all active:scale-95">
                       <ImageIcon className="h-4 w-4" />
                       Choose from Gallery
                       <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
@@ -182,9 +182,6 @@ export default function ScanPage() {
 
               {mode === "manual" && (
                 <div className="flex h-full w-full flex-col items-center justify-center p-8 bg-background">
-                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[6px] bg-secondary/10 text-primary">
-                    <Type className="h-8 w-8" />
-                  </div>
                   <form 
                     onSubmit={(e) => { e.preventDefault(); processCode(manualCode); }}
                     className="w-full space-y-4"
@@ -194,17 +191,16 @@ export default function ScanPage() {
                         type="text" 
                         value={manualCode}
                         onChange={(e) => setManualCode(e.target.value)}
-                        placeholder="Type barcode number..."
-                        className="w-full rounded-[6px] border border-border bg-white px-6 py-4 text-center text-sm font-bold outline-none transition-all focus:border-primary/50"
+                        placeholder="P-2026-10-Jade"
+                        className="w-full rounded-[8px] border border-border bg-white px-6 py-4 text-center text-sm font-bold outline-none transition-all focus:border-primary/50"
                         required
                       />
                     </div>
                     <button 
                       type="submit" 
                       disabled={loading || !manualCode.trim()}
-                      className="flex w-full items-center justify-center gap-2 rounded-[6px] bg-primary py-4 text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
+                      className="block w-full rounded-[8px] bg-primary py-4 text-center text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50"
                     >
-                      {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5 fill-current" />}
                       Verify & Find
                     </button>
                   </form>
@@ -215,7 +211,7 @@ export default function ScanPage() {
 
           {/* Refined Navigation Switcher */}
           <div className="flex items-center justify-center p-1">
-            <div className="flex items-center gap-1 rounded-[6px] border border-border/30 bg-white/50 p-1">
+            <div className="flex items-center gap-1 rounded-[8px] border border-border/30 bg-white/50 p-1">
               <ModeTab active={mode === "camera"} onClick={() => setMode("camera")} icon={Camera} label="Scan" />
               <ModeTab active={mode === "upload"} onClick={() => setMode("upload")} icon={ImageIcon} label="Upload" />
               <ModeTab active={mode === "manual"} onClick={() => setMode("manual")} icon={Type} label="Manual" />
@@ -244,9 +240,9 @@ function ModeTab({ active, onClick, icon: Icon, label }: { active: boolean, onCl
     <button
       onClick={onClick}
       className={cx(
-        "relative flex items-center gap-2 rounded-[6px] px-5 py-2.5 transition-all duration-300",
+        "relative flex items-center gap-2 rounded-[8px] px-5 py-2.5 transition-all duration-300",
         active 
-          ? "bg-white text-primary border border-border/30" 
+          ? "bg-white text-primary" 
           : "text-muted-foreground hover:text-foreground hover:bg-white/30"
       )}
     >

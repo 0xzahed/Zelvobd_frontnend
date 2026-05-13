@@ -95,7 +95,7 @@ export default function CategoryPage(props: { params: any }) {
         {/* Sub-categories */}
         {subCategories.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-base font-medium text-foreground md:text-xl">Browse {category.name}</h2>
+            <h2 className="text-lg font-semibold text-foreground md:text-xl">Browse {category.name}</h2>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-8 md:gap-2">
               {subCategories.map((sc) => (
                 <SubCategoryCard key={sc.id} categorySlug={category.slug} subCategory={sc} />

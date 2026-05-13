@@ -159,109 +159,87 @@ export default function AdminCategoriesPage() {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Header card */}
-      <div className="rounded-xl bg-card p-4 shadow-card md:p-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          {/* Left: search */}
-          <div className="relative w-full md:max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-foreground">Categories</h2>
+          <p className="text-xs text-muted-foreground">{categories.length} total</p>
+        </div>
+        <div className="flex w-full items-center gap-2">
+          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
+            <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search categories..."
-              className="h-10 w-full rounded-full border border-border bg-background pl-9 pr-4 text-sm outline-none focus:border-primary/60"
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-
-          {/* Right: title + add */}
-          <div className="flex items-center justify-between gap-3 md:gap-4">
-            <h2 className="text-base text-foreground md:text-lg"></h2>
-            <button
-              onClick={openAdd}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-sm text-white transition hover:bg-primary/90"
-            >
-              <Plus className="h-4 w-4" />
-              Add Category
-            </button>
-          </div>
+          <button
+            onClick={openAdd}
+            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" /> Add Category
+          </button>
         </div>
+      </div>
 
-        {/* Table */}
-        <div className="mt-4 overflow-hidden rounded-lg border border-border/60">
-          <div className="grid grid-cols-[1fr_auto] items-center gap-4 border-b border-border/60 bg-secondary px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground md:grid-cols-[48px_1fr_1fr_auto]">
-            <span className="hidden md:block" aria-hidden />
-            <span className="md:text-left">Title</span>
-            <span className="hidden text-muted-foreground md:block">Slug</span>
-            <span className="text-right">Actions</span>
-          </div>
-
-          <ul className="divide-y divide-border/60">
-            {filtered.length === 0 && (
-              <li className="px-5 py-10 text-center text-sm text-muted-foreground">
-                No categories found.
-              </li>
-            )}
-            {filtered.map((cat) => (
-              <li
-                key={cat.id}
-                className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3 transition hover:bg-secondary md:grid-cols-[48px_1fr_1fr_auto]"
-              >
-                <div className="hidden h-10 w-10 overflow-hidden rounded-full ring-1 ring-border/60 md:block">
-                  <Image
-                    src={cat.image || "/placeholder.svg"}
-                    alt={cat.name}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                  />
+      {/* Cards */}
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {filtered.length === 0 && (
+            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+              No categories found.
+            </div>
+          )}
+          {filtered.map((cat) => (
+            <div
+              key={cat.id}
+              className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden"
+            >
+              <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
+                <Image
+                  src={cat.image || "/placeholder.svg"}
+                  alt={cat.name}
+                  fill
+                  sizes="112px"
+                  className="object-contain p-1.5"
+                />
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[120px]">
+                <div className="space-y-1">
+                  <p className="truncate text-sm font-semibold text-foreground">{cat.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">/{cat.slug}</p>
                 </div>
-
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-border/60 md:hidden">
-                    <Image
-                      src={cat.image || "/placeholder.svg"}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <p className="truncate text-sm text-foreground">{cat.name}</p>
-                </div>
-
-                <p className="hidden truncate text-xs text-muted-foreground md:block">
-                  /{cat.slug}
-                </p>
-
-                <div className="flex items-center justify-end gap-1.5">
+                <div className="flex w-full gap-1">
                   <button
                     onClick={() => void openView(cat)}
                     aria-label={`View ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-foreground transition hover:bg-secondary"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold">View</span>
                   </button>
                   <button
                     onClick={() => openEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-primary transition hover:bg-secondary"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDelete(cat)}
                     aria-label={`Delete ${cat.name}`}
-                    className="grid h-8 w-8 place-items-center rounded-md text-accent transition hover:bg-accent/10"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold">Delete</span>
                   </button>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
 
       {/* Modal */}
       {showModal && (

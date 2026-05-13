@@ -162,7 +162,7 @@ export function BottomNavbar() {
           justify-content: center;
           align-items: center;
           border-radius: 50%;
-          border: 6px solid transparent;
+          border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
           box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
           pointer-events: auto;
         }
