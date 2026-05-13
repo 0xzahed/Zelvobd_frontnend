@@ -256,30 +256,32 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         </div>
 
         {/* Stock & Availability Checkboxes */}
-        <div className="grid gap-4 md:grid-cols-2 pt-2">
-          <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
-            <div className="relative flex items-center">
-              <input
-                type="checkbox"
-                checked={stock}
-                onChange={(e) => setStock(e.target.checked)}
-                className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
-              />
-            </div>
-            In Stock
-          </label>
-          <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
-            <div className="relative flex items-center">
-              <input
-                type="checkbox"
-                checked={availability}
-                onChange={(e) => setAvailability(e.target.checked)}
-                className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
-              />
-            </div>
-            Available for Purchase
-          </label>
-        </div>
+        {initial && (
+          <div className="grid gap-4 md:grid-cols-2 pt-2">
+            <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  checked={stock}
+                  onChange={(e) => setStock(e.target.checked)}
+                  className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
+                />
+              </div>
+              In Stock
+            </label>
+            <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer group">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  checked={availability}
+                  onChange={(e) => setAvailability(e.target.checked)}
+                  className="h-5 w-5 rounded border-border text-primary focus:ring-primary/20"
+                />
+              </div>
+              Available for Purchase
+            </label>
+          </div>
+        )}
 
         {/* Variants */}
         <div className="space-y-3 pt-2">
