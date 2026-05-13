@@ -99,9 +99,11 @@ export const mapProduct = (product: any): Product => {
 export const mapBanner = (banner: any): Slider => ({
   id: banner.id,
   title: banner.title || "",
-  subtitle: "",
+  subtitle: banner.subTitle || "",
   cta: "Shop now",
   link: banner.url || "/",
   image: toAbsoluteUploadUrl(banner.imageUrl),
   bg: "var(--secondary)",
+  categoryId: banner.categoryId || undefined,
+  inHomePage: Boolean(banner.inHomePage),
 })

@@ -18,13 +18,14 @@ import {
 type Draft = {
   id?: string
   title: string
+  subtitle: string
   link: string
   image: string
   categoryId: string
   inHomePage: boolean
 }
 
-const emptyDraft: Draft = { title: "", link: "", image: "", categoryId: "", inHomePage: true }
+const emptyDraft: Draft = { title: "", subtitle: "", link: "", image: "", categoryId: "", inHomePage: true }
 
 export default function AdminSliders() {
   const { data: sliders = [], isLoading: isLoadingBanners } = useBanners()
@@ -59,6 +60,7 @@ export default function AdminSliders() {
     setDraft({
       id: s.id,
       title: s.title || "",
+      subtitle: s.subtitle || "",
       link: s.link || "",
       image: typeof s.image === "string" ? s.image : "",
       categoryId: s.categoryId || "",
@@ -92,6 +94,7 @@ export default function AdminSliders() {
         {
           id: draft.id,
           title: draft.title,
+          subtitle: draft.subtitle,
           url: draft.link,
           categoryId: draft.categoryId,
           image: draft.image,
@@ -108,6 +111,7 @@ export default function AdminSliders() {
       createMutation.mutate(
         {
           title: draft.title,
+          subtitle: draft.subtitle,
           url: draft.link,
           categoryId: draft.categoryId,
           image: draft.image,
@@ -185,7 +189,10 @@ export default function AdminSliders() {
                     )}
                   </div>
                 </div>
-                <div className="text-foreground text-left pl-2">{s.title || "Untitled"}</div>
+                <div className="text-foreground text-left pl-2">
+                  <div className="font-medium">{s.title || "Untitled"}</div>
+                  {s.subtitle && <div className="text-xs text-muted-foreground mt-0.5">{s.subtitle}</div>}
+                </div>
                 <div>
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-tight ${
@@ -272,6 +279,15 @@ export default function AdminSliders() {
                 placeholder="Title"
                 className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-primary"
                 required
+              />
+
+              {/* Subtitle */}
+              <input
+                type="text"
+                value={draft.subtitle}
+                onChange={(e) => setDraft({ ...draft, subtitle: e.target.value })}
+                placeholder="Sub Title (Optional)"
+                className="h-11 w-full rounded-md border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-primary"
               />
 
               {/* Link */}
