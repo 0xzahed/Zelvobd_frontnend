@@ -21,7 +21,6 @@ export default function CheckoutPage() {
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    email: "",
     address: "",
     district: "",
     union: "",
@@ -86,6 +85,7 @@ export default function CheckoutPage() {
         const list: District[] = rows
           .filter((item: { id?: string; name?: string }) => item?.id && item?.name)
           .map((item: { id: string; name: string }) => ({ id: item.id, district: item.name }))
+          .sort((a, b) => a.district.localeCompare(b.district))
         if (!cancelled) setDistricts(list)
       } catch {
         if (!cancelled) setDistricts([])
@@ -123,6 +123,7 @@ export default function CheckoutPage() {
           .flat()
           .map((item: { name?: string }) => item?.name)
           .filter((v): v is string => Boolean(v))
+          .sort((a, b) => a.localeCompare(b))
         if (!cancelled) setUnions(list)
       } catch {
         if (!cancelled) setUnions([])
@@ -231,12 +232,6 @@ export default function CheckoutPage() {
                     value={form.phone}
                     onChange={(e) => updateForm("phone", e.target.value)}
                     placeholder="Phone Number"
-                    className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <input
-                    value={form.email}
-                    onChange={(e) => updateForm("email", e.target.value)}
-                    placeholder="Email (optional)"
                     className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary"
                   />
                   <textarea

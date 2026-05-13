@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ChevronDown, Mail, MessageCircle, Phone, Search } from "lucide-react"
+import { ChevronDown, MessageCircle, MessagesSquare, Phone } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { cx } from "@/lib/format"
@@ -18,19 +18,19 @@ const faqs = [
   },
   {
     q: "How do I track my order?",
-    a: "Open the Notifications page — we send you tracking updates at every step. You can also contact support for real-time help.",
+    a: "Open the My Orders page — enter your order link or code in the track field for real-time updates.",
   },
   {
     q: "What is your return policy?",
-    a: "Most products can be returned within 7 days of delivery, unused and in original packaging. Some items (like innerwear and cosmetics) are non-returnable for hygiene reasons.",
+    a: "Most products can be returned within 7 days of delivery, unused and in original packaging.",
   },
   {
     q: "Do you offer cash on delivery?",
-    a: "Yes, COD is available for orders under ৳30,000 in most areas. You can also pay via bKash, Nagad, or card.",
+    a: "Yes, COD is available for orders in most areas. You can also pay via bKash, Nagad, or card.",
   },
   {
     q: "How do I apply a promo code?",
-    a: "Add items to your cart, open Cart, and enter your promo code in the ticket field. Tap the arrow to apply.",
+    a: "Add items to your cart, and enter your promo code in the ticket field on the Cart page.",
   },
 ]
 
@@ -40,42 +40,47 @@ export default function HelpPage() {
   return (
     <AppShell>
       <BackHeader title="Help Center" />
-      <div className="space-y-5 py-4 md:py-6">
-        <div className="flex h-11 items-center gap-2 rounded-full bg-card px-4 shadow-card">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            placeholder="Search help articles..."
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-        </div>
-
-        <section className="grid grid-cols-3 gap-3">
+      <div className="space-y-6 py-4 md:py-8">
+        <section className="grid grid-cols-3 gap-3 px-1">
           <Link href="/chat" className="contents">
             <QuickAction icon={MessageCircle} label="Live Chat" />
           </Link>
+          <QuickAction icon={MessagesSquare} label="WhatsApp" />
           <QuickAction icon={Phone} label="Call Us" />
-          <QuickAction icon={Mail} label="Email" />
         </section>
 
-        <section className="space-y-3">
-          <h2 className="text-base font-bold text-foreground md:text-xl">Frequently Asked</h2>
-          <ul className="space-y-2">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-base font-bold text-foreground md:text-xl">Frequently Asked Questions</h2>
+          </div>
+          <ul className="space-y-2.5">
             {faqs.map((f, i) => (
-              <li key={i} className="overflow-hidden rounded-2xl bg-card shadow-card">
+              <li key={i} className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm">
                 <button
                   onClick={() => setOpen((v) => (v === i ? null : i))}
-                  className="flex w-full items-center justify-between gap-3 p-4 text-left"
+                  className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-muted/30"
                   aria-expanded={open === i}
                 >
                   <span className="text-sm font-semibold text-foreground">{f.q}</span>
                   <ChevronDown
                     className={cx(
-                      "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+                      "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300",
                       open === i && "rotate-180",
                     )}
                   />
                 </button>
-                {open === i && <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">{f.a}</p>}
+                <div 
+                  className={cx(
+                    "grid transition-all duration-300 ease-in-out",
+                    open === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
+                      {f.a}
+                    </p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
@@ -85,13 +90,13 @@ export default function HelpPage() {
   )
 }
 
-function QuickAction({ icon: Icon, label }: { icon: typeof Search; label: string }) {
+function QuickAction({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <button className="flex flex-col items-center gap-2 rounded-2xl bg-card p-4 shadow-card transition hover:-translate-y-0.5">
+    <button className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition hover:border-primary/40 hover:bg-primary/[0.02]">
       <div className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-primary">
         <Icon className="h-5 w-5" />
       </div>
-      <span className="text-xs font-medium text-foreground">{label}</span>
+      <span className="text-xs font-bold text-foreground">{label}</span>
     </button>
   )
 }
