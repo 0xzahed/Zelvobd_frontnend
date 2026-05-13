@@ -106,4 +106,5 @@ export const mapBanner = (banner: any): Slider => ({
   bg: "var(--secondary)",
   categoryId: banner.categoryId || undefined,
   inHomePage: Boolean(banner.inHomePage),
+  createdAt: banner.createdAt || undefined,
 })

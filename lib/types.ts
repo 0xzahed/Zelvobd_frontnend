@@ -70,6 +70,7 @@ export type Slider = {
   bg: string
   categoryId?: string
   inHomePage?: boolean
+  createdAt?: string
 }
 
 export type Notification = {
