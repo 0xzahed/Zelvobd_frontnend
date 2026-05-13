@@ -3,10 +3,11 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { ArrowLeft, Check, Link2, Package } from "lucide-react"
+import { ArrowLeft, Link2 } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 import { useCart } from "@/contexts/cart-context"
 import { useProducts } from "@/lib/use-store-data"
+import { TickLottie } from "./success/tick-lottie"
 
 const BD_API_BASE = "https://bdapi.vercel.app/api/v.1"
 
@@ -142,13 +143,10 @@ export default function CheckoutPage() {
 
     return (
       <AppShell>
-        <div className="mx-auto flex max-w-md flex-col items-center gap-5 py-8 text-center md:py-16">
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-full border border-success/20 animate-pulse" />
-            <div className="absolute inset-0 z-0 animate-ping rounded-full bg-success/30" />
-            <div className="relative grid h-24 w-24 place-items-center rounded-full bg-success text-white shadow-[0_14px_30px_rgba(34,197,94,0.35)] animate-in zoom-in duration-500 fill-mode-both">
-              <Check className="h-12 w-12 animate-in slide-in-from-bottom-4 duration-700" strokeWidth={4} />
-            </div>
+        <div className="mx-auto flex min-h-[calc(100dvh-140px)] max-w-md flex-col items-center justify-center gap-5 px-4 text-center">
+          {/* Animated success tick */}
+          <div className="relative grid h-24 w-24 place-items-center rounded-full bg-success">
+            <TickLottie />
           </div>
 
           <div className="space-y-1">
@@ -158,13 +156,13 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          <div className="w-full rounded-2xl bg-card p-5 shadow-[0_10px_26px_rgba(15,23,42,0.08)]">
+          <div className="w-full rounded-[6px] border border-border/30 bg-card p-5">
             <div className="flex items-center justify-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               <Link2 className="h-4 w-4" />
               Order Link
             </div>
-            <div className="mt-3 overflow-hidden rounded-xl bg-muted/50 p-3">
-              <a 
+            <div className="mt-3 overflow-hidden rounded-[6px] bg-muted/50 p-3">
+              <a
                 href={orderLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -180,7 +178,7 @@ export default function CheckoutPage() {
 
           <button
             onClick={() => router.push("/")}
-            className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-primary/20"
+            className="block w-full rounded-[6px] bg-primary py-3.5 text-center text-sm font-semibold text-white"
           >
             হোমে ফিরে যান
           </button>

@@ -6,7 +6,7 @@ import { AppShell } from "@/components/layout/app-shell"
 
 export default function MorePage() {
   const menu = [
-    { icon: Package, label: "My Orders", href: "/orders" },
+    { icon: Package, label: "Track Your Order", href: "/orders" },
     { icon: HelpCircle, label: "Help & Support", href: "/help" },
   ]
 

@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: "How do I track my order?",
-    a: "Open the My Orders page — enter your order link or code in the track field for real-time updates.",
+    a: "Open the Track Your Order page — enter your order link or code in the track field for real-time updates.",
   },
   {
     q: "What is your return policy?",

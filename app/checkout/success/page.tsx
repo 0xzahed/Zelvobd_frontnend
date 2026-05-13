@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { Check, MessageSquare, Package, ListOrdered } from "lucide-react"
+import { MessageSquare, Package, ListOrdered } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 import { CopyCode } from "./copy-code"
+import { TickLottie } from "./tick-lottie"
 
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -12,15 +13,12 @@ export default async function CheckoutSuccessPage({
   const maskedPhone = phone ? phone.replace(/(\+?\d{3,4})(\d+)(\d{2})/, "$1•••••$3") : ""
 
   return (
+    <>
     <AppShell>
-      <div className="mx-auto flex max-w-md flex-col items-center gap-5 py-8 text-center md:py-16">
+      <div className="mx-auto flex min-h-[calc(100dvh-140px)] max-w-md flex-col items-center justify-center gap-5 px-4 text-center">
         {/* Animated success tick */}
-        <div className="relative">
-          <div className="absolute -inset-4 rounded-full border border-success/20" />
-          <div className="absolute inset-0 z-0 animate-ping rounded-full bg-success/30" />
-          <div className="relative grid h-24 w-24 place-items-center rounded-full bg-success text-white shadow-[0_14px_30px_rgba(34,197,94,0.35)]">
-            <Check className="h-11 w-11 animate-[pulse_1.5s_ease-in-out_infinite]" strokeWidth={3} />
-          </div>
+        <div className="relative grid h-24 w-24 place-items-center rounded-full bg-success">
+          <TickLottie />
         </div>
 
         <div className="space-y-1">
@@ -60,7 +58,7 @@ export default async function CheckoutSuccessPage({
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-center text-sm font-semibold text-white"
           >
             <ListOrdered className="h-4 w-4" />
-            My Orders
+            Track Your Order
           </Link>
           <Link
             href="/"
@@ -71,5 +69,7 @@ export default async function CheckoutSuccessPage({
         </div>
       </div>
     </AppShell>
+
+    </>
   )
 }
