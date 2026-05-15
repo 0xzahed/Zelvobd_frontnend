@@ -63,6 +63,7 @@ const MENU: NavItem[] = [
     icon: Sparkles,
     children: [{ href: "/admin/sliders", label: "Sliders List" }],
   },
+  { section: "Marketing", label: "Promos", icon: CircleDollarSign, href: "/admin/promos" },
   { section: "Marketing", label: "Flash Sale", icon: Gauge, href: "/admin/flash-sale" },
   {
     section: "Sales",
