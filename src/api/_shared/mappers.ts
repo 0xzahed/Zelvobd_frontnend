@@ -38,13 +38,19 @@ export const mapSubCategory = (subCategory: any) => ({
 })
 
 export const mapProduct = (product: any): Product => {
-  const firstVariant = product.firstVariant || product.variants?.[0]
+  const rawVariants = Array.isArray(product.variants) && product.variants.length > 0
+    ? product.variants
+    : product.firstVariant
+      ? [product.firstVariant]
+      : []
+
+  const firstVariant = product.firstVariant || rawVariants[0]
   const isFlashSale = Boolean(product.isFlashSale)
   const price = isFlashSale && firstVariant?.flashSalePrice != null ? Number(firstVariant.flashSalePrice) : Number(firstVariant?.discountedPrice || 0)
   const cutPrice = isFlashSale && firstVariant?.flashSalePrice != null ? Number(firstVariant?.discountedPrice || 0) : Number(firstVariant?.actualPrice || 0)
 
   const imageCandidates = uniqueNonEmpty([
-    ...(product.variants || []).map((v: any) => toAbsoluteUploadUrl(v.imageUrl)),
+    ...rawVariants.map((v: any) => toAbsoluteUploadUrl(v.imageUrl)),
     toAbsoluteUploadUrl(firstVariant?.imageUrl),
     toAbsoluteUploadUrl(product.imageUrl),
     toAbsoluteUploadUrl(product.thumbnailUrl),
@@ -83,7 +89,7 @@ export const mapProduct = (product: any): Product => {
     material: product.material || undefined,
     status: product.status || undefined,
     createdAt: product.createdAt || undefined,
-    variants: (product.variants || []).map((variant: any) => ({
+    variants: rawVariants.map((variant: any) => ({
       id: variant.id,
       color: variant.color || "",
       size: variant.size || "",

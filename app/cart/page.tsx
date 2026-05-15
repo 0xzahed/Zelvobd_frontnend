@@ -25,12 +25,56 @@ import { formatBDT } from "@/lib/format";
 import { useProducts } from "@/lib/use-store-data";
 import { applyPromoAPI } from "@/src/api/promo/applyPromo";
 import { notify } from "@/lib/notify";
+import { getProductDetails } from "@/src/api/products/getProductDetails";
+import { mapProduct } from "@/src/api/_shared/mappers";
+
+function colorToHex(name: string): string {
+  const key = name.toLowerCase()
+  const map: Record<string, string> = {
+    black: "#111827",
+    "black titanium": "#1f2937",
+    white: "#F3F4F6",
+    "white titanium": "#E5E7EB",
+    silver: "#C0C4CC",
+    gold: "#E9C687",
+    "rose gold": "#E6B8A2",
+    blue: "#2563EB",
+    "blue titanium": "#4A5A70",
+    "midnight blue": "#1E3A5F",
+    "natural titanium": "#A9A299",
+    "desert titanium": "#C8B5A3",
+    moonstone: "#A8B0B9",
+    jade: "#3A8F6B",
+    obsidian: "#111827",
+    porcelain: "#F1EEE8",
+    graphite: "#3A3A3A",
+    coral: "#F0746E",
+    lemongrass: "#A9B85A",
+    sky: "#7CB6E8",
+    red: "#DC2626",
+    green: "#16A34A",
+    pink: "#F472B6",
+    purple: "#8B5CF6",
+    gray: "#6B7280",
+    grey: "#6B7280",
+    brown: "#8B5E3C",
+    beige: "#D6C6A8",
+    navy: "#1E3A8A",
+    midnight: "#1B1F2A",
+  }
+  if (map[key]) return map[key]
+  for (const k of Object.keys(map)) {
+    if (key.includes(k)) return map[k]
+  }
+  return "#9CA3AF"
+}
 
 export default function CartPage() {
   const router = useRouter();
   const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo } = useCart();
   const { products } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [detailMap, setDetailMap] = useState<Record<string, Product>>({});
   
   const [promoCodeInput, setPromoCodeInput] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
@@ -58,6 +102,73 @@ export default function CartPage() {
     color?: string;
     storage?: string;
   }) => `${item.productId}__${item.color || ""}__${item.storage || ""}`;
+
+  const getDisplayVariant = (item: { color?: string; storage?: string; product: Product }) => {
+    const variants = item.product.variants || []
+    if (variants.length === 0) return { color: item.color, size: item.storage }
+
+    if (item.color && item.storage) return { color: item.color, size: item.storage }
+
+    const byColor = item.color ? variants.find((v) => v.color === item.color) : null
+    if (byColor) {
+      return {
+        color: item.color,
+        size: item.storage || byColor.size,
+      }
+    }
+
+    const bySize = item.storage ? variants.find((v) => v.size === item.storage) : null
+    if (bySize) {
+      return {
+        color: item.color || bySize.color,
+        size: item.storage,
+      }
+    }
+
+    return {
+      color: item.color || variants[0]?.color,
+      size: item.storage || variants[0]?.size,
+    }
+  }
+
+  const getVariantLabels = (item: { color?: string; storage?: string; product: Product }) => {
+    const displayVariant = getDisplayVariant(item)
+    const color = (displayVariant.color || "").trim()
+    const size = (displayVariant.size || "").trim()
+    const shouldShow = Boolean(color || size)
+    return { color, size, shouldShow }
+  }
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadDetails = async () => {
+      const targets = enriched
+        .map((item) => item.product)
+        .filter((p) => (p.variants?.length || 0) === 0 || !(p.variants || []).some((v) => (v.color || "").trim() || (v.size || "").trim()))
+
+      for (const p of targets) {
+        if (detailMap[p.id]) continue
+        try {
+          const res = await getProductDetails(p.id)
+          const mapped = mapProduct(res?.data)
+          if (!cancelled) {
+            setDetailMap((prev) => ({ ...prev, [p.id]: mapped }))
+          }
+        } catch {
+          // ignore detail errors
+        }
+      }
+    }
+
+    if (enriched.length > 0) {
+      void loadDetails()
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [enriched, detailMap])
 
   const allKeys = useMemo(() => enriched.map((item) => keyForItem(item)), [enriched]);
   const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedKeys.has(k));
@@ -189,10 +300,11 @@ export default function CartPage() {
                 </span>
               </li>
               {enriched.map((item) => {
-                const p = item.product;
+                const p = detailMap[item.productId] || item.product;
                 const imgQuery = encodeURIComponent(`${p.name} product photo`);
                 const itemKey = keyForItem(item);
                 const isSelected = selectedKeys.has(itemKey);
+                const variantLabels = getVariantLabels({ ...item, product: p })
                 return (
                   <li
                     key={`${p.id}-${item.color}-${item.storage}`}
@@ -210,7 +322,7 @@ export default function CartPage() {
                           <Square className="h-4 w-4" />
                         )}
                       </button>
-                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+                      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[8px] bg-muted">
                         <Image
                           src={
                             p.images?.[0] ||
@@ -231,19 +343,28 @@ export default function CartPage() {
                         <p className="text-sm font-medium text-primary">
                           {p.brand}
                         </p>
-                        {(item.color || item.storage) && (
-                          <p className="text-xs text-muted-foreground">
-                            {[
-                              item.color ? `Color: ${item.color}` : null,
-                              item.storage ? `Size: ${item.storage}` : null,
-                            ]
-                              .filter(Boolean)
-                              .join(" • ")}
-                          </p>
-                        )}
                         <p className="mt-1 text-base font-bold text-foreground">
                           {formatBDT(p.price)}
                         </p>
+                        {variantLabels.shouldShow && (
+                          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                            {variantLabels.color && (
+                              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-2 py-1">
+                                <span
+                                  className="h-3 w-3 rounded-full border border-border/60"
+                                  style={{ backgroundColor: colorToHex(variantLabels.color) }}
+                                  aria-hidden="true"
+                                />
+                                <span className="font-semibold text-foreground">{variantLabels.color}</span>
+                              </span>
+                            )}
+                            {variantLabels.size && (
+                              <span className="inline-flex items-center rounded-full border border-border/60 bg-card px-2 py-1 font-semibold text-foreground">
+                                {variantLabels.size}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-3">
