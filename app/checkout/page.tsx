@@ -15,7 +15,7 @@ type District = { id: string; district: string }
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, clearCart } = useCart()
+  const { items, clearCart, appliedPromo } = useCart()
   const { products } = useProducts()
   const [isSuccess, setIsSuccess] = useState(false)
   const [orderCode, setOrderCode] = useState("")
@@ -55,14 +55,19 @@ export default function CheckoutPage() {
     
     // Save to localStorage for demo purposes
     const subtotal = enriched.reduce((s, i: any) => s + i.product.price * i.quantity, 0)
-    const total = subtotal + 15
+    const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0
+    const total = Math.max(0, subtotal + 15 - discountAmount)
+    
     const newOrder = {
       code,
       status: "Pending",
       amount: total,
       phone: form.phone,
+      promoCode: appliedPromo?.code || null,
+      discountAmount: discountAmount,
       createdAt: new Date().toISOString(),
     }
+    
     const existingRaw = typeof window !== "undefined" ? localStorage.getItem("customer_orders") : null
     const existing = existingRaw ? JSON.parse(existingRaw) : []
     if (typeof window !== "undefined") {
@@ -86,7 +91,7 @@ export default function CheckoutPage() {
         const list: District[] = rows
           .filter((item: { id?: string; name?: string }) => item?.id && item?.name)
           .map((item: { id: string; name: string }) => ({ id: item.id, district: item.name }))
-          .sort((a, b) => a.district.localeCompare(b.district))
+          .sort((a: District, b: District) => a.district.localeCompare(b.district))
         if (!cancelled) setDistricts(list)
       } catch {
         if (!cancelled) setDistricts([])
@@ -124,7 +129,7 @@ export default function CheckoutPage() {
           .flat()
           .map((item: { name?: string }) => item?.name)
           .filter((v): v is string => Boolean(v))
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a: string, b: string) => a.localeCompare(b))
         if (!cancelled) setUnions(list)
       } catch {
         if (!cancelled) setUnions([])

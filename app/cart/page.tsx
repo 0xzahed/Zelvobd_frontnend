@@ -15,18 +15,25 @@ import {
   ShoppingBag,
   Ticket,
   Trash2,
+  X,
+  Loader2,
 } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { AppShell } from "@/components/layout/app-shell";
 import { useCart } from "@/contexts/cart-context";
 import { formatBDT } from "@/lib/format";
 import { useProducts } from "@/lib/use-store-data";
+import { applyPromoAPI } from "@/src/api/promo/applyPromo";
+import { notify } from "@/lib/notify";
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, clearCart } = useCart();
+  const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo } = useCart();
   const { products } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const enriched = items
     .map((item) => {
@@ -43,7 +50,8 @@ export default function CartPage() {
 
   const subtotal = enriched.reduce((s, i) => s + i.product.price * i.quantity, 0);
   const shippingTax = subtotal === 0 ? 0 : 15;
-  const total = subtotal + shippingTax;
+  const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0;
+  const total = Math.max(0, subtotal + shippingTax - discountAmount);
 
   const keyForItem = (item: {
     productId: string;
@@ -88,6 +96,37 @@ export default function CartPage() {
     }
     clearCart();
   };
+
+  const handleApplyPromo = async () => {
+    if (!promoCodeInput.trim()) {
+      notify.error({ title: "Error", message: "Please enter a promo code." })
+      return
+    }
+
+    if (subtotal === 0) {
+      notify.error({ title: "Error", message: "Cart is empty." })
+      return
+    }
+
+    setPromoLoading(true)
+    try {
+      const data = await applyPromoAPI(promoCodeInput, subtotal)
+      applyPromo({
+        code: data.code,
+        discountAmount: data.discountAmount,
+        discountType: data.discountType
+      })
+      notify.success({ title: "Applied", message: `${data.code} applied successfully!` })
+      setPromoCodeInput("")
+    } catch (error: any) {
+      notify.error({ 
+        title: "Invalid Promo Code", 
+        message: error.message || "Unable to apply promo code." 
+      })
+    } finally {
+      setPromoLoading(false)
+    }
+  }
 
 
   return (
@@ -256,16 +295,44 @@ export default function CartPage() {
               })}
             </ul>
             <div className="space-y-4 md:sticky md:top-20 md:self-start">
-              <div className="flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2">
-                <Ticket className="h-4 w-4 text-muted-foreground" />
-                <input
-                  placeholder="Enter Promo Code"
-                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                />
-                <button className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground">
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
+              {appliedPromo ? (
+                <div className="flex items-center justify-between rounded-full border border-primary/30 bg-primary/5 px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="h-4 w-4 text-primary" />
+                    <div>
+                      <span className="text-sm font-semibold text-primary">{appliedPromo.code}</span>
+                      <span className="ml-2 text-xs font-medium text-muted-foreground">Applied</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={removePromo}
+                    className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                    aria-label="Remove promo code"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                  <Ticket className="h-4 w-4 text-muted-foreground" />
+                  <input
+                    value={promoCodeInput}
+                    onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                    placeholder="Enter Promo Code"
+                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleApplyPromo()
+                    }}
+                  />
+                  <button 
+                    onClick={handleApplyPromo}
+                    disabled={promoLoading || !promoCodeInput.trim()}
+                    className="grid h-8 w-8 place-items-center rounded-full text-primary transition-colors hover:bg-secondary disabled:opacity-50 disabled:hover:bg-transparent"
+                  >
+                    {promoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronRight className="h-4 w-4" />}
+                  </button>
+                </div>
+              )}
 
               <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4">
                 <div className="flex justify-between text-sm">
@@ -280,6 +347,14 @@ export default function CartPage() {
                     {formatBDT(shippingTax)}
                   </span>
                 </div>
+                {appliedPromo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-primary font-medium">Discount ({appliedPromo.code})</span>
+                    <span className="font-bold text-primary">
+                      - {formatBDT(appliedPromo.discountAmount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between pt-1 border-t border-border/60 mt-1">
                   <span className="text-base font-semibold text-foreground">Total</span>
                   <span className="text-base font-bold text-foreground">
@@ -291,7 +366,7 @@ export default function CartPage() {
               <button
                 type="button"
                 onClick={() => router.push("/checkout")}
-                className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white"
+                className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white transition-transform active:scale-[0.98]"
               >
                 Checkout
               </button>
