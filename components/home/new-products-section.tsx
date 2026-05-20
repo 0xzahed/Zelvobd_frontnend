@@ -9,21 +9,38 @@ import { ProductCard } from "@/components/ui/product-card"
 import type { Product } from "@/lib/types"
 
 const MAX_NEW = 13
+let newProductsCache: Product[] | null = null
+let newProductsInFlight: Promise<Product[]> | null = null
 
 export function NewProductsSection() {
   const [newItems, setNewItems] = useState<Product[]>([])
 
   useEffect(() => {
+    let cancelled = false
     const load = async () => {
       try {
-        const res = await getProducts({ limit: MAX_NEW, sortBy: "createdAt", sortOrder: "desc" })
-        const products = (res?.data?.products || []).map(mapProduct) as Product[]
-        setNewItems(products)
+        if (newProductsCache) {
+          if (!cancelled) setNewItems(newProductsCache)
+          return
+        }
+        if (!newProductsInFlight) {
+          newProductsInFlight = getProducts({ limit: MAX_NEW, sortBy: "createdAt", sortOrder: "desc" })
+            .then((res) => (res?.data?.products || []).map(mapProduct) as Product[])
+            .finally(() => {
+              newProductsInFlight = null
+            })
+        }
+        const products = await newProductsInFlight
+        newProductsCache = products
+        if (!cancelled) setNewItems(products)
       } catch {
-        setNewItems([])
+        if (!cancelled) setNewItems([])
       }
     }
     void load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (

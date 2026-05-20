@@ -139,6 +139,25 @@ export default function CartPage() {
     return { color, size, shouldShow }
   }
 
+  const getEditUrl = (item: { color?: string; storage?: string; product: Product }) => {
+    const p = item.product
+    const baseUrl = `/${p.categorySlug || "all"}/${p.subCategorySlug || "all"}/${p.slug || p.id}`
+    const variants = p.variants || []
+    if (variants.length === 0) return baseUrl
+
+    const norm = (v?: string) => (v || "").trim().toLowerCase()
+    const selected = getDisplayVariant(item)
+    const selectedColor = norm(selected.color)
+    const selectedSize = norm(selected.size)
+
+    const matched =
+      variants.find((v) => norm(v.color) === selectedColor && norm(v.size) === selectedSize) ||
+      variants.find((v) => norm(v.color) === selectedColor) ||
+      variants.find((v) => norm(v.size) === selectedSize)
+
+    return matched?.id ? `${baseUrl}/${matched.id}` : baseUrl
+  }
+
   useEffect(() => {
     let cancelled = false
 
@@ -368,7 +387,10 @@ export default function CartPage() {
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-3">
-                      <button className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                      <button
+                        onClick={() => router.push(getEditUrl({ ...item, product: p }))}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-primary"
+                      >
                         <Pencil className="h-3.5 w-3.5" /> Edit
                       </button>
                       <div className="flex items-center gap-3">

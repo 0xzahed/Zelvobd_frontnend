@@ -65,7 +65,9 @@ const buildProductFormData = async (
         },
       ]) as ProductVariant[]
 
-  const variantPayload = variants.map((variant) => {
+  console.log(`[buildProductFormData] Processing ${variants.length} variant(s)`, variants)
+
+  const variantPayload = variants.map((variant, idx) => {
     return {
       actualPrice: variant.actualPrice,
       discountedPrice: variant.discountedPrice,
@@ -74,6 +76,8 @@ const buildProductFormData = async (
       image: variant.image || product.images?.[0] || "",
     }
   })
+
+  console.log(`[buildProductFormData] Variant payload created:`, variantPayload)
 
   const formData = new FormData()
   const descriptionHtml = toHtml(product.description || "N/A")
@@ -100,34 +104,44 @@ const buildProductFormData = async (
   formData.append("material", product.material?.trim() || "N/A")
   formData.append("stock", String(product.stock))
   formData.append("availability", String(product.availability))
-  formData.append(
-    "variants",
-    JSON.stringify(
-      variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
-        actualPrice,
-        discountedPrice,
-        color,
-        size,
-      })),
-    ),
-  )
 
+  const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
+    actualPrice,
+    discountedPrice,
+    color,
+    size,
+  }))
+  
+  console.log(`[buildProductFormData] Appending ${variantJsonPayload.length} variant(s) to JSON payload`)
+  formData.append("variants", JSON.stringify(variantJsonPayload))
+
+  let uploadedImageCount = 0
   for (let i = 0; i < variantPayload.length; i += 1) {
     const variant = variantPayload[i]
+    console.log(`[buildProductFormData] Processing variant ${i + 1}/${variantPayload.length}, image URL:`, variant.image?.substring(0, 50))
+    
     const file = await fileFromUrl(variant.image, `variant-${i + 1}`)
     if (!file) {
-      throw new Error("Each variant must have an image")
+      console.error(`[buildProductFormData] Failed to load image for variant ${i + 1}. Image URL:`, variant.image)
+      throw new Error(`Variant ${i + 1} image is missing or could not be loaded. Please upload an image for each variant.`)
     }
+    
+    console.log(`[buildProductFormData] Successfully loaded image for variant ${i + 1}:`, file.name)
     formData.append("variantImages", file)
+    uploadedImageCount++
   }
+
+  console.log(`[buildProductFormData] Successfully appended ${uploadedImageCount} variant image(s) to FormData`)
 
   if (product.video) {
     const videoFile = await fileFromUrl(product.video, "product-video")
     if (videoFile) {
+      console.log(`[buildProductFormData] Video appended:`, videoFile.name)
       formData.append("video", videoFile)
     }
   }
 
+  console.log(`[buildProductFormData] FormData complete with ${uploadedImageCount} variant image(s)`)
   return formData
 }
 

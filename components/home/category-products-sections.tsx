@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { useCategories, useProducts } from "@/lib/use-store-data"
@@ -8,13 +9,27 @@ import { ProductCard } from "@/components/ui/product-card"
 const MAX_PER_CATEGORY = 12
 
 export function CategoryProductsSections() {
-  const { categories, loaded: catsLoaded } = useCategories()
-  const { products, loaded: prodLoaded } = useProducts()
+  const { categories } = useCategories()
+  const { products } = useProducts()
+  const productsByCategory = useMemo(() => {
+    const grouped = new Map<string, typeof products>()
+    for (const product of products) {
+      const key = product.categorySlug || ""
+      if (!key) continue
+      const list = grouped.get(key)
+      if (list) {
+        list.push(product)
+      } else {
+        grouped.set(key, [product])
+      }
+    }
+    return grouped
+  }, [products])
 
   return (
     <div className="space-y-6 md:space-y-8">
       {categories.map((category) => {
-        const items = products.filter((p) => p.categorySlug === category.slug)
+        const items = productsByCategory.get(category.slug) || []
         const visibleItems = items.slice(0, MAX_PER_CATEGORY)
 
         return (

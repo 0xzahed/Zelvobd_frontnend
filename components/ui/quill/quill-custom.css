@@ -61,9 +61,23 @@
   font-family: 'Lato', sans-serif;
 }
 
-/* Base styles for the editor */
+/* Base editor styles */
 .ql-editor {
   font-family: inherit;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* Quill handles list markers with pseudo elements.
+   Forcing browser list-style creates duplicate markers (e.g. 1. 1. item). */
+.ql-container .ql-editor ol li,
+.ql-container .ql-editor ul li {
+  list-style-type: none !important;
+  list-style-position: outside !important;
 }
 
 /* Ensure SVG icons render cleanly inside Quill */
@@ -83,4 +97,43 @@
 .ql-toolbar button.ql-lucideIcon svg {
   width: 18px !important;
   height: 18px !important;
+}
+
+/* Ensure container takes full width */
+.ql-container {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+.ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  background-color: var(--secondary) !important;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+}
+
+/* Responsiveness for images and videos inside the editor */
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.ql-editor iframe {
+  max-width: 100%;
+}
+
+/* Better mobile toolbar */
+@media (max-width: 640px) {
+  .ql-toolbar.ql-snow {
+    padding: 4px !important;
+  }
+  .ql-snow .ql-formats {
+    margin-right: 4px !important;
+  }
 }

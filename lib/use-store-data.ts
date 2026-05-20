@@ -68,12 +68,19 @@ export function useCategories() {
   return { categories, loaded }
 }
 
-export function useProducts() {
+export function useProducts(options?: { enabled?: boolean }) {
   const pathname = usePathname()
   const [products, setProducts] = useState<Product[]>([])
   const [loaded, setLoaded] = useState(false)
+  const enabled = options?.enabled ?? true
 
   useEffect(() => {
+    if (!enabled) {
+      setProducts([])
+      setLoaded(false)
+      return
+    }
+
     if (pathname?.startsWith("/admin")) {
       setProducts([])
       setLoaded(true)
@@ -114,7 +121,7 @@ export function useProducts() {
     return () => {
       cancelled = true
     }
-  }, [pathname])
+  }, [pathname, enabled])
 
   return { products, loaded }
 }

@@ -54,7 +54,7 @@ export default async function CheckoutSuccessPage({
 
         <div className="flex w-full flex-col gap-2">
           <Link
-            href={`/orders?code=${encodeURIComponent(code)}`}
+            href={`/track-order?code=${code}`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-center text-sm font-semibold text-white"
           >
             <ListOrdered className="h-4 w-4" />

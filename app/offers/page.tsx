@@ -7,7 +7,6 @@ import { BackHeader } from "@/components/layout/back-header"
 import { useBanners } from "@/src/hooks/api/useBanners"
 import { formatRelativeTime } from "@/lib/format"
 import type { Slider } from "@/lib/types"
-import { MessageSquare } from "lucide-react"
 
 export default function OffersPage() {
   const { data: banners = [], isLoading } = useBanners()
@@ -16,9 +15,9 @@ export default function OffersPage() {
     <AppShell>
       <BackHeader title="Offers" />
 
-      <div className="mx-auto max-w-md space-y-0 py-2">
+      <div className="mx-auto max-w-md space-y-3 py-3">
         {isLoading ? (
-          <div className="flex items-center justify-center h-40">
+          <div className="flex h-40 items-center justify-center rounded-2xl border border-border/50 bg-card">
             <span className="text-muted-foreground text-sm">Loading offers...</span>
           </div>
         ) : banners.length > 0 ? (
@@ -26,29 +25,21 @@ export default function OffersPage() {
             <Link
               key={slide.id}
               href={slide.link}
-              className="flex gap-3 border-b border-border/30 px-4 py-4 transition-colors active:bg-muted/30"
+              className="block rounded-[8px] border border-border/60 bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.995]"
             >
-              {/* Icon badge */}
-              <div className="shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <MessageSquare className="h-5 w-5" />
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <h3 className="text-[15px] font-medium leading-snug text-foreground">
+              <div className="min-w-0 space-y-2">
+                <h3 className="text-base font-semibold leading-snug text-foreground">
                   {slide.title || "Untitled"}
                 </h3>
                 {slide.subtitle && (
-                  <p className="text-sm leading-snug text-muted-foreground line-clamp-2">
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                     {slide.subtitle}
                   </p>
                 )}
 
                 {/* Image card */}
                 {slide.image && (
-                  <div className="relative mt-1.5 aspect-[16/9] w-full overflow-hidden rounded-lg border border-border/20">
+                  <div className="relative mt-1 aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-border/30">
                     <Image
                       src={slide.image}
                       alt={slide.title || "Offer"}
@@ -58,7 +49,7 @@ export default function OffersPage() {
                   </div>
                 )}
 
-                <p className="text-xs text-muted-foreground pt-1">
+                <p className="pt-1 text-xs font-medium text-muted-foreground">
                   {formatRelativeTime(slide.createdAt)}
                 </p>
               </div>

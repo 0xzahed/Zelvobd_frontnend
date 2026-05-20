@@ -10,31 +10,56 @@ import { getAllActiveFlashSaleProducts } from "@/src/api/flashSale/getAllActiveF
 import { mapProduct } from "@/src/api/_shared/mappers"
 import type { Product } from "@/lib/types"
 
+let flashCache: { items: Product[]; backgroundImage: string } | null = null
+let flashInFlight: Promise<{ items: Product[]; backgroundImage: string }> | null = null
+
 export function FlashSaleSection() {
   const [items, setItems] = useState<Product[]>([])
   const [backgroundImage, setBackgroundImage] = useState("")
 
   useEffect(() => {
+    let cancelled = false
     const load = async () => {
       try {
-        const res = await getAllActiveFlashSaleProducts({ limit: 13 })
-        setItems(
-          (res?.data?.products || []).map((product: any) => ({
-            ...mapProduct(product),
-            isFlashSale: true,
-          })),
-        )
-
-        const campaign = res?.data?.campaigns?.[0] || {}
-        const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""
-
-        setBackgroundImage(apiBg)
+        if (flashCache) {
+          if (!cancelled) {
+            setItems(flashCache.items)
+            setBackgroundImage(flashCache.backgroundImage)
+          }
+          return
+        }
+        if (!flashInFlight) {
+          flashInFlight = getAllActiveFlashSaleProducts({ limit: 13 })
+            .then((res) => {
+              const nextItems = (res?.data?.products || []).map((product: any) => ({
+                ...mapProduct(product),
+                isFlashSale: true,
+              }))
+              const campaign = res?.data?.campaigns?.[0] || {}
+              const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""
+              return { items: nextItems, backgroundImage: apiBg }
+            })
+            .finally(() => {
+              flashInFlight = null
+            })
+        }
+        const next = await flashInFlight
+        flashCache = next
+        if (!cancelled) {
+          setItems(next.items)
+          setBackgroundImage(next.backgroundImage)
+        }
       } catch {
-        setItems([])
-        setBackgroundImage("")
+        if (!cancelled) {
+          setItems([])
+          setBackgroundImage("")
+        }
       }
     }
     void load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (

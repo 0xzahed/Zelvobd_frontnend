@@ -8,6 +8,9 @@ const __dirname = path.dirname(__filename)
 const nextConfig = {
   turbopack: {
     root: __dirname,
+    resolveAlias: {
+      canvas: path.join(__dirname, "lib/empty-canvas.ts"),
+    },
   },
   typescript: {
     ignoreBuildErrors: true,

@@ -29,7 +29,12 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
 
-  const variants = product.variants ?? []
+  const norm = (v: string) => v.trim().toLowerCase()
+  const variants = (product.variants ?? []).map((v) => ({
+    ...v,
+    color: (v.color || "").trim(),
+    size: (v.size || "").trim(),
+  }))
   const uniqueColors = Array.from(
     new Set(
       variants
@@ -53,10 +58,10 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   }
 
   const [selectedColor, setSelectedColor] = useState<string>(
-    initialVariant?.color?.trim() || uniqueColors[0] || (variants.length ? "Default" : "")
+    initialVariant?.color || uniqueColors[0] || ""
   )
   const [selectedSize, setSelectedSize] = useState<string>(
-    initialVariant?.size?.trim() || uniqueSizes[0] || (variants.length ? "Standard" : "")
+    initialVariant?.size || uniqueSizes[0] || ""
   )
   
   // Keep gallery image in sync (memoized so its reference is stable across renders)
@@ -70,9 +75,11 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   // Find exact active variant based on selected color and size
-  const activeVariant = variants.find(
-    v => v.color === selectedColor && v.size === selectedSize
-  ) || variants.find(v => v.color === selectedColor) || null
+  const activeVariant = useMemo(() => {
+    return variants.find(
+      v => norm(v.color) === norm(selectedColor) && norm(v.size) === norm(selectedSize)
+    ) || variants.find((v) => norm(v.color) === norm(selectedColor)) || variants[0] || null
+  }, [variants, selectedColor, selectedSize])
 
   // Update image index when the active variant changes
   useEffect(() => {
@@ -94,8 +101,10 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const handleColorChange = (c: string) => {
     setSelectedColor(c)
     // Optional: Auto-select a valid size for this color if the current size isn't available in this color
-    const availableSizesForColor = variants.filter(v => v.color === c).map(v => v.size)
-    if (availableSizesForColor.length > 0 && !availableSizesForColor.includes(selectedSize)) {
+    const availableSizesForColor = variants
+      .filter((v) => norm(v.color) === norm(c))
+      .map((v) => v.size)
+    if (availableSizesForColor.length > 0 && !availableSizesForColor.some((s) => norm(s) === norm(selectedSize))) {
       setSelectedSize(availableSizesForColor[0])
     }
   }
@@ -109,12 +118,12 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     if (!img) return
     const variantForImage = variants.find(v => v.image === img)
     if (!variantForImage) return
-    if (variantForImage.color && variantForImage.color !== selectedColor) {
+    if (variantForImage.color && norm(variantForImage.color) !== norm(selectedColor)) {
       setSelectedColor(variantForImage.color)
       const availableSizesForColor = variants
-        .filter(v => v.color === variantForImage.color)
-        .map(v => v.size)
-      if (availableSizesForColor.length > 0 && !availableSizesForColor.includes(selectedSize)) {
+        .filter((v) => norm(v.color) === norm(variantForImage.color))
+        .map((v) => v.size)
+      if (availableSizesForColor.length > 0 && !availableSizesForColor.some((s) => norm(s) === norm(selectedSize))) {
         setSelectedSize(availableSizesForColor[0])
       }
     }
@@ -193,7 +202,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   }, [product.id, product.subCategoryId])
 
   return (
-    <div className="container pb-20 pt-4 md:pb-10">
+    <div className="pb-20 pt-4 md:pb-10">
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
@@ -229,14 +238,16 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-        <ProductGallery
-          images={allImages}
-          productName={product.name}
-          activeImageIndex={activeImageIndex}
-          onImageChange={handleImageChange}
-        />
+        <div className="min-w-0">
+          <ProductGallery
+            images={allImages}
+            productName={product.name}
+            activeImageIndex={activeImageIndex}
+            onImageChange={handleImageChange}
+          />
+        </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0">
           <ProductInfo
             product={product}
             activeVariant={activeVariant}
@@ -269,7 +280,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       </div>
 
       {/* Mobile fixed bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 border-t border-border/60 bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md md:hidden">
         <button
           type="button"
           onClick={handleBuy}

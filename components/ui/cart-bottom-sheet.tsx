@@ -11,7 +11,7 @@ import { useProducts } from "@/lib/use-store-data"
 
 export function CartBottomSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items } = useCart()
-  const { products } = useProducts()
+  const { products } = useProducts({ enabled: open })
 
   useEffect(() => { document.body.style.overflow = open ? "hidden" : ""; return () => { document.body.style.overflow = "" } }, [open])
 

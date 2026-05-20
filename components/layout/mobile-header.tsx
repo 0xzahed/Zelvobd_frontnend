@@ -44,11 +44,11 @@ export function MobileHeader() {
       <header className="sticky top-0 z-40 border-b border-border/40 bg-white shadow-[0_2px_10px_rgba(15,23,42,0.08)] md:hidden">
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
-          <Link href="/" className="flex shrink-0 items-center gap-1.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
               E
             </span>
-            {!searchOpen && <span className="text-lg font-bold text-foreground">EcoMerce</span>}
+            {!searchOpen && <span className="truncate text-lg font-bold text-foreground">EcoMerce</span>}
           </Link>
 
           {/* Expanding inline search input. Uses min-w-0 so flex can shrink without overflow. */}

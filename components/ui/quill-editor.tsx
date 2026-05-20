@@ -59,6 +59,44 @@ const getPlainText = (html: string) => {
   return (doc.body.textContent || "").replace(/\u00a0/g, " ").trim()
 }
 
+const stripDuplicateListPrefixes = (html: string) => {
+  if (typeof window === "undefined" || !html) return html
+  const doc = new DOMParser().parseFromString(html, "text/html")
+  const listItems = Array.from(doc.querySelectorAll("li"))
+  const prefixPattern = /^\s*(?:(?:\d+[.)])|[-*•])\s+/
+
+  listItems.forEach((li) => {
+    const walker = doc.createTreeWalker(li, NodeFilter.SHOW_TEXT)
+    let node = walker.nextNode() as Text | null
+    let shouldRemove = false
+
+    while (node) {
+      const original = node.textContent ?? ""
+      if (original.trim().length > 0) {
+        let cleaned = original
+        while (prefixPattern.test(cleaned)) {
+          cleaned = cleaned.replace(prefixPattern, "")
+        }
+        cleaned = cleaned.replace(/^\s+/, "")
+        if (cleaned !== original) node.textContent = cleaned
+        if (!cleaned.trim()) shouldRemove = true
+        break
+      }
+      node = walker.nextNode() as Text | null
+    }
+
+    if (!node) {
+      shouldRemove = true
+    }
+
+    if (shouldRemove && li.parentElement?.children.length && li.parentElement.children.length > 1) {
+      li.remove()
+    }
+  })
+
+  return doc.body.innerHTML
+}
+
 export function QuillEditor({ label, value, onChange, placeholder, required }: QuillEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const quillRef = useRef<Quill | null>(null)
@@ -142,6 +180,9 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
             lucideIcon: lucideIconHandler,
           },
         },
+        clipboard: {
+          matchVisual: false,
+        },
       },
       formats: FORMATS,
     })
@@ -166,8 +207,9 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
     const quill = quillRef.current
     if (!quill) return
     if (value === currentRef.current) return
-    quill.clipboard.dangerouslyPasteHTML(value || "")
-    currentRef.current = value || ""
+    const normalized = stripDuplicateListPrefixes(value || "")
+    quill.clipboard.dangerouslyPasteHTML(normalized)
+    currentRef.current = normalized
   }, [value])
 
   const handleIconInsert = (svgHtml: string) => {
@@ -189,8 +231,8 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
       <label className="mb-1 block text-foreground">
         {label} {required && <span className="text-accent">*</span>}
       </label>
-      <div className="relative overflow-hidden rounded-md border border-border bg-background">
-        <div ref={hostRef} className="min-h-62.5" />
+      <div className="relative w-full overflow-hidden rounded-lg border border-border/80 bg-background shadow-sm transition-shadow focus-within:border-primary/40 focus-within:shadow-md">
+        <div ref={hostRef} className="min-h-72 w-full" />
         {required && (
           <input
             tabIndex={-1}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ImagePlus, Plus, Trash2, UploadCloud } from "lucide-react"
 import type { Product, ProductVariant } from "@/lib/types"
 import dynamic from "next/dynamic"
@@ -115,6 +115,13 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!htmlToPlainText(description)) return
+
+    // Validate that all variants have images
+    const missingImages = variants.filter(v => !v.image || v.image.trim() === '')
+    if (missingImages.length > 0) {
+      alert(`Please upload an image for each variant. Missing images for ${missingImages.length} variant(s).`)
+      return
+    }
 
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
@@ -304,11 +311,18 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
             {variants.map((v, idx) => (
               <div
                 key={v.id}
-                className="rounded-lg border border-border bg-secondary p-4"
+                className={`rounded-lg border p-4 ${
+                  !v.image || v.image.trim() === ''
+                    ? 'border-accent/50 bg-accent/5'
+                    : 'border-border bg-secondary'
+                }`}
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-semibold text-muted-foreground">
                     Variant {idx + 1}
+                    {(!v.image || v.image.trim() === '') && (
+                      <span className="ml-2 text-accent">✗ Missing image</span>
+                    )}
                   </span>
                   <button
                     type="button"
@@ -321,8 +335,8 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                   </button>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-[80px_1fr]">
-                  <label className="relative grid h-20 w-20 place-items-center overflow-hidden rounded-md border-2 border-dashed border-primary/40 bg-card transition hover:border-primary/70 cursor-pointer">
+                <div className="flex flex-col gap-4 md:grid md:grid-cols-[80px_1fr]">
+                  <label className="relative flex h-24 w-24 shrink-0 mx-auto md:mx-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-primary/40 bg-card transition hover:border-primary/70 cursor-pointer">
                     {v.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -345,7 +359,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                     />
                   </label>
 
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <label className="col-span-2 block text-xs md:col-span-1">
                       <span className="mb-1.5 block font-semibold text-foreground">Color</span>
                       <input

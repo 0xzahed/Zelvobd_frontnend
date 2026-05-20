@@ -126,7 +126,7 @@ export function ProductInfo({
       {uniqueColors.length > 0 && (
         <div>
           <p className="mb-2 text-sm font-medium text-foreground">Color</p>
-          <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3">
+          <div className="flex flex-wrap gap-2">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
               return (
@@ -136,18 +136,18 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex min-h-12 items-center gap-3 rounded-full border bg-transparent px-2 py-1.5 text-left transition md:min-h-14",
+                    "flex shrink-0 items-center gap-2 rounded-full border bg-transparent px-3 py-1.5 text-left transition md:px-4",
                     selected
                       ? "border-primary text-primary"
                       : "border-border/60 text-foreground hover:border-border",
                   )}
                 >
                   <span
-                    className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-12 md:w-12"
+                    className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-11 md:w-11"
                     style={{ backgroundColor: colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="min-w-0 truncate text-base">{c}</span>
+                  <span className="text-sm font-medium">{c}</span>
                 </button>
               )
             })}
@@ -187,7 +187,7 @@ export function ProductInfo({
         <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-sm font-medium text-foreground">Description</h3>
           <div
-            className="max-w-none wrap-break-word text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
@@ -198,7 +198,7 @@ export function ProductInfo({
         <div className="border-t border-border/40 pt-4">
           <h3 className="mb-2 text-sm font-medium text-foreground">More Information</h3>
           <div
-            className="max-w-none wrap-break-word text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: product.extraDescription }}
           />
         </div>

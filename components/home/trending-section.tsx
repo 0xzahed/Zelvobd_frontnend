@@ -8,24 +8,43 @@ import { mapProduct } from "@/src/api/_shared/mappers"
 import type { Product } from "@/lib/types"
 import { ProductCard } from "@/components/ui/product-card"
 
+let trendingCache: Product[] | null = null
+let trendingInFlight: Promise<Product[]> | null = null
+
 export function TrendingSection() {
   const [trending, setTrending] = useState<Product[]>([])
 
   useEffect(() => {
+    let cancelled = false
     const load = async () => {
       try {
-        const res = await getTrending({ limit: 13 })
-        setTrending(
-          (res?.data?.products || []).map((product: any) => ({
-            ...mapProduct(product),
-            isTrending: true,
-          })),
-        )
+        if (trendingCache) {
+          if (!cancelled) setTrending(trendingCache)
+          return
+        }
+        if (!trendingInFlight) {
+          trendingInFlight = getTrending({ limit: 13 })
+            .then((res) =>
+              (res?.data?.products || []).map((product: any) => ({
+                ...mapProduct(product),
+                isTrending: true,
+              })),
+            )
+            .finally(() => {
+              trendingInFlight = null
+            })
+        }
+        const next = await trendingInFlight
+        trendingCache = next
+        if (!cancelled) setTrending(next)
       } catch {
-        setTrending([])
+        if (!cancelled) setTrending([])
       }
     }
     void load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return (

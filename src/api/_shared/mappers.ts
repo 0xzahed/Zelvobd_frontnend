@@ -15,6 +15,22 @@ const toAbsoluteUploadUrl = (path: string | null | undefined): string => {
 const uniqueNonEmpty = (values: Array<string | null | undefined>) =>
   Array.from(new Set(values.map((v) => (v || "").trim()).filter(Boolean)))
 
+const toStringSafe = (value: unknown): string => String(value ?? "").trim()
+
+const pickVariantList = (product: any): any[] => {
+  const candidates = [
+    product?.variants,
+    product?.productVariants,
+    product?.variantList,
+    product?.variantOptions,
+  ]
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate) && candidate.length > 0) return candidate
+  }
+  if (product?.firstVariant) return [product.firstVariant]
+  return []
+}
+
 export const mapCategory = (category: any): Category => ({
   id: category.id,
   name: category.title,
@@ -38,11 +54,7 @@ export const mapSubCategory = (subCategory: any) => ({
 })
 
 export const mapProduct = (product: any): Product => {
-  const rawVariants = Array.isArray(product.variants) && product.variants.length > 0
-    ? product.variants
-    : product.firstVariant
-      ? [product.firstVariant]
-      : []
+  const rawVariants = pickVariantList(product)
 
   const firstVariant = product.firstVariant || rawVariants[0]
   const isFlashSale = Boolean(product.isFlashSale)
@@ -90,14 +102,14 @@ export const mapProduct = (product: any): Product => {
     status: product.status || undefined,
     createdAt: product.createdAt || undefined,
     variants: rawVariants.map((variant: any) => ({
-      id: variant.id,
-      color: variant.color || "",
-      size: variant.size || "",
+      id: String(variant.id || variant._id || ""),
+      color: toStringSafe(variant.color ?? variant.colorName),
+      size: toStringSafe(variant.size ?? variant.storage ?? variant.capacity),
       actualPrice: Number(variant.actualPrice || 0),
       discountedPrice: Number(variant.discountedPrice || 0),
       flashSalePrice: variant.flashSalePrice != null ? Number(variant.flashSalePrice) : undefined,
-      image: toAbsoluteUploadUrl(variant.imageUrl),
-      barcodeUrl: toAbsoluteUploadUrl(variant.barcodeUrl),
+      image: toAbsoluteUploadUrl(variant.imageUrl || variant.image),
+      barcodeUrl: toAbsoluteUploadUrl(variant.barcodeUrl || variant.barcode),
     })),
   }
 }

@@ -14,7 +14,6 @@ const navGroups = [
   {
     title: "Account",
     links: [
-      { label: "Track Your Order", href: "/orders" },
       { label: "Help & Support", href: "/support" },
       { label: "More", href: "/more" },
     ],
