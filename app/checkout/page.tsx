@@ -3,11 +3,13 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { ArrowLeft, Link2 } from "lucide-react"
+import { ArrowLeft, Link2, Loader2 } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 import { useCart } from "@/contexts/cart-context"
 import { useProducts } from "@/lib/use-store-data"
 import { TickLottie } from "./success/tick-lottie"
+import { placeOrderAPI } from "@/src/api/orders/placeOrder"
+import { notify } from "@/lib/notify"
 
 const BD_API_BASE = "https://bdapi.vercel.app/api/v.1"
 
@@ -17,8 +19,11 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart, appliedPromo } = useCart()
   const { products } = useProducts()
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [orderCode, setOrderCode] = useState("")
+  
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -27,6 +32,7 @@ export default function CheckoutPage() {
     union: "",
     notes: "",
   })
+  
   const [districts, setDistricts] = useState<District[]>([])
   const [unions, setUnions] = useState<string[]>([])
   const [districtLoading, setDistrictLoading] = useState(false)
@@ -45,39 +51,51 @@ export default function CheckoutPage() {
 
   const selectedDistrict = districts.find((d) => d.district === form.district)
 
-  const onCheckout = () => {
+  const onCheckout = async () => {
     if (!form.name || !form.phone || !form.address || !form.district) {
-      alert("Please fill in all required fields (Name, Phone, Address, District)")
+      notify.error({ title: "Validation Error", message: "Please fill in all required fields (Name, Phone, Address, District)" })
       return
     }
 
-    const code = "EC" + Math.floor(Math.random() * 100000000).toString().padStart(8, "0")
-    
-    // Save to localStorage for demo purposes
-    const subtotal = enriched.reduce((s, i: any) => s + i.product.price * i.quantity, 0)
-    const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0
-    const total = Math.max(0, subtotal + 15 - discountAmount)
-    
-    const newOrder = {
-      code,
-      status: "Pending",
-      amount: total,
-      phone: form.phone,
-      promoCode: appliedPromo?.code || null,
-      discountAmount: discountAmount,
-      createdAt: new Date().toISOString(),
-    }
-    
-    const existingRaw = typeof window !== "undefined" ? localStorage.getItem("customer_orders") : null
-    const existing = existingRaw ? JSON.parse(existingRaw) : []
-    if (typeof window !== "undefined") {
-      localStorage.setItem("customer_orders", JSON.stringify([newOrder, ...existing]))
+    if (items.length === 0) {
+      notify.error({ title: "Error", message: "Your cart is empty." })
+      return
     }
 
-    setOrderCode(code)
-    setIsSuccess(true)
-    clearCart()
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    try {
+      setIsSubmitting(true)
+
+      const payload = {
+        customerName: form.name,
+        customerPhone: form.phone,
+        address: form.address,
+        district: form.district,
+        union: form.union || null,
+        orderNotes: form.notes || null,
+        promoCode: appliedPromo?.code || null,
+        items: items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          color: item.color || null,
+          size: item.storage || null // 'storage' in cart item maps to 'size' in backend variant
+        }))
+      }
+
+      const orderData = await placeOrderAPI(payload)
+
+      setOrderCode(orderData.code)
+      setIsSuccess(true)
+      clearCart()
+      window.scrollTo({ top: 0, behavior: "smooth" })
+      
+    } catch (error: any) {
+      notify.error({ 
+        title: "Checkout Failed", 
+        message: error.message || "An unexpected error occurred. Please try again." 
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   useEffect(() => {
@@ -295,9 +313,11 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 onClick={onCheckout}
-                className="block w-full rounded-full bg-primary py-4 text-center text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-transform active:scale-[0.98]"
+                disabled={isSubmitting}
+                className="block w-full rounded-full bg-primary py-4 text-center text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-transform active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
               >
-                Place Order
+                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Processing..." : "Place Order"}
               </button>
             </div>
           </div>
