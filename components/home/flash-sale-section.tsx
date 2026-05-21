@@ -5,17 +5,31 @@ import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/ui/product-card"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
-import { LottieIcon } from "@/components/ui/lottie-icon"
 import { getAllActiveFlashSaleProducts } from "@/src/api/flashSale/getAllActiveFlashSaleProducts"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import type { Product } from "@/lib/types"
 
-let flashCache: { items: Product[]; backgroundImage: string } | null = null
-let flashInFlight: Promise<{ items: Product[]; backgroundImage: string }> | null = null
+let flashCache: {
+  items: Product[]
+  backgroundImage: string
+  campaignTitle?: string
+  campaignStartAt?: string | number | null
+  serverTime?: string | number
+} | null = null
+let flashInFlight: Promise<{
+  items: Product[]
+  backgroundImage: string
+  campaignTitle?: string
+  campaignStartAt?: string | number | null
+  serverTime?: string | number
+}> | null = null
 
 export function FlashSaleSection() {
   const [items, setItems] = useState<Product[]>([])
   const [backgroundImage, setBackgroundImage] = useState("")
+  const [campaignTitle, setCampaignTitle] = useState("Flash Sale")
+  const [campaignStartAt, setCampaignStartAt] = useState<string | number | null>(null)
+  const [serverTime, setServerTime] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -37,7 +51,13 @@ export function FlashSaleSection() {
               }))
               const campaign = res?.data?.campaigns?.[0] || {}
               const apiBg = campaign?.bgImage || campaign?.backgroundImage || campaign?.bg || ""
-              return { items: nextItems, backgroundImage: apiBg }
+              return {
+                items: nextItems,
+                backgroundImage: apiBg,
+                campaignTitle: campaign?.title,
+                campaignStartAt: campaign?.startAt,
+                serverTime: res?.data?.serverTime,
+              }
             })
             .finally(() => {
               flashInFlight = null
@@ -48,6 +68,10 @@ export function FlashSaleSection() {
         if (!cancelled) {
           setItems(next.items)
           setBackgroundImage(next.backgroundImage)
+          setCampaignTitle(typeof next.campaignTitle === "string" && next.campaignTitle.trim() ? next.campaignTitle : "Flash Sale")
+          setCampaignStartAt(next.campaignStartAt ?? null)
+          const parsedServerTime = next.serverTime ? new Date(next.serverTime).getTime() : Number.NaN
+          setServerTime(Number.isNaN(parsedServerTime) ? null : parsedServerTime)
         }
       } catch {
         if (!cancelled) {
@@ -66,34 +90,50 @@ export function FlashSaleSection() {
     return null
   }
 
+  const startAtMs = campaignStartAt ? new Date(campaignStartAt).getTime() : null
+  const campaignInitials = campaignTitle
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
     <section className="space-y-3">
-      <div
-        className="relative overflow-hidden rounded-lg border border-border/60 bg-card"
-        style={
-          backgroundImage
-            ? {
+      <div className="px-1">
+        <h2 className="text-sm font-semibold text-muted-foreground">Upcoming Campaigns</h2>
+      </div>
+      <div className="rounded-2xl bg-muted/30 p-3">
+        <div className="relative overflow-hidden rounded-xl border border-border/60 bg-white">
+          {backgroundImage && (
+            <div
+              className="absolute inset-0 opacity-15"
+              style={{
                 backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-              }
-            : undefined
-        }
-      >
-        {backgroundImage && <div className="absolute inset-0 bg-black/25" />}
-        <div className="relative z-10 flex min-h-16 items-center gap-2 p-3 md:min-h-20 md:p-4">
-          <div className="flex shrink-0 items-center gap-2">
-            <LottieIcon
-              src="/fire-animaiton.json"
-              className="block h-7 w-7 md:h-9 md:w-9"
-              ariaLabel="Flash sale"
+              }}
             />
-            <h2 className="text-base font-bold text-foreground md:text-xl">
-              Flash <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #d7f540, #03204f)" }}>Sale</span>
-            </h2>
+          )}
+          <div className="relative flex items-center gap-3 p-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-white shadow-[0_1px_8px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-700">{campaignInitials}</span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-orange-600">Campaign starts in</p>
+                <p className="truncate text-sm font-semibold text-foreground">{campaignTitle}</p>
+              </div>
+            </div>
+            <div className="ml-auto">
+              <CountdownTimer
+                variant="campaign"
+                targetTime={startAtMs ?? undefined}
+                serverTime={serverTime ?? undefined}
+              />
+            </div>
           </div>
-          <div className="min-w-0 flex-1" />
-          <CountdownTimer days={0} hours={0} minutes={0} compact />
         </div>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
