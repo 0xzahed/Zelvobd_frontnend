@@ -45,7 +45,7 @@ export function ProductCard({
       className={cx(
         "group relative flex h-full snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
         compact
-          ? "w-40 shrink-0 sm:w-44"
+          ? "w-44 shrink-0 md:w-48 lg:w-56"
           : emphasis
             ? "w-full p-4 md:h-96 md:max-w-225"
             : "w-full p-2.5 md:h-80 md:max-w-225 md:p-2",

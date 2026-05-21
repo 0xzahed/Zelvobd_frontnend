@@ -173,7 +173,7 @@ export function TrendingProducts({ adminData }: Props) {
       {isProductsLoading ? (
          <div className="flex h-32 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       ) : availableProducts.length === 0 ? (
-         <div className="flex h-32 items-center justify-center rounded-[8px] border border-dashed text-muted-foreground bg-secondary/20">
+         <div className="flex h-32 items-center justify-center rounded-sm border border-dashed text-muted-foreground bg-secondary/20">
            No products found matching filters.
          </div>
       ) : (
@@ -183,7 +183,7 @@ export function TrendingProducts({ adminData }: Props) {
             return (
               <label
                 key={p.id}
-                className={`flex cursor-pointer flex-col gap-2 rounded-[8px] border p-3 transition-colors hover:bg-secondary/30 ${isSelected ? "border-primary bg-primary/5" : "border-border/40 bg-card shadow-sm"}`}
+                className={`flex cursor-pointer flex-col gap-2 rounded-sm border p-3 transition-colors hover:bg-secondary/30 ${isSelected ? "border-primary bg-primary/5" : "border-border/40 bg-card shadow-sm"}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
