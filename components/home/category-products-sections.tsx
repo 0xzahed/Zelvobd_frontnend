@@ -30,6 +30,8 @@ export function CategoryProductsSections() {
     <div className="space-y-6 md:space-y-8">
       {categories.map((category) => {
         const items = productsByCategory.get(category.slug) || []
+        if (items.length === 0) return null
+        
         const visibleItems = items.slice(0, MAX_PER_CATEGORY)
 
         return (

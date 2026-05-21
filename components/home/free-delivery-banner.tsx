@@ -41,7 +41,7 @@ export function FreeDeliveryBanner() {
             href="/free-delivery"
             className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary md:text-xs"
           >
-            See All
+            See All <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
       </div>
