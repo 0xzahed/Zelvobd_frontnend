@@ -159,7 +159,9 @@ export default function AdminSubCategoriesPage() {
             onClick={openAdd}
             className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
-            <Plus className="h-4 w-4" /> Add Sub Category
+            <Plus className="hidden h-4 w-4 md:inline-flex" />
+            <span className="md:hidden">Add</span>
+            <span className="hidden md:inline">Add Sub Category</span>
           </button>
         </div>
       </div>
@@ -198,18 +200,18 @@ export default function AdminSubCategoriesPage() {
                   <button
                     onClick={() => openEdit(sub)}
                     aria-label={`Edit ${sub.name}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white"
+                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white md:gap-1.5"
                   >
-                    <Pencil className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-semibold">Edit</span>
+                    <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    <span className="text-[10px] font-semibold leading-none">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteSub(sub.parentId, sub)}
                     aria-label={`Delete ${sub.name}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white"
+                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white md:gap-1.5"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-semibold">Delete</span>
+                    <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    <span className="text-[10px] font-semibold leading-none">Delete</span>
                   </button>
                 </div>
               </div>

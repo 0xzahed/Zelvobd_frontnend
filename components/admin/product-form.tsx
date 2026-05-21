@@ -297,9 +297,9 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex h-9 items-center gap-1 rounded-md bg-success px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-success/90"
+              className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
-              <Plus className="h-3.5 w-3.5" /> Add Variant
+              Add Variant
             </button>
           </div>
 
@@ -311,18 +311,11 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
             {variants.map((v, idx) => (
               <div
                 key={v.id}
-                className={`rounded-lg border p-4 ${
-                  !v.image || v.image.trim() === ''
-                    ? 'border-accent/50 bg-accent/5'
-                    : 'border-border bg-secondary'
-                }`}
+                className="rounded-lg border border-border/80 bg-background p-4 shadow-sm"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-xs font-semibold text-muted-foreground">
                     Variant {idx + 1}
-                    {(!v.image || v.image.trim() === '') && (
-                      <span className="ml-2 text-accent">✗ Missing image</span>
-                    )}
                   </span>
                   <button
                     type="button"
@@ -335,8 +328,8 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                   </button>
                 </div>
 
-                <div className="flex flex-col gap-4 md:grid md:grid-cols-[80px_1fr]">
-                  <label className="relative flex h-24 w-24 shrink-0 mx-auto md:mx-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-primary/40 bg-card transition hover:border-primary/70 cursor-pointer">
+                <div className="grid gap-4 md:grid-cols-[96px_1fr] md:items-start">
+                  <label className="relative mx-auto flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-border/80 bg-background transition hover:border-primary/70 md:mx-0 cursor-pointer">
                     {v.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -359,29 +352,27 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                     />
                   </label>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <label className="col-span-2 block text-xs md:col-span-1">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <label className="block text-xs">
                       <span className="mb-1.5 block font-semibold text-foreground">Color</span>
                       <input
                         value={v.color}
                         onChange={(e) => updateVariant(v.id, { color: e.target.value })}
-                        placeholder="e.g., Red, Blue"
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
-                    <label className="col-span-2 block text-xs md:col-span-1">
+                    <label className="block text-xs">
                       <span className="mb-1.5 block font-semibold text-foreground">Size</span>
                       <input
                         value={v.size}
                         onChange={(e) => updateVariant(v.id, { size: e.target.value })}
-                        placeholder="e.g., XL, Large"
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Actual Price (৳)</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">Price (৳)</span>
                       <input
                         type="number"
                         min={1}
@@ -390,11 +381,11 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                           updateVariant(v.id, { actualPrice: Number(e.target.value) || 0 })
                         }
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Discounted Price (৳)</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">Discount Price (৳)</span>
                       <input
                         type="number"
                         min={0}
@@ -403,7 +394,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                           updateVariant(v.id, { discountedPrice: Number(e.target.value) || 0 })
                         }
                         required
-                        className="h-10 w-full rounded-md border border-border bg-card px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                        className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
                   </div>
@@ -451,7 +442,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         <button
           type="submit"
           disabled={isSaving}
-          className="rounded-full bg-primary px-8 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
+          className="rounded-md bg-primary px-8 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
         >
           {isSaving ? "Saving..." : initial ? "Save Changes" : "Create Product"}
         </button>

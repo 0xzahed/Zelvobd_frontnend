@@ -179,7 +179,9 @@ export default function AdminCategoriesPage() {
             onClick={openAdd}
             className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
-            <Plus className="h-4 w-4" /> Add Category
+            <Plus className="hidden h-4 w-4 md:inline-flex" />
+            <span className="md:hidden">Add</span>
+            <span className="hidden md:inline">Add Category</span>
           </button>
         </div>
       </div>
@@ -214,26 +216,26 @@ export default function AdminCategoriesPage() {
                   <button
                     onClick={() => void openView(cat)}
                     aria-label={`View ${cat.name}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white"
+                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
                   >
-                    <Eye className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-semibold">View</span>
+                    <Eye className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    <span className="text-[10px] font-semibold leading-none">View</span>
                   </button>
                   <button
                     onClick={() => openEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white"
+                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white md:gap-1.5"
                   >
-                    <Pencil className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-semibold">Edit</span>
+                    <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    <span className="text-[10px] font-semibold leading-none">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDelete(cat)}
                     aria-label={`Delete ${cat.name}`}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white"
+                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white md:gap-1.5"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span className="text-[10px] font-semibold">Delete</span>
+                    <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    <span className="text-[10px] font-semibold leading-none">Delete</span>
                   </button>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Copy, Pencil, Plus, Search, Trash2 } from "lucide-react"
+import { Copy, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/types"
@@ -17,6 +17,7 @@ import {
 import { ProductForm } from "@/components/admin/product-form"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -106,23 +107,40 @@ export default function AdminProductsPage() {
             onClick={() => setAddOpen(true)}
             className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
           >
-            <Plus className="h-4 w-4" /> Add Product
+            <Plus className="hidden h-4 w-4 md:inline-flex" />
+            <span className="md:hidden">Add</span>
+            <span className="hidden md:inline">Add Product</span>
           </button>
         </div>
       </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="no-scrollbar max-h-[85dvh] overflow-y-auto overflow-x-hidden sm:max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>New Product</DialogTitle>
-            <DialogDescription>Add a new product to the catalog.</DialogDescription>
-          </DialogHeader>
-          <ProductForm
-            onSave={handleCreate}
-            onCancel={() => setAddOpen(false)}
-            isSaving={createMutation.isPending}
-            variant="plain"
-          />
+        <DialogContent
+          showCloseButton={false}
+          className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-5xl"
+        >
+          <div className="sticky top-0 z-10 -mx-6 -mt-6 border-b border-border/60 bg-background/95 px-6 pt-1 pb-2 backdrop-blur">
+            <div className="flex items-start justify-between gap-4">
+              <DialogHeader className="text-left">
+                <DialogTitle>New Product</DialogTitle>
+                <DialogDescription>Add a new product to the catalog.</DialogDescription>
+              </DialogHeader>
+              <DialogClose
+                aria-label="Close"
+                className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
+              >
+                <X className="h-4 w-4" />
+              </DialogClose>
+            </div>
+          </div>
+          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
+            <ProductForm
+              onSave={handleCreate}
+              onCancel={() => setAddOpen(false)}
+              isSaving={createMutation.isPending}
+              variant="plain"
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -202,28 +220,28 @@ export default function AdminProductsPage() {
                 <Link
                   href={`/admin/products/${p.id}`}
                   aria-label="Edit"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
                 >
-                  <Pencil className="h-3.5 w-3.5" />
-                  <span className="text-[10px] font-semibold">Edit</span>
+                  <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                  <span className="text-[10px] font-semibold leading-none">Edit</span>
                 </Link>
                 <button
                   onClick={() => handleCopy(p.id)}
                   disabled={copyMutation.isPending}
                   aria-label="Copy"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50 md:gap-1.5"
                 >
-                  <Copy className="h-3.5 w-3.5" />
-                  <span className="text-[10px] font-semibold">Copy</span>
+                  <Copy className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                  <span className="text-[10px] font-semibold leading-none">Copy</span>
                 </button>
                 <button
                   onClick={() => handleDelete(p)}
                   disabled={deleteMutation.isPending}
                   aria-label="Delete"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50 md:gap-1.5"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  <span className="text-[10px] font-semibold">Delete</span>
+                  <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                  <span className="text-[10px] font-semibold leading-none">Delete</span>
                 </button>
               </div>
             </div>
