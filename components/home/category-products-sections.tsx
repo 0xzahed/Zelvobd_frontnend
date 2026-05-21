@@ -37,8 +37,18 @@ export function CategoryProductsSections() {
         return (
           <section key={category.id} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground md:text-xl">
-                {category.name}
+              <h2 className="text-base font-semibold text-foreground md:text-xl">
+                {(() => {
+                  const words = category.name.split(" ");
+                  if (words.length >= 2) {
+                    return (
+                      <>
+                        {words[0]} <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #d7f540, #03204f)" }}>{words[1]}</span> {words.slice(2).join(" ")}
+                      </>
+                    )
+                  }
+                  return category.name;
+                })()}
               </h2>
               <Link
                 href={`/category/${category.slug}`}

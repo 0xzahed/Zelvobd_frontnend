@@ -88,7 +88,9 @@ export function FlashSaleSection() {
               className="block h-7 w-7 md:h-9 md:w-9"
               ariaLabel="Flash sale"
             />
-            <h2 className="text-lg font-bold text-foreground md:text-xl">Flash Sale</h2>
+            <h2 className="text-base font-bold text-foreground md:text-xl">
+              Flash <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #d7f540, #03204f)" }}>Sale</span>
+            </h2>
           </div>
           <div className="min-w-0 flex-1" />
           <CountdownTimer days={0} hours={0} minutes={0} compact />

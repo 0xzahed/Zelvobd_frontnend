@@ -35,7 +35,9 @@ export function FreeDeliveryBanner() {
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-medium text-foreground md:text-xl">Free Delivery</h2>
+        <h2 className="text-base font-medium text-foreground md:text-xl">
+          Free <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #d7f540, #03204f)" }}>Delivery</span>
+        </h2>
         <div className="flex items-center gap-2">
           <Link
             href="/free-delivery"
