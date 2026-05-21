@@ -206,7 +206,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -215,7 +215,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
             type="button"
             onClick={handleShareCopy}
             aria-label="Copy product link"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card text-foreground"
           >
             <Share2 className="h-5 w-5" />
           </button>
@@ -224,7 +224,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
               type="button"
               onClick={() => router.push("/cart")}
               aria-label="Go to cart"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card shadow-sm text-foreground"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-card text-foreground"
             >
               <ShoppingCart className="h-5 w-5" />
             </button>
