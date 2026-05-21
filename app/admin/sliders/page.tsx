@@ -190,7 +190,7 @@ export default function AdminSliders() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-nowrap gap-1">
+                  <div className="flex flex-nowrap gap-1 justify-end">
                     <button
                       onClick={() => openEdit(s)}
                       aria-label="Edit"
