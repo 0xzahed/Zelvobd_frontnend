@@ -79,27 +79,25 @@ export default function AdminFlashSaleListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Flash Sales</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your store's flash sale campaigns and limited-time offers.
-          </p>
+          <h1 className="text-base font-semibold text-foreground md:text-3xl md:font-bold md:tracking-tight">
+            Flash Sales
+          </h1>
         </div>
 
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add New Campaign
+            <Button className="rounded-sm">
+              <Plus className="mr-2 hidden h-4 w-4 md:inline-flex" />
+              <span className="md:hidden">Add</span>
+              <span className="hidden md:inline">Add New Campaign</span>
             </Button>
           </DialogTrigger>
           <DialogContent>
             <form onSubmit={handleCreate}>
               <DialogHeader>
                 <DialogTitle>Create Flash Sale</DialogTitle>
-                <DialogDescription>
-                  Set up a new flash sale campaign. You can add products to it later.
-                </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
@@ -168,7 +166,7 @@ export default function AdminFlashSaleListPage() {
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="flex flex-row justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
                   Cancel
                 </Button>
@@ -194,13 +192,18 @@ export default function AdminFlashSaleListPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
           {campaigns.map((campaign) => (
-            <div key={campaign.id} className="group relative rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
+            <div
+              key={campaign.id}
+              className="group relative rounded-xl border border-border/60 bg-card p-3 shadow-sm transition-shadow hover:shadow-md md:p-5"
+            >
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-foreground line-clamp-1" title={campaign.title}>{campaign.title}</h3>
-                  <div className="mt-1.5 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-foreground line-clamp-1 md:text-base" title={campaign.title}>
+                    {campaign.title}
+                  </h3>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <Badge variant={
                       campaign.status === "ACTIVE" ? "default" :
                       campaign.status === "SCHEDULED" ? "secondary" : "outline"
@@ -235,17 +238,17 @@ export default function AdminFlashSaleListPage() {
                 </DropdownMenu>
               </div>
 
-              <div className="mt-6 space-y-2 text-sm text-muted-foreground">
+              <div className="mt-4 space-y-2 text-xs text-muted-foreground md:mt-6 md:text-sm">
                 <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 opacity-70" />
+                  <CalendarDays className="h-3.5 w-3.5 opacity-70 md:h-4 md:w-4" />
                   <span>{format(new Date(campaign.startAt), "MMM d, yyyy h:mm a")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 opacity-70" />
+                  <Clock className="h-3.5 w-3.5 opacity-70 md:h-4 md:w-4" />
                   <span>{format(new Date(campaign.endAt), "MMM d, yyyy h:mm a")}</span>
                 </div>
-                <div className="flex items-center gap-2 pt-2 border-t mt-3">
-                  <span className="font-medium text-foreground">{campaign.productCount}</span> 
+                <div className="flex items-center gap-2 border-t pt-2 mt-3">
+                  <span className="font-medium text-foreground">{campaign.productCount}</span>
                   <span>products selected</span>
                 </div>
               </div>

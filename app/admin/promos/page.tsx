@@ -113,7 +113,7 @@ export default function AdminPromosPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-foreground">Promo Codes</h2>
+          <h2 className="text-base font-semibold text-foreground">Promo Codes</h2>
           <p className="text-xs text-muted-foreground">{promos.length} total</p>
         </div>
         <div className="flex w-full items-center gap-2 md:w-auto">
@@ -136,7 +136,77 @@ export default function AdminPromosPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm">
+      <div className="space-y-3 md:hidden">
+        {isLoading && (
+          <div className="rounded-[10px] border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
+            Loading promos...
+          </div>
+        )}
+        {!isLoading && filtered.length === 0 && (
+          <div className="rounded-[10px] border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
+            No promo codes found.
+          </div>
+        )}
+        {!isLoading &&
+          filtered.map((p: PromoCode) => (
+            <div key={p.id} className="rounded-[10px] border border-border/60 bg-card p-2.5 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-muted-foreground">Code</p>
+                  <p className="text-sm font-semibold text-foreground">{p.code}</p>
+                </div>
+                <span className="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
+                  {p.discountType === "PERCENT" ? `${p.discountValue}%` : `৳${p.discountValue}`}
+                </span>
+              </div>
+              <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center justify-between">
+                  <span>Usage</span>
+                  <span className="text-foreground">{p.usageCount} times</span>
+                </div>
+                <div>
+                  <p className="mb-1 text-xs text-muted-foreground">Constraints</p>
+                  <div className="space-y-0.5">
+                    {p.minOrderValue && <div>Min: ৳{p.minOrderValue}</div>}
+                    {p.maxDiscount && <div>Max: ৳{p.maxDiscount}</div>}
+                    {p.startDate && <div>From: {new Date(p.startDate).toLocaleDateString()}</div>}
+                    {p.endDate && <div>To: {new Date(p.endDate).toLocaleDateString()}</div>}
+                    {!p.minOrderValue && !p.maxDiscount && !p.startDate && !p.endDate && (
+                      <span>None</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Active</span>
+                  <Switch
+                    checked={p.isActive}
+                    onCheckedChange={(val) => handleToggle(p.id, val)}
+                    disabled={updateMutation.isPending && updateMutation.variables?.id === p.id}
+                  />
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={() => openEdit(p)}
+                  aria-label="Edit"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(p)}
+                  disabled={deleteMutation.isPending}
+                  aria-label="Delete"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-245 text-left text-sm">
             <thead>

@@ -308,25 +308,27 @@ export default function FlashSaleDetailsPage() {
               <DialogTitle>Edit Campaign Time</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="editStartAt">Start Time</Label>
-                <Input 
-                  id="editStartAt" 
-                  type="datetime-local" 
-                  required 
-                  value={timeForm.startAt}
-                  onChange={e => setTimeForm({ ...timeForm, startAt: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="editEndAt">End Time</Label>
-                <Input 
-                  id="editEndAt" 
-                  type="datetime-local" 
-                  required 
-                  value={timeForm.endAt}
-                  onChange={e => setTimeForm({ ...timeForm, endAt: e.target.value })}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editStartAt">Start Time</Label>
+                  <Input 
+                    id="editStartAt" 
+                    type="datetime-local" 
+                    required 
+                    value={timeForm.startAt}
+                    onChange={e => setTimeForm({ ...timeForm, startAt: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editEndAt">End Time</Label>
+                  <Input 
+                    id="editEndAt" 
+                    type="datetime-local" 
+                    required 
+                    value={timeForm.endAt}
+                    onChange={e => setTimeForm({ ...timeForm, endAt: e.target.value })}
+                  />
+                </div>
               </div>
             </div>
             <DialogFooter>
