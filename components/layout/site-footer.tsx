@@ -114,9 +114,22 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-slate-800 pt-5 text-xs text-slate-500 md:flex-row md:items-center">
-          <p>© {new Date().getFullYear()} EcoMerce. All rights reserved.</p>
-          <p>Made with care for shoppers everywhere.</p>
+        <div className="mt-8 border-t border-slate-800 pt-5">
+          <div className="flex justify-center">
+            <Link href="/" className="flex items-center gap-2" aria-label="Parpelia home">
+              <Image
+                src="/logo1.png"
+                alt="Parpelia"
+                width={110}
+                height={36}
+                className="h-auto w-auto max-w-[110px] object-contain brightness-0 invert"
+              />
+            </Link>
+          </div>
+
+          <p className="mt-4 text-center text-xs tracking-wide text-slate-500">
+            © {new Date().getFullYear()} — Parpelia. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

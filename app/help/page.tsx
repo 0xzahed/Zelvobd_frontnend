@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ChevronDown, MessageCircle } from "lucide-react"
+import { ChevronDown, MessageCircle, Phone, MessageSquareText } from "lucide-react"
+import { FaWhatsapp } from "react-icons/fa"
 import Image from "next/image"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
@@ -36,70 +37,79 @@ const faqs = [
 ]
 
 export default function HelpPage() {
-  const [open, setOpen] = useState<number | null>(0)
+  const [open, setOpen] = useState<number | null>(null)
 
   return (
     <AppShell>
       <BackHeader title="Help Center" />
       <div className="mx-auto max-w-md space-y-5 py-4 md:py-6">
 
+        <div className="px-1 text-center">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Need assistance? Our support team is always ready to help you.
+          </p>
+        </div>
+
         {/* Hero Avatar */}
-        <div className="flex flex-col items-center gap-3 px-1">
-          <div className="relative h-32 w-32 overflow-hidden rounded-[8px] border border-border/20">
+        <div className="flex flex-col items-center gap-4 px-1">
+          <div className="relative h-64 w-64 overflow-hidden rounded-[18px] bg-transparent">
             <Image
               src="/call-icon.png"
               alt="Customer Service"
               fill
-              className="object-contain p-4"
+              className="object-contain p-1"
             />
           </div>
-          <p className="text-center text-sm text-muted-foreground">
-            Need help? We are here for you 24/7
-          </p>
         </div>
 
         {/* Action Buttons */}
         <section className="space-y-3 px-1">
+          <Link
+            href="/chat"
+            className="flex h-14 items-center justify-center gap-2 rounded-full border-2 border-border/70 bg-transparent px-3 py-3 text-foreground transition hover:bg-muted/20 active:scale-[0.98]"
+          >
+            <MessageSquareText className="h-5 w-5 shrink-0" />
+            <span className="text-sm font-semibold">Live Chat</span>
+          </Link>
+
           <div className="grid grid-cols-2 gap-3">
             {/* Chat (WhatsApp style) */}
-            <a href="https://wa.me/8801790939394" target="_blank" rel="noopener noreferrer" className="contents">
-              <button className="flex items-center justify-center gap-2 rounded-full border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-[#25D366] transition active:scale-[0.98]">
-                <MessageCircle className="h-5 w-5 shrink-0" />
-                <span className="text-sm font-semibold">Chat</span>
-              </button>
+            <a
+              href="https://wa.me/8801790939394"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-14 items-center justify-center gap-3 rounded-full bg-[#25D366] px-4 py-3 text-white transition hover:opacity-95 active:scale-[0.98]"
+            >
+              <FaWhatsapp className="h-10 w-10 shrink-0" />
+              <span className="text-lg font-semibold">Chat</span>
             </a>
-            {/* Messenger */}
-            <Link href="/chat" className="contents">
-              <button className="flex items-center justify-center gap-2 rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-3 text-blue-500 transition active:scale-[0.98]">
-                <MessageCircle className="h-5 w-5 shrink-0" />
-                <span className="text-sm font-semibold">Messenger</span>
-              </button>
-            </Link>
+            {/* Call */}
+            <a
+              href="tel:+8801790939394"
+              className="flex h-14 items-center justify-center gap-3 rounded-full bg-primary px-4 py-3 text-white transition hover:opacity-95 active:scale-[0.98]"
+            >
+              <Phone className="h-8 w-8 shrink-0" />
+              <span className="text-lg font-semibold">Call</span>
+            </a>
           </div>
-          {/* Call - full width red pill */}
-          <a href="tel:+8801790939394" className="contents">
-            <button className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white transition active:scale-[0.98]">
-              Call
-            </button>
-          </a>
         </section>
 
         <section className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-lg font-semibold text-foreground md:text-xl">Frequently Asked Questions</h2>
           </div>
-          <ul className="space-y-2.5">
+          <ul className="space-y-1">
             {faqs.map((f, i) => (
-              <li key={i} className="overflow-hidden rounded-[6px] border border-border/30 bg-card shadow-sm">
+              <li key={i} className="overflow-hidden bg-transparent">
                 <button
                   onClick={() => setOpen((v) => (v === i ? null : i))}
-                  className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-muted/30"
+                  className="flex w-full items-center justify-between gap-3 rounded-none px-1 py-4 text-left transition-colors hover:bg-muted/20"
                   aria-expanded={open === i}
                 >
                   <span className="text-sm font-medium text-foreground">{f.q}</span>
                   <ChevronDown
                     className={cx(
-                      "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300",
+                      "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300",
                       open === i && "rotate-180",
                     )}
                   />
@@ -111,7 +121,7 @@ export default function HelpPage() {
                   )}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
+                    <p className="px-1 pb-4 text-sm leading-relaxed text-muted-foreground">
                       {f.a}
                     </p>
                   </div>
@@ -124,4 +134,3 @@ export default function HelpPage() {
     </AppShell>
   )
 }
-
