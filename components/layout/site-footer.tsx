@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react"
+import Image from "next/image"
 
 const navGroups = [
   {
@@ -52,10 +53,7 @@ export function SiteFooter() {
           {/* Brand */}
           <div className="md:col-span-4">
             <Link href="/" className="flex items-center gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
-                E
-              </span>
-              <span className="text-xl font-bold text-slate-100">EcoMerce</span>
+              <Image src="/logo1.png" alt="EcoMerce" width={150} height={50} />
             </Link>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
               Everyday essentials and the latest tech, delivered fast with care.

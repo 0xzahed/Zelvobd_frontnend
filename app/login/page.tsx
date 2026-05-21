@@ -7,6 +7,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
+import Image from "next/image"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -51,14 +52,11 @@ export default function LoginPage() {
     <div className="min-h-dvh bg-background">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary text-lg font-bold text-white">
-              E
-            </span>
-            <span className="text-2xl font-bold text-foreground">EcoMerce</span>
+          <div className="mb-2">
+            <Image src="/logo1.png" alt="EcoMerce" width={150} height={50} />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Admin Login</h1>
             <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your store</p>
           </div>
         </div>
@@ -67,14 +65,14 @@ export default function LoginPage() {
           <div>
             <label className="mb-1 block text-xs font-medium text-foreground">Email</label>
             <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 cursor-text">
-              <Mail className="h-4 w-4 text-muted-foreground" />
+              <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="adminemail@example.com"
                 required
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
+                className="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
               />
             </div>
           </div>
@@ -82,20 +80,20 @@ export default function LoginPage() {
           <div>
             <label className="mb-1 block text-xs font-medium text-foreground">Password</label>
             <div className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 cursor-text">
-              <Lock className="h-4 w-4 text-muted-foreground" />
+              <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 type={showPw ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 required
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
+                className="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground cursor-text caret-current"
               />
               <button
                 type="button"
                 onClick={() => setShowPw((v) => !v)}
                 aria-label={showPw ? "Hide password" : "Show password"}
-                className="text-muted-foreground"
+                className="shrink-0 text-muted-foreground"
               >
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

@@ -7,6 +7,7 @@ import { Search, ShoppingCart } from "lucide-react"
 import { NotificationBell } from "@/components/ui/notification-bell"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { useCart } from "@/contexts/cart-context"
+import Image from "next/image"
 
 export function MobileHeader() {
   const [searchOpen, setSearchOpen] = useState(false)
@@ -45,10 +46,7 @@ export function MobileHeader() {
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
-              E
-            </span>
-            {!searchOpen && <span className="truncate text-lg font-bold text-foreground">EcoMerce</span>}
+            <Image src="/logo1.png" alt="EcoMerce" width={100} height={50} />
           </Link>
 
           {/* Expanding inline search input. Uses min-w-0 so flex can shrink without overflow. */}
