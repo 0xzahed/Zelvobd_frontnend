@@ -85,6 +85,7 @@ const MENU: NavItem[] = [
   { section: "Support", label: "Live Chat", icon: MessageSquare, href: "/admin/chat" },
   { section: "System", label: "Admins", icon: ShieldCheck, href: "/admin/admins" },
   { section: "System", label: "Settings", icon: Settings, href: "/admin/settings" },
+  { section: "System", label: "Footer", icon: Settings2, href: "/admin/footer" },
 ]
 
 function isChildActive(pathname: string, href: string) {
