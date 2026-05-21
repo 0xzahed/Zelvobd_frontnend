@@ -28,6 +28,10 @@ export function FreeDeliveryBanner() {
     void load()
   }, [])
 
+  if (freeDelivery.length === 0) {
+    return null
+  }
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">

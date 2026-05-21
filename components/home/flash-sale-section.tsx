@@ -62,6 +62,10 @@ export function FlashSaleSection() {
     }
   }, [])
 
+  if (items.length === 0) {
+    return null
+  }
+
   return (
     <section className="space-y-3">
       <div

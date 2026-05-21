@@ -41,7 +41,7 @@ export function MobileHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border/40 bg-white shadow-[0_2px_10px_rgba(15,23,42,0.08)] md:hidden">
+      <header className="sticky top-0 z-40 border-b border-border/40 bg-white md:hidden">
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5">
