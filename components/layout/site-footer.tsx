@@ -113,15 +113,15 @@ export function SiteFooter() {
 
             <ul className="mt-4 space-y-2 text-sm text-slate-400">
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-amber-300" />
+                <Mail className="h-4 w-4 text-primary" />
                 <span>{footer.supportEmail}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-amber-300" />
+                <Phone className="h-4 w-4 text-primary" />
                 <span>{footer.supportPhone}</span>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-amber-300" />
+                <MapPin className="h-4 w-4 text-primary" />
                 <span>{footer.supportAddress}</span>
               </li>
             </ul>
@@ -137,7 +137,7 @@ export function SiteFooter() {
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="text-sm text-slate-400 transition hover:text-amber-300"
+                        className="text-sm text-slate-400 transition hover:text-primary"
                       >
                         {l.label}
                       </Link>
@@ -160,7 +160,7 @@ export function SiteFooter() {
                     key={label}
                     href={href}
                     aria-label={label}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-amber-300 hover:text-amber-300"
+                    className="grid h-9 w-9 place-items-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-primary hover:text-primary"
                   >
                     {Icon ? <Icon className="h-4 w-4" /> : <span className="text-xs font-semibold">{fallback}</span>}
                   </a>

@@ -9,6 +9,8 @@ type Settings = {
   freeDeliveryThreshold: number
   deliveryFee: number
   announcement: string
+  floatingIconImages: string[]
+  floatingIconIntervalSec: number
 }
 
 const defaults: Settings = {
@@ -18,6 +20,8 @@ const defaults: Settings = {
   freeDeliveryThreshold: 50,
   deliveryFee: 4.99,
   announcement: "Free delivery for orders over $50",
+  floatingIconImages: ["/placeholder-user.jpg", "/demo-product-2.jpg", "/demo-product-3.jpg"],
+  floatingIconIntervalSec: 3,
 }
 
 export default function AdminSettingsPage() {
@@ -46,6 +50,27 @@ export default function AdminSettingsPage() {
   function reset() {
     setSettings(defaults)
     localStorage.removeItem("ecomerce_settings")
+  }
+
+  async function addFloatingImages(files: File[]) {
+    if (files.length === 0) return
+    const results = await Promise.all(
+      files.map(
+        (file) =>
+          new Promise<string>((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(String(reader.result ?? ""))
+            reader.onerror = () => resolve("")
+            reader.readAsDataURL(file)
+          })
+      )
+    )
+    const images = results.filter(Boolean)
+    if (images.length === 0) return
+    setSettings((prev) => ({
+      ...prev,
+      floatingIconImages: [...prev.floatingIconImages, ...images],
+    }))
   }
 
   return (
@@ -121,6 +146,61 @@ export default function AdminSettingsPage() {
           <input
             value={settings.announcement}
             onChange={(e) => update("announcement", e.target.value)}
+            className="input"
+          />
+        </Field>
+
+        <Field label="Floating icon images" full>
+          <div className="space-y-3">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.currentTarget.files ?? [])
+                void addFloatingImages(files)
+                e.currentTarget.value = ""
+              }}
+              className="input"
+            />
+            {settings.floatingIconImages.length > 0 ? (
+              <div className="flex flex-wrap gap-3">
+                {settings.floatingIconImages.map((src, index) => (
+                  <div key={`${src}-${index}`} className="relative h-14 w-14">
+                    <img
+                      src={src}
+                      alt={`Floating icon ${index + 1}`}
+                      className="h-14 w-14 rounded-full border border-border object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          floatingIconImages: prev.floatingIconImages.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-destructive text-xs font-semibold text-white"
+                      aria-label="Remove image"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">No images added yet.</p>
+            )}
+          </div>
+        </Field>
+
+        <Field label="Floating icon change interval (seconds)" full>
+          <input
+            type="number"
+            min={1}
+            step={0.5}
+            value={settings.floatingIconIntervalSec}
+            onChange={(e) => update("floatingIconIntervalSec", Number(e.target.value) || 1)}
             className="input"
           />
         </Field>

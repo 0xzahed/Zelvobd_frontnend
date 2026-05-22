@@ -107,7 +107,7 @@ export function ProductCard({
         {/* Current price */}
         <div
           className={cx(
-            "mt-1 truncate whitespace-nowrap font-medium text-foreground",
+            "mt-1 truncate whitespace-nowrap font-semibold text-foreground",
             compact
               ? "text-[15px]"
               : emphasis
