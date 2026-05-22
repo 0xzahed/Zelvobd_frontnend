@@ -56,14 +56,14 @@ export function CountdownTimer({
   const activeVariant = variant ?? (compact ? "compact" : "default")
   const boxCls =
     activeVariant === "campaign"
-      ? "grid h-8 min-w-8 place-items-center rounded-md bg-slate-800 px-2 text-xs font-semibold text-white shadow-sm"
+      ? "grid h-9 min-w-9 place-items-center rounded-lg bg-slate-700 px-2 text-xs font-semibold text-white shadow-sm"
       : activeVariant === "compact"
         ? "grid h-7 min-w-7 place-items-center rounded border border-border/70 bg-white px-1.5 text-xs font-bold text-foreground shadow-sm"
         : "grid h-9 min-w-9 place-items-center rounded-md bg-foreground px-2 text-sm font-bold text-white"
 
   const sepCls =
     activeVariant === "campaign"
-      ? "text-xs font-bold text-slate-500"
+      ? "text-xs font-bold text-slate-400"
       : activeVariant === "compact"
         ? "text-xs font-bold text-foreground"
         : "text-base font-bold text-foreground"
