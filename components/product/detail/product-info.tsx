@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { ListChecks, Minus, Plus } from "lucide-react"
 import { cx, formatBDT } from "@/lib/format"
 import type { Product, ProductVariant } from "@/lib/types"
@@ -75,6 +74,16 @@ export function ProductInfo({
   const isFlashSale = product.isFlashSale
   const price = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.flashSalePrice : (activeVariant?.discountedPrice || product.price)
   const cutPrice = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.discountedPrice : (activeVariant?.actualPrice || product.cutPrice)
+  const availableSizes = selectedColor
+    ? Array.from(
+        new Set(
+          product.variants
+            ?.filter((variant) => variant.color?.trim().toLowerCase() === selectedColor.trim().toLowerCase())
+            .map((variant) => variant.size?.trim())
+            .filter(Boolean) ?? [],
+        ),
+      )
+    : uniqueSizes
 
   return (
     <div className="space-y-5 md:space-y-6">
@@ -83,6 +92,11 @@ export function ProductInfo({
         <h1 className="wrap-break-word text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
           {product.name}
         </h1>
+        {product.brand && (
+          <p className="text-sm text-muted-foreground">
+            by: <span className="font-medium text-primary">{product.brand}</span>
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="min-w-0 flex items-baseline flex-wrap gap-2">
             <span className="text-xl font-medium text-[#292929] md:text-2xl">{formatBDT(price)}</span>
@@ -112,21 +126,13 @@ export function ProductInfo({
             </button>
           </div>
         </div>
-        {product.brand && (
-          <p className="text-xs text-muted-foreground">
-            by{" "}
-            <Link href="#" className="font-medium text-primary">
-              {product.brand}
-            </Link>
-          </p>
-        )}
       </div>
 
       {/* Colors */}
       {uniqueColors.length > 0 && (
         <div>
           <p className="mb-2 text-sm font-medium text-foreground">Color</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
               return (
@@ -136,7 +142,7 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex shrink-0 items-center gap-2 rounded-full border bg-transparent px-3 py-1.5 text-left transition md:px-4",
+                    "flex h-full min-w-0 items-center gap-2 rounded-full border bg-transparent px-3 py-1.5 text-left transition md:shrink-0 md:px-4",
                     selected
                       ? "border-primary text-primary"
                       : "border-border/60 text-foreground hover:border-border",
@@ -156,11 +162,11 @@ export function ProductInfo({
       )}
 
       {/* Sizes */}
-      {uniqueSizes.length > 0 && (
+      {availableSizes.length > 0 && (
         <div>
           <p className="mb-2 text-sm font-medium text-foreground">Size</p>
           <div className="flex flex-wrap gap-2">
-            {uniqueSizes.map((s) => {
+            {availableSizes.map((s) => {
               const selected = selectedSize === s
               return (
                 <button
