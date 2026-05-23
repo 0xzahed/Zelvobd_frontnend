@@ -126,7 +126,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
       color: v.color.trim() || "Default",
-      size: v.size.trim() || "Standard",
+      size: v.size.trim(),
       actualPrice: Math.max(0, Number(v.actualPrice) || 0),
       discountedPrice: Math.max(0, Number(v.discountedPrice) || 0),
       image: v.image || undefined,
@@ -367,7 +367,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                       <input
                         value={v.size}
                         onChange={(e) => updateVariant(v.id, { size: e.target.value })}
-                        required
+                        placeholder="Optional"
                         className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
@@ -417,7 +417,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
               {videoName ? videoName : "Click to upload video"}
             </span>
             <span className="text-xs text-muted-foreground">
-              Maximum video size 500 MB
+              Maximum video size 100 MB
             </span>
           </button>
           <input

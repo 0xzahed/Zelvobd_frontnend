@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Copy, Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { Copy, Eye, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/types"
@@ -15,6 +15,7 @@ import {
   useToggleProductField,
 } from "@/src/hooks/api/useProducts"
 import { ProductForm } from "@/components/admin/product-form"
+import { ProductViewDialog } from "@/components/admin/product-view-dialog"
 import {
   Dialog,
   DialogClose,
@@ -35,6 +36,7 @@ export default function AdminProductsPage() {
 
   const [q, setQ] = useState("")
   const [addOpen, setAddOpen] = useState(false)
+  const [viewProductId, setViewProductId] = useState<string | null>(null)
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
@@ -82,7 +84,10 @@ export default function AdminProductsPage() {
   const filtered = useMemo(() => {
     const lc = q.toLowerCase().trim()
     if (!lc) return products
-    return products.filter((p: any) => p.name.toLowerCase().includes(lc) || p.brand.toLowerCase().includes(lc))
+    return products.filter(
+      (p: any) =>
+        p.name.toLowerCase().includes(lc) || (p.brand || "").toLowerCase().includes(lc),
+    )
   }, [products, q])
 
   return (
@@ -144,10 +149,20 @@ export default function AdminProductsPage() {
         </DialogContent>
       </Dialog>
 
+      <ProductViewDialog
+        productId={viewProductId}
+        open={Boolean(viewProductId)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setViewProductId(null)
+          }
+        }}
+      />
+
       {/* Cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {isLoading && (
-          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+          <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
             <div className="flex flex-col items-center justify-center gap-2">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               <p className="text-xs text-muted-foreground">Loading products...</p>
@@ -155,13 +170,13 @@ export default function AdminProductsPage() {
           </div>
         )}
         {!isLoading && filtered.length === 0 && (
-          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+          <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
             No products found.
           </div>
         )}
         {!isLoading && filtered.map((p: any) => (
-          <div key={p.id} className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden">
-            <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
+          <div key={p.id} className="flex rounded-sm border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden">
+            <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-sm border-r border-border/40 bg-muted/10">
               <Image
                 src={p.images?.[0] || "/placeholder.svg"}
                 alt={p.name}
@@ -171,7 +186,7 @@ export default function AdminProductsPage() {
                 unoptimized
               />
             </div>
-            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[140px]">
+            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-35">
               <div>
                 <div className="min-w-0 space-y-1">
                   <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
@@ -217,6 +232,15 @@ export default function AdminProductsPage() {
                 </div>
               </div>
               <div className="flex w-full gap-1 mt-3">
+                <button
+                  type="button"
+                  onClick={() => setViewProductId(p.id)}
+                  aria-label="View"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
+                >
+                  <Eye className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                  <span className="text-[10px] font-semibold leading-none">View</span>
+                </button>
                 <Link
                   href={`/admin/products/${p.id}`}
                   aria-label="Edit"

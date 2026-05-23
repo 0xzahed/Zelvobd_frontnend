@@ -58,7 +58,7 @@ const buildProductFormData = async (
         {
           id: "default",
           color: "Default",
-          size: "Standard",
+          size: "",
           actualPrice: product.price || 0,
           discountedPrice: product.cutPrice || product.price || 0,
           image: product.images?.[0],
@@ -88,6 +88,7 @@ const buildProductFormData = async (
   formData.append("categoryId", categoryId)
   formData.append("subCategoryId", subCategoryId)
   formData.append("title", product.name?.trim() || "Untitled Product")
+  formData.append("brand", product.brand?.trim() || "")
   formData.append("descriptionDelta", JSON.stringify(finalDescriptionDelta))
   formData.append("descriptionHtml", descriptionHtml)
   
@@ -101,7 +102,7 @@ const buildProductFormData = async (
   }
   
   formData.append("weight", product.weight?.trim() || "N/A")
-  formData.append("material", product.material?.trim() || "N/A")
+  formData.append("material", product.material?.trim() || "")
   formData.append("stock", String(product.stock))
   formData.append("availability", String(product.availability))
 
@@ -109,7 +110,7 @@ const buildProductFormData = async (
     actualPrice,
     discountedPrice,
     color,
-    size,
+    size: size?.trim() || "",
   }))
   
   console.log(`[buildProductFormData] Appending ${variantJsonPayload.length} variant(s) to JSON payload`)
