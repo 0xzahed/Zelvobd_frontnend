@@ -13,6 +13,7 @@ export type Product = {
   id: string
   name: string
   brand: string
+  descriptionDelta?: any
   categoryId?: string
   subCategoryId?: string
   categorySlug?: string
@@ -27,6 +28,7 @@ export type Product = {
   images: string[]
   features: string[]
   description: string
+  extraDescriptionDelta?: any
   extraDescription?: string
   isTrending: boolean
   isFlashSale: boolean

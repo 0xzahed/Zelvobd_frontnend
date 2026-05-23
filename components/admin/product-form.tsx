@@ -46,10 +46,12 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const [name, setName] = useState(initial?.name ?? "")
   const [brand, setBrand] = useState(initial?.brand ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
-  const [descriptionDelta, setDescriptionDelta] = useState<any>(null)
+  const [descriptionDelta, setDescriptionDelta] = useState<any>(initial?.descriptionDelta ?? null)
   
   const [extraDescription, setExtraDescription] = useState(initial?.extraDescription ?? "")
-  const [extraDescriptionDelta, setExtraDescriptionDelta] = useState<any>(null)
+  const [extraDescriptionDelta, setExtraDescriptionDelta] = useState<any>(
+    initial?.extraDescriptionDelta ?? null,
+  )
   
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "")
   const [subCategoryId, setSubCategoryId] = useState(initial?.subCategoryId ?? "")
@@ -238,6 +240,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           label="Description"
           required
           value={description}
+          deltaValue={descriptionDelta}
           onChange={(html, delta) => {
             setDescription(html)
             setDescriptionDelta(delta)
@@ -249,6 +252,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         <QuillEditor
           label="Extra description"
           value={extraDescription}
+          deltaValue={extraDescriptionDelta}
           onChange={(html, delta) => {
             setExtraDescription(html)
             setExtraDescriptionDelta(delta)

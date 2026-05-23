@@ -13,6 +13,7 @@ import "./quill/quill-custom.css"
 type QuillEditorProps = {
   label: string
   value: string
+  deltaValue?: any
   onChange: (html: string, delta?: any) => void
   placeholder?: string
   required?: boolean
@@ -97,10 +98,18 @@ const stripDuplicateListPrefixes = (html: string) => {
   return doc.body.innerHTML
 }
 
-export function QuillEditor({ label, value, onChange, placeholder, required }: QuillEditorProps) {
+export function QuillEditor({
+  label,
+  value,
+  deltaValue,
+  onChange,
+  placeholder,
+  required,
+}: QuillEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const quillRef = useRef<Quill | null>(null)
   const currentRef = useRef<string>("")
+  const currentDeltaRef = useRef<string>("")
   const [isIconModalOpen, setIsIconModalOpen] = useState(false)
 
   const imageHandler = useCallback(() => {
@@ -199,6 +208,7 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
       const html = quill.root.innerHTML
       const delta = quill.getContents()
       currentRef.current = html
+      currentDeltaRef.current = JSON.stringify(delta)
       onChange(html, delta)
     })
   }, [onChange, placeholder, imageHandler, lucideIconHandler])
@@ -206,11 +216,23 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
   useEffect(() => {
     const quill = quillRef.current
     if (!quill) return
+
+    const serializedDelta = deltaValue ? JSON.stringify(deltaValue) : ""
+    if (serializedDelta && serializedDelta !== currentDeltaRef.current) {
+      quill.setContents(deltaValue, "silent")
+      currentRef.current = quill.root.innerHTML
+      currentDeltaRef.current = serializedDelta
+      return
+    }
+
     if (value === currentRef.current) return
+
     const normalized = stripDuplicateListPrefixes(value || "")
-    quill.clipboard.dangerouslyPasteHTML(normalized)
-    currentRef.current = normalized
-  }, [value])
+    const convertedDelta = quill.clipboard.convert({ html: normalized })
+    quill.setContents(convertedDelta, "silent")
+    currentRef.current = quill.root.innerHTML
+    currentDeltaRef.current = JSON.stringify(quill.getContents())
+  }, [value, deltaValue])
 
   const handleIconInsert = (svgHtml: string) => {
     const quill = quillRef.current
@@ -223,11 +245,6 @@ export function QuillEditor({ label, value, onChange, placeholder, required }: Q
 
   return (
     <div className="text-sm">
-      {/* Import Google Fonts */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
-      `}} />
-
       <label className="mb-1 block text-foreground">
         {label} {required && <span className="text-accent">*</span>}
       </label>
