@@ -145,8 +145,8 @@ export default function AdminSubCategoriesPage() {
           <h2 className="text-lg font-bold text-foreground">Sub-Categories</h2>
           <p className="text-xs text-muted-foreground">{rows.length} total</p>
         </div>
-        <div className="flex w-full items-center gap-2">
-          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
+        <div className="flex w-full flex-wrap items-center gap-2">
+          <div className="flex h-10 min-w-0 flex-[2] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={query}
@@ -154,6 +154,20 @@ export default function AdminSubCategoriesPage() {
               placeholder="Search sub-categories..."
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
+          </div>
+          <div className="min-w-[220px] flex-1">
+            <AdminSelect
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="h-10"
+            >
+              <option value="">Select category...</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </AdminSelect>
           </div>
           <button
             onClick={openAdd}
