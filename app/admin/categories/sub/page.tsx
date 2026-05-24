@@ -159,7 +159,7 @@ export default function AdminSubCategoriesPage() {
             <AdminSelect
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(e.target.value)}
-              className="h-10"
+              className="h-10 rounded-sm"
             >
               <option value="">Select category...</option>
               {categories.map((c) => (
