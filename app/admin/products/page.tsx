@@ -160,7 +160,7 @@ export default function AdminProductsPage() {
       />
 
       {/* Cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {isLoading && (
           <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
             <div className="flex flex-col items-center justify-center gap-2">
@@ -175,28 +175,32 @@ export default function AdminProductsPage() {
           </div>
         )}
         {!isLoading && filtered.map((p: any) => (
-          <div key={p.id} className="flex rounded-sm border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden">
-            <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-sm border-r border-border/40 bg-muted/10">
+          <div key={p.id} className="flex flex-col overflow-hidden rounded-sm border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 sm:flex-row">
+            <div className="relative h-44 w-full shrink-0 overflow-hidden border-b border-border/40 bg-muted/10 sm:h-auto sm:w-32 sm:border-b-0 sm:border-r">
               <Image
                 src={p.images?.[0] || "/placeholder.svg"}
                 alt={p.name}
                 fill
-                sizes="112px"
-                className="object-contain p-1.5"
+                sizes="(max-width: 640px) 100vw, 128px"
+                className="object-contain p-2"
                 unoptimized
               />
             </div>
-            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-35">
+            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 sm:p-3.5 min-h-0 sm:min-h-35">
               <div>
                 <div className="min-w-0 space-y-1">
-                  <p className="line-clamp-1 text-sm font-semibold text-foreground">{p.name}</p>
+                  <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground sm:line-clamp-1">
+                    {p.name}
+                  </p>
                   <p className="text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
                   <p className="text-[10px] text-muted-foreground">
                     {p.categoryName || p.categorySlug || "Uncategorized"}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">{formatBDT(p.price)}</span>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium text-foreground sm:text-base">
+                    {formatBDT(p.price)}
+                  </span>
                   {p.discount > 0 && (
                     <span className="rounded bg-accent/10 px-1.5 py-px text-[10px] font-semibold text-accent">
                       -{p.discount}%
@@ -231,12 +235,12 @@ export default function AdminProductsPage() {
                   )}
                 </div>
               </div>
-              <div className="flex w-full gap-1 mt-3">
+              <div className="mt-3 grid w-full grid-cols-1 gap-1.5 sm:grid-cols-3">
                 <button
                   type="button"
                   onClick={() => setViewProductId(p.id)}
                   aria-label="View"
-                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
                 >
                   <Eye className="h-3 w-3 md:h-3.5 md:w-3.5" />
                   <span className="text-[10px] font-semibold leading-none">View</span>
@@ -244,7 +248,7 @@ export default function AdminProductsPage() {
                 <Link
                   href={`/admin/products/${p.id}`}
                   aria-label="Edit"
-                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
                 >
                   <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
                   <span className="text-[10px] font-semibold leading-none">Edit</span>
@@ -253,7 +257,7 @@ export default function AdminProductsPage() {
                   onClick={() => handleCopy(p.id)}
                   disabled={copyMutation.isPending}
                   aria-label="Copy"
-                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50 md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-primary transition hover:bg-primary hover:text-white disabled:opacity-50 md:gap-1.5"
                 >
                   <Copy className="h-3 w-3 md:h-3.5 md:w-3.5" />
                   <span className="text-[10px] font-semibold leading-none">Copy</span>

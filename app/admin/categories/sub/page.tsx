@@ -145,8 +145,8 @@ export default function AdminSubCategoriesPage() {
           <h2 className="text-lg font-bold text-foreground">Sub-Categories</h2>
           <p className="text-xs text-muted-foreground">{rows.length} total</p>
         </div>
-        <div className="flex w-full flex-wrap items-center gap-2">
-          <div className="flex h-10 min-w-0 flex-[2] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={query}
@@ -155,7 +155,7 @@ export default function AdminSubCategoriesPage() {
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <div className="min-w-[220px] flex-1">
+          <div className="w-full sm:min-w-[220px] sm:flex-1">
             <AdminSelect
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(e.target.value)}
@@ -171,7 +171,7 @@ export default function AdminSubCategoriesPage() {
           </div>
           <button
             onClick={openAdd}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:flex-1"
           >
             <Plus className="hidden h-4 w-4 md:inline-flex" />
             <span className="md:hidden">Add</span>
@@ -194,15 +194,15 @@ export default function AdminSubCategoriesPage() {
           {rows.map((sub) => (
             <div
               key={sub.id}
-              className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden"
+              className="flex flex-col overflow-hidden rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 sm:flex-row"
             >
-              <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
+              <div className="relative h-40 w-full shrink-0 overflow-hidden border-b border-border/40 bg-muted/10 sm:h-auto sm:w-28 sm:border-b-0 sm:border-r">
                 <Image
                   src={sub.image || "/placeholder.svg"}
                   alt={sub.name}
                   fill
                   sizes="112px"
-                  className="object-contain p-1.5"
+                  className="object-contain p-2"
                 />
               </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[120px]">
@@ -210,11 +210,11 @@ export default function AdminSubCategoriesPage() {
                   <p className="truncate text-sm font-semibold text-foreground">{sub.name}</p>
                   <p className="truncate text-xs text-muted-foreground">{sub.parentName}</p>
                 </div>
-                <div className="flex w-full gap-1">
+                <div className="flex w-full flex-col gap-1 sm:flex-row">
                   <button
                     onClick={() => openEdit(sub)}
                     aria-label={`Edit ${sub.name}`}
-                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-secondary h-7 text-primary transition hover:bg-primary hover:text-white md:gap-1.5"
+                    className="flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-secondary text-primary transition hover:bg-primary hover:text-white md:gap-1.5"
                   >
                     <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
                     <span className="text-[10px] font-semibold leading-none">Edit</span>
@@ -222,7 +222,7 @@ export default function AdminSubCategoriesPage() {
                   <button
                     onClick={() => handleDeleteSub(sub.parentId, sub)}
                     aria-label={`Delete ${sub.name}`}
-                    className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white md:gap-1.5"
+                    className="flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 text-accent transition hover:bg-accent hover:text-white md:gap-1.5"
                   >
                     <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
                     <span className="text-[10px] font-semibold leading-none">Delete</span>
