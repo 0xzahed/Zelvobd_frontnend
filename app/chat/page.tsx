@@ -18,7 +18,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hi there! Welcome to EcoMerce Support. How can we help you today?",
+      text: "Hi there! Welcome to Zelvobd Support. How can we help you today?",
       sender: "bot",
       timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 mins ago
     },
@@ -93,7 +93,7 @@ export default function ChatPage() {
               <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-foreground">EcoMerce Support</h1>
+              <h1 className="text-sm font-bold text-foreground">Zelvobd Support</h1>
               <p className="text-[10px] font-medium text-emerald-600">Always active</p>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function ChatPage() {
           </div>
         </div>
         <p className="mt-3 text-center text-[10px] text-muted-foreground">
-          Powered by EcoMerce Smart Support
+          Powered by Zelvobd Smart Support
         </p>
       </footer>
     </div>

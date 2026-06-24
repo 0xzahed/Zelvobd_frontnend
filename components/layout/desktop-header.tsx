@@ -15,7 +15,6 @@ import {
   Truck,
   X,
 } from "lucide-react"
-import { NotificationBell } from "@/components/ui/notification-bell"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { useCart } from "@/contexts/cart-context"
 
@@ -91,7 +90,7 @@ export function DesktopHeader() {
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
               E
             </span>
-            <span className="text-xl font-bold text-foreground">EcoMerce</span>
+            <span className="text-xl font-bold text-foreground">Zelvobd</span>
           </Link>
 
           {/* Primary navigation — grows to fill, icons on the right */}
@@ -132,8 +131,6 @@ export function DesktopHeader() {
             >
               <Search className="h-5 w-5" />
             </button>
-
-            <NotificationBell />
 
             <button
               onClick={() => setCartOpen(true)}

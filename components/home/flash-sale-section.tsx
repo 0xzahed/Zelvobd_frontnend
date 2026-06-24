@@ -398,7 +398,6 @@ export function FlashSaleSection() {
         <h2 className="text-sm font-semibold text-muted-foreground">Flash Sale</h2>
       </div>
       <CampaignStrip />
-      <CampaignProductGrid />
     </section>
   )
 }

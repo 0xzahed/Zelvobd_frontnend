@@ -1,13 +1,31 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronRight, HelpCircle, Package } from "lucide-react"
+import {
+  ChevronRight,
+  HelpCircle,
+  Package,
+  Info,
+  Mail,
+  Shield,
+  FileText,
+  Star,
+  Share2,
+  MessageCircleQuestion,
+} from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 
 export default function MorePage() {
   const menu = [
     { icon: Package, label: "My Tracking Orders", href: "/track-order" },
+    { icon: Info, label: "About Us", href: "/about" },
+    { icon: Mail, label: "Contact Us", href: "/contact" },
+    { icon: MessageCircleQuestion, label: "FAQ", href: "/faq" },
+    { icon: Shield, label: "Privacy Policy", href: "/privacy" },
+    { icon: FileText, label: "Terms & Conditions", href: "/terms" },
     { icon: HelpCircle, label: "Help & Support", href: "/help" },
+    { icon: Star, label: "Rate App", href: "#" },
+    { icon: Share2, label: "Share App", href: "#" },
   ]
 
   return (
@@ -29,7 +47,7 @@ export default function MorePage() {
           ))}
         </ul>
 
-        <p className="text-center text-[11px] text-muted-foreground">EcoMerce v1.0.0</p>
+        <p className="text-center text-[11px] text-muted-foreground">Zelvobd v1.0.0</p>
       </div>
     </AppShell>
   )

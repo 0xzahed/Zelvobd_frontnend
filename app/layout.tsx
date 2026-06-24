@@ -12,9 +12,9 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "EcoMerce — Shop smarter, faster",
+  title: "Zelvobd — Shop smarter, faster",
   description:
-    "EcoMerce is a modern mobile-first eCommerce experience with flash sales, daily deals, and free delivery on orders above ৳500.",
+    "Zelvobd is a modern mobile-first eCommerce experience with flash sales, daily deals, and free delivery on orders above ৳500.",
   generator: "v0.app",
 }
 

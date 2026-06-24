@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react"
-import Image from "next/image"
-
 type FooterNavLink = { label: string; href: string }
 type FooterNavGroup = { title: string; links: FooterNavLink[] }
 type FooterSocial = { label: string; href: string; icon?: "facebook" | "instagram" | "twitter" | "youtube" | "" }
@@ -19,12 +17,12 @@ type FooterSettings = {
   socials: FooterSocial[]
 }
 
-const STORAGE_KEY = "ecomerce_footer"
+const STORAGE_KEY = "zelvobd_footer"
 
 const DEFAULT_FOOTER: FooterSettings = {
-  brandName: "EcoMerce",
+  brandName: "Zelvobd",
   brandTagline: "Everyday essentials and the latest tech, delivered fast with care.",
-  supportEmail: "support@ecomerce.app",
+  supportEmail: "support@zelvobd.app",
   supportPhone: "+880 1700 000 000",
   supportAddress: "Dhaka, Bangladesh",
   navGroups: [
@@ -98,14 +96,8 @@ export function SiteFooter() {
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo1.png"
-                alt={footer.brandName}
-                width={150}
-                height={50}
-                className="h-auto w-auto max-w-[150px] object-contain brightness-0 invert"
-              />
+            <Link href="/" className="flex items-center gap-2 text-xl font-bold text-foreground">
+              {footer.brandName}
             </Link>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
               {footer.brandTagline}
@@ -172,14 +164,8 @@ export function SiteFooter() {
 
         <div className="mt-8 border-t border-slate-800 pt-5">
           <div className="flex justify-center">
-            <Link href="/" className="flex items-center gap-2" aria-label={`${footer.brandName} home`}>
-              <Image
-                src="/logo1.png"
-                alt={footer.brandName}
-                width={110}
-                height={36}
-                className="h-auto w-auto max-w-[110px] object-contain brightness-0 invert"
-              />
+            <Link href="/" className="flex items-center gap-2 text-lg font-bold text-foreground" aria-label={`${footer.brandName} home`}>
+              {footer.brandName}
             </Link>
           </div>
 

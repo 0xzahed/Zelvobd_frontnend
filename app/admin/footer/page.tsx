@@ -17,12 +17,12 @@ type FooterSettings = {
   socials: FooterSocial[]
 }
 
-const STORAGE_KEY = "ecomerce_footer"
+const STORAGE_KEY = "zelvobd_footer"
 
 const DEFAULT_FOOTER: FooterSettings = {
-  brandName: "EcoMerce",
+  brandName: "Zelvobd",
   brandTagline: "Everyday essentials and the latest tech, delivered fast with care.",
-  supportEmail: "support@ecomerce.app",
+  supportEmail: "support@zelvobd.app",
   supportPhone: "+880 1700 000 000",
   supportAddress: "Dhaka, Bangladesh",
   navGroups: [

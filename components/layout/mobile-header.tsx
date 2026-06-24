@@ -4,11 +4,8 @@ import { useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { Search, ShoppingCart } from "lucide-react"
-import { NotificationBell } from "@/components/ui/notification-bell"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { useCart } from "@/contexts/cart-context"
-import Image from "next/image"
-
 export function MobileHeader() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState("")
@@ -45,8 +42,8 @@ export function MobileHeader() {
       <header className="sticky top-0 z-40 border-b border-border/40 bg-white md:hidden">
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
-          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5">
-            <Image src="/logo1.png" alt="EcoMerce" width={100} height={50} />
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5 text-lg font-bold text-foreground">
+            Zelvobd
           </Link>
 
           {/* Expanding inline search input. Uses min-w-0 so flex can shrink without overflow. */}
@@ -81,7 +78,6 @@ export function MobileHeader() {
                 <Search className="h-5 w-5" />
               </button>
             )}
-            <NotificationBell />
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Open cart"

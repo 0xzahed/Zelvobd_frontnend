@@ -5,7 +5,7 @@
 export function WhatsAppFab({ number }: { number: string }) {
   if (!number) return null
 
-  const href = `https://wa.me/${number.replace(/[^0-9]/g, "")}?text=Hi%20EcoMerce%2C%20I%20have%20a%20question`
+  const href = `https://wa.me/${number.replace(/[^0-9]/g, "")}?text=Hi%20Zelvobd%2C%20I%20have%20a%20question`
   return (
     <a
       href={href}

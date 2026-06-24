@@ -160,7 +160,7 @@ export default function AdminProductsPage() {
       />
 
       {/* Cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {isLoading && (
           <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
             <div className="flex flex-col items-center justify-center gap-2">
@@ -175,30 +175,35 @@ export default function AdminProductsPage() {
           </div>
         )}
         {!isLoading && filtered.map((p: any) => (
-          <div key={p.id} className="flex flex-col overflow-hidden rounded-sm border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 sm:flex-row">
-            <div className="relative h-44 w-full shrink-0 overflow-hidden border-b border-border/40 bg-muted/10 sm:h-auto sm:w-32 sm:border-b-0 sm:border-r">
+          <div key={p.id} className="flex flex-col overflow-hidden rounded-sm border border-border/40 bg-card shadow-card transition hover:shadow-lg sm:h-48 sm:flex-row">
+            {/* Image */}
+            <div className="relative h-48 w-full shrink-0 overflow-hidden bg-muted/10 sm:h-full sm:w-36 sm:border-r sm:border-border/40">
               <Image
                 src={p.images?.[0] || "/placeholder.svg"}
                 alt={p.name}
                 fill
-                sizes="(max-width: 640px) 100vw, 128px"
+                sizes="(max-width: 640px) 100vw, 144px"
                 className="object-contain p-2"
                 unoptimized
               />
             </div>
-            <div className="flex min-w-0 flex-1 flex-col justify-between p-3 sm:p-3.5 min-h-0 sm:min-h-35">
-              <div>
-                <div className="min-w-0 space-y-1">
+
+            {/* Content */}
+            <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5">
+              {/* Top info */}
+              <div className="space-y-2">
+                <div className="min-w-0">
                   <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground sm:line-clamp-1">
                     {p.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
                   <p className="text-[10px] text-muted-foreground">
                     {p.categoryName || p.categorySlug || "Uncategorized"}
                   </p>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium text-foreground sm:text-base">
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-bold text-foreground">
                     {formatBDT(p.price)}
                   </span>
                   {p.discount > 0 && (
@@ -207,8 +212,9 @@ export default function AdminProductsPage() {
                     </span>
                   )}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <Switch
                       checked={Boolean(p.stock)}
                       onCheckedChange={(val) => handleToggle(p.id, "stock", val)}
@@ -216,7 +222,7 @@ export default function AdminProductsPage() {
                     />
                     Stock
                   </label>
-                  <label className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <Switch
                       checked={Boolean(p.availability)}
                       onCheckedChange={(val) => handleToggle(p.id, "availability", val)}
@@ -225,51 +231,53 @@ export default function AdminProductsPage() {
                     Avail
                   </label>
                   {p.isTrending && (
-                    <span className="rounded-full bg-blue-50 px-1.5 py-px text-[9px] font-semibold text-primary">Trend</span>
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">Trending</span>
                   )}
                   {p.isFlashSale && (
-                    <span className="rounded-full bg-pink-50 px-1.5 py-px text-[9px] font-semibold text-accent">Flash</span>
+                    <span className="rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-semibold text-accent">Flash</span>
                   )}
                   {p.isFreeDelivery && (
-                    <span className="rounded-full bg-green-50 px-1.5 py-px text-[9px] font-semibold text-success">Free</span>
+                    <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">Free</span>
                   )}
                 </div>
               </div>
-              <div className="mt-3 grid w-full grid-cols-1 gap-1.5 sm:grid-cols-3">
+
+              {/* Buttons */}
+              <div className="mt-3 grid grid-cols-4 gap-2">
                 <button
                   type="button"
                   onClick={() => setViewProductId(p.id)}
                   aria-label="View"
-                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
                 >
-                  <Eye className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                  <span className="text-[10px] font-semibold leading-none">View</span>
+                  <Eye className="h-4 w-4" />
+                  <span className="hidden text-[11px] font-semibold sm:inline">View</span>
                 </button>
                 <Link
                   href={`/admin/products/${p.id}`}
                   aria-label="Edit"
-                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-foreground transition hover:bg-primary hover:text-white md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
                 >
-                  <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                  <span className="text-[10px] font-semibold leading-none">Edit</span>
+                  <Pencil className="h-4 w-4" />
+                  <span className="hidden text-[11px] font-semibold sm:inline">Edit</span>
                 </Link>
                 <button
                   onClick={() => handleCopy(p.id)}
                   disabled={copyMutation.isPending}
                   aria-label="Copy"
-                  className="flex h-9 items-center justify-center gap-1 rounded-sm bg-secondary text-primary transition hover:bg-primary hover:text-white disabled:opacity-50 md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
                 >
-                  <Copy className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                  <span className="text-[10px] font-semibold leading-none">Copy</span>
+                  <Copy className="h-4 w-4" />
+                  <span className="hidden text-[11px] font-semibold sm:inline">Copy</span>
                 </button>
                 <button
                   onClick={() => handleDelete(p)}
                   disabled={deleteMutation.isPending}
                   aria-label="Delete"
-                  className="flex flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 h-7 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50 md:gap-1.5"
+                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-red-50 px-2 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
                 >
-                  <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                  <span className="text-[10px] font-semibold leading-none">Delete</span>
+                  <Trash2 className="h-4 w-4" />
+                  <span className="hidden text-[11px] font-semibold sm:inline">Delete</span>
                 </button>
               </div>
             </div>

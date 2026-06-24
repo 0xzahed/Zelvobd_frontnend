@@ -14,8 +14,8 @@ type Settings = {
 }
 
 const defaults: Settings = {
-  storeName: "EcoMerce",
-  supportEmail: "support@ecomerce.app",
+  storeName: "Zelvobd",
+  supportEmail: "support@zelvobd.app",
   currency: "USD",
   freeDeliveryThreshold: 50,
   deliveryFee: 4.99,
@@ -30,7 +30,7 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("ecomerce_settings")
+      const raw = localStorage.getItem("zelvobd_settings")
       if (raw) setSettings({ ...defaults, ...JSON.parse(raw) })
     } catch {
       // noop
@@ -42,14 +42,14 @@ export default function AdminSettingsPage() {
   }
 
   function save() {
-    localStorage.setItem("ecomerce_settings", JSON.stringify(settings))
+    localStorage.setItem("zelvobd_settings", JSON.stringify(settings))
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
 
   function reset() {
     setSettings(defaults)
-    localStorage.removeItem("ecomerce_settings")
+    localStorage.removeItem("zelvobd_settings")
   }
 
   async function addFloatingImages(files: File[]) {

@@ -7,8 +7,6 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import Image from "next/image"
-
 export default function LoginPage() {
   const router = useRouter()
   const { loginAdmin, isAdmin, authLoading } = useAuth()
@@ -53,7 +51,7 @@ export default function LoginPage() {
       <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="mb-2">
-            <Image src="/logo1.png" alt="EcoMerce" width={150} height={50} />
+            <h1 className="text-2xl font-bold text-foreground">Zelvobd</h1>
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-semibold text-foreground">Admin Login</h1>

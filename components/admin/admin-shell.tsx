@@ -1,7 +1,6 @@
 "use client"
 
 import { type ReactNode, useEffect, useMemo, useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -232,7 +231,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="flex h-dvh flex-col">
           <div className="flex h-16 items-center justify-between px-4">
             <Link href="/admin" prefetch={false} className="flex items-center gap-2.5">
-              <Image src="/logo1.png" alt="EcoMerce" width={108} height={44} className="h-8 w-auto" />
+              <span className="text-lg font-bold text-foreground">Zelvobd</span>
             </Link>
             <button onClick={() => setOpen(false)} className="md:hidden" aria-label="Close menu">
               <X className="h-5 w-5" />
