@@ -100,11 +100,25 @@ export function ProductViewDialog({
 
                 {product.extraDescription && (
                   <div className="rounded-lg border border-border/70 bg-card p-4">
-                    <h3 className="text-sm font-semibold text-foreground">Extra Description</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Warranty</h3>
                     <div
                       className="prose prose-sm mt-3 max-w-none text-foreground"
                       dangerouslySetInnerHTML={{ __html: product.extraDescription }}
                     />
+                  </div>
+                )}
+
+                {product.specifications && product.specifications.length > 0 && (
+                  <div className="rounded-lg border border-border/70 bg-card p-4">
+                    <h3 className="text-sm font-semibold text-foreground">Specifications</h3>
+                    <div className="mt-3 divide-y divide-border/40 rounded-md border border-border/40">
+                      {product.specifications.map((spec, idx) => (
+                        <div key={idx} className="flex grid-cols-3 flex-col sm:grid sm:gap-4 p-3 text-sm">
+                          <dt className="font-medium text-foreground">{spec.title}</dt>
+                          <dd className="col-span-2 text-muted-foreground">{spec.information}</dd>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -201,10 +215,18 @@ export function ProductViewDialog({
                             />
                           </div>
                           <div className="min-w-0 flex-1 space-y-1 text-sm">
-                            <p className="font-medium text-foreground">
-                              {variant.color || "Default color"}
-                              {variant.size ? ` / ${variant.size}` : ""}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              {variant.colorCode && (
+                                <span 
+                                  className="h-3 w-3 shrink-0 rounded-full border border-border/50" 
+                                  style={{ backgroundColor: variant.colorCode }} 
+                                />
+                              )}
+                              <p className="font-medium text-foreground">
+                                {variant.color || "Default color"}
+                                {variant.size ? ` / ${product.variantLabel || "Size"}: ${variant.size}` : ""}
+                              </p>
+                            </div>
                             <p className="text-muted-foreground">
                               Actual: {formatBDT(variant.actualPrice)} | Discounted:{" "}
                               {formatBDT(variant.discountedPrice)}
