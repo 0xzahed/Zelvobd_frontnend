@@ -23,7 +23,7 @@ export function TrendingSection() {
           return
         }
         if (!trendingInFlight) {
-          trendingInFlight = getTrending({ limit: 13 })
+          trendingInFlight = getTrending({ limit: 9 })
             .then((res) =>
               (res?.data?.products || []).map((product: any) => ({
                 ...mapProduct(product),
@@ -63,12 +63,12 @@ export function TrendingSection() {
         </Link>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-        {trending.slice(0, 12).map((p) => (
+        {trending.slice(0, 8).map((p) => (
           <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}
-        {trending.length > 12 && (
+        {trending.length > 8 && (
           <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <Link
               href="/trending"
