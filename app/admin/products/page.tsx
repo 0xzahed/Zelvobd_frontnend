@@ -122,24 +122,22 @@ export default function AdminProductsPage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent
           showCloseButton={false}
-          className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-5xl"
+          className="flex h-dvh w-screen max-w-[100vw]! flex-col overflow-hidden rounded-none border-0 p-0 sm:h-auto sm:max-h-[85dvh] sm:max-w-5xl! sm:rounded-2xl sm:border sm:border-border/60 sm:p-6 sm:shadow-2xl"
           onInteractOutside={(e) => e.preventDefault()}
         >
-          <div className="sticky top-0 z-10 -mx-6 -mt-6 border-b border-border/60 bg-background/95 px-6 pt-1 pb-2 backdrop-blur">
-            <div className="flex items-start justify-between gap-4">
-              <DialogHeader className="text-left">
-                <DialogTitle>New Product</DialogTitle>
-                <DialogDescription>Add a new product to the catalog.</DialogDescription>
-              </DialogHeader>
-              <DialogClose
-                aria-label="Close"
-                className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
-              >
-                <X className="h-4 w-4" />
-              </DialogClose>
-            </div>
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-4">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-lg font-bold sm:text-xl">New Product</DialogTitle>
+              <DialogDescription className="hidden text-sm sm:block">Add a new product to the catalog.</DialogDescription>
+            </DialogHeader>
+            <DialogClose
+              aria-label="Close"
+              className="grid h-9 w-9 place-items-center rounded-full bg-muted/40 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+            </DialogClose>
           </div>
-          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-0 sm:pt-6">
             <ProductForm
               onSave={handleCreate}
               onCancel={() => setAddOpen(false)}

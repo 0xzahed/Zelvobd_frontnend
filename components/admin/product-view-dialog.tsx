@@ -1,11 +1,12 @@
 "use client"
 
 import Image from "next/image"
-import { Loader2, PackageOpen } from "lucide-react"
+import { Loader2, PackageOpen, X } from "lucide-react"
 import { formatBDT } from "@/lib/format"
 import { useProductDetails } from "@/src/hooks/api/useProducts"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -30,13 +31,24 @@ export function ProductViewDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-h-[88dvh] overflow-y-auto sm:max-w-5xl"
+        showCloseButton={false}
+        className="flex h-dvh w-screen max-w-[100vw]! flex-col overflow-hidden rounded-none border-0 p-0 sm:h-auto sm:max-h-[85dvh] sm:max-w-5xl! sm:rounded-2xl sm:border sm:border-border/60 sm:p-6 sm:shadow-2xl"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader className="text-left">
-          <DialogTitle>Product Details</DialogTitle>
-          <DialogDescription>Detailed admin view for this product.</DialogDescription>
-        </DialogHeader>
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-4">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-lg font-bold sm:text-xl">Product Details</DialogTitle>
+            <DialogDescription className="hidden text-sm sm:block">Detailed admin view for this product.</DialogDescription>
+          </DialogHeader>
+          <DialogClose
+            aria-label="Close"
+            className="grid h-9 w-9 place-items-center rounded-full bg-muted/40 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+          >
+            <X className="h-4 w-4" />
+          </DialogClose>
+        </div>
+
+        <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-0 sm:pt-6">
 
         {isLoading ? (
           <div className="flex min-h-64 flex-col items-center justify-center gap-3">
@@ -214,6 +226,7 @@ export function ProductViewDialog({
             </div>
           </div>
         )}
+        </div>
       </DialogContent>
     </Dialog>
   )
