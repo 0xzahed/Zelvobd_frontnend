@@ -137,36 +137,39 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 grid place-items-center bg-black/85 p-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 p-4"
           onClick={() => setZoomOpen(false)}
         >
           <button
             onClick={() => setZoomOpen(false)}
             aria-label="Close"
-            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white text-foreground"
+            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
-          <div className="relative max-h-full w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={images[activeImageIndex] || "/placeholder.svg"}
-              alt={productName}
-              className="max-h-[80vh] w-full rounded-lg object-contain"
-            />
+          
+          <div className="relative flex flex-col items-center w-full max-w-[min(100%,75vh)]" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-white shadow-2xl">
+              <Image
+                src={images[activeImageIndex] || "/placeholder.svg"}
+                alt={productName}
+                fill
+                className="object-cover"
+              />
+            </div>
+            
             {images.length > 1 && (
-              <div className="mt-3 flex justify-center gap-2 overflow-x-auto pb-1">
+              <div className="mt-4 flex justify-center gap-2 overflow-x-auto w-full pb-1 snap-x">
                 {images.map((src, i) => (
                   <button
                     key={i}
                     onClick={() => onImageChange(i)}
                     className={cx(
-                      "relative h-14 w-14 shrink-0 overflow-hidden rounded-md border bg-white",
-                      activeImageIndex === i ? "border-primary" : "border-white/30",
+                      "relative h-16 w-16 shrink-0 snap-center overflow-hidden rounded-md border bg-white transition",
+                      activeImageIndex === i ? "border-primary border-2" : "border-transparent opacity-60 hover:opacity-100",
                     )}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src || "/placeholder.svg"} alt="" className="h-full w-full object-cover" />
+                    <Image src={src || "/placeholder.svg"} alt="" fill className="object-cover p-1" />
                   </button>
                 ))}
               </div>
