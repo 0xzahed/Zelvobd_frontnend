@@ -251,16 +251,16 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           placeholder="Detailed product description..."
         />
 
-        {/* Extra description */}
+        {/* Warranty */}
         <QuillEditor
-          label="Extra description"
+          label="Warranty"
           value={extraDescription}
           deltaValue={extraDescriptionDelta}
           onChange={(html, delta) => {
             setExtraDescription(html)
             setExtraDescriptionDelta(delta)
           }}
-          placeholder="Additional info, specs, warranty..."
+          placeholder="Enter warranty details here..."
         />
 
         {/* Material & Weight */}
