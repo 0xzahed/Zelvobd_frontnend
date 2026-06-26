@@ -103,6 +103,9 @@ export const mapProduct = (product: any): Product => {
     material: product.material || undefined,
     status: product.status || undefined,
     createdAt: product.createdAt || undefined,
+    specifications: Array.isArray(product.specifications) 
+      ? product.specifications 
+      : (typeof product.specifications === 'string' ? JSON.parse(product.specifications) : []),
     variants: rawVariants.map((variant: any) => ({
       id: String(variant.id || variant._id || ""),
       color: toStringSafe(variant.color ?? variant.colorName),

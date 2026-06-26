@@ -29,7 +29,10 @@ export function ProductViewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88dvh] overflow-y-auto sm:max-w-5xl">
+      <DialogContent 
+        className="max-h-[88dvh] overflow-y-auto sm:max-w-5xl"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="text-left">
           <DialogTitle>Product Details</DialogTitle>
           <DialogDescription>Detailed admin view for this product.</DialogDescription>

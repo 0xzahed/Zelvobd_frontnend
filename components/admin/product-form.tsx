@@ -64,6 +64,9 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const [stock, setStock] = useState<boolean>(initial?.stock ?? true)
   const [availability, setAvailability] = useState<boolean>(initial?.availability ?? true)
   const [variantLabel, setVariantLabel] = useState(initial?.variantLabel ?? "Size")
+  const [specifications, setSpecifications] = useState<{title: string; information: string}[]>(
+    initial?.specifications || []
+  )
 
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -173,6 +176,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
       whatsapp: initial?.whatsapp ?? "+8801700000000",
       video: video.trim() || undefined,
       variantLabel,
+      specifications: specifications.filter(s => s.title.trim() !== "" && s.information.trim() !== ""),
       variants: cleanVariants,
     }
     onSave(product, descriptionDelta, extraDescriptionDelta, categoryId, subCategoryId)
@@ -236,6 +240,62 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         <div className="grid gap-4 md:grid-cols-2">
           <Text label="Title" value={name} onChange={setName} required placeholder="Product Title" />
           <Text label="Brand" value={brand} onChange={setBrand} placeholder="Brand name" />
+        </div>
+
+        {/* Specifications */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-foreground">Specifications</span>
+            <button
+              type="button"
+              onClick={() => setSpecifications([...specifications, { title: "", information: "" }])}
+              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md bg-primary/10 px-4 text-xs font-semibold text-primary transition hover:bg-primary/20"
+            >
+              <Plus className="h-4 w-4" /> Add Specification
+            </button>
+          </div>
+          {specifications.length > 0 && (
+            <div className="space-y-3">
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex flex-col gap-3 rounded-md border border-border/40 bg-muted/10 p-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={spec.title}
+                      onChange={(e) => {
+                        const newSpecs = [...specifications];
+                        newSpecs[index].title = e.target.value;
+                        setSpecifications(newSpecs);
+                      }}
+                      className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSpecs = specifications.filter((_, i) => i !== index);
+                        setSpecifications(newSpecs);
+                      }}
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-destructive/20 bg-destructive/10 text-destructive transition hover:bg-destructive/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <textarea
+                    rows={3}
+                    placeholder="Information"
+                    value={spec.information}
+                    onChange={(e) => {
+                      const newSpecs = [...specifications];
+                      newSpecs[index].information = e.target.value;
+                      setSpecifications(newSpecs);
+                    }}
+                    className="w-full resize-y rounded-md border border-border/80 bg-background p-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Description */}

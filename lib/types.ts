@@ -42,6 +42,7 @@ export type Product = {
   video?: string
   material?: string
   variantLabel?: string
+  specifications?: { title: string; information: string }[]
   variants?: ProductVariant[]
   slug?: string
   status?: string

@@ -123,6 +123,7 @@ export default function AdminProductsPage() {
         <DialogContent
           showCloseButton={false}
           className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-5xl"
+          onInteractOutside={(e) => e.preventDefault()}
         >
           <div className="sticky top-0 z-10 -mx-6 -mt-6 border-b border-border/60 bg-background/95 px-6 pt-1 pb-2 backdrop-blur">
             <div className="flex items-start justify-between gap-4">
