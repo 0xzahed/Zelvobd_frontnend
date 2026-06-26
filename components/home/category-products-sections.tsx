@@ -43,7 +43,7 @@ export function CategoryProductsSections() {
                   if (words.length >= 2) {
                     return (
                       <>
-                        {words[0]} <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #d7f540, #03204f)" }}>{words[1]}</span> {words.slice(2).join(" ")}
+                        {words[0]} <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}>{words[1]}</span> {words.slice(2).join(" ")}
                       </>
                     )
                   }
