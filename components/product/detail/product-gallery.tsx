@@ -140,15 +140,15 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 p-4"
           onClick={() => setZoomOpen(false)}
         >
-          <button
-            onClick={() => setZoomOpen(false)}
-            aria-label="Close"
-            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          
           <div className="relative flex flex-col items-center w-full max-w-[min(100%,75vh)]" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setZoomOpen(false)}
+              aria-label="Close"
+              className="absolute -top-12 right-0 z-10 grid h-10 w-10 place-items-center rounded-full bg-white text-foreground transition hover:bg-gray-200"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            
             <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-white shadow-2xl">
               <Image
                 src={images[activeImageIndex] || "/placeholder.svg"}
