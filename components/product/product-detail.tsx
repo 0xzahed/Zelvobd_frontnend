@@ -30,25 +30,29 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
 
   const norm = (v: string) => v.trim().toLowerCase()
-  const variants = (product.variants ?? []).map((v) => ({
-    ...v,
-    color: (v.color || "").trim(),
-    size: (v.size || "").trim(),
-  }))
-  const uniqueColors = Array.from(
+  const variants = useMemo(() => (
+    (product.variants ?? []).map((v) => ({
+      ...v,
+      color: (v.color || "").trim(),
+      size: (v.size || "").trim(),
+    }))
+  ), [product.variants])
+  
+  const uniqueColors = useMemo(() => Array.from(
     new Set(
       variants
         .map((v) => (v.color || "").trim())
         .filter(Boolean),
     ),
-  )
-  const uniqueSizes = Array.from(
+  ), [variants])
+  
+  const uniqueSizes = useMemo(() => Array.from(
     new Set(
       variants
         .map((v) => (v.size || "").trim())
         .filter(Boolean),
     ),
-  )
+  ), [variants])
 
   // Identify initial variant
   let initialVariant = variants[0]
