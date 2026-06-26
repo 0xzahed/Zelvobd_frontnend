@@ -41,6 +41,7 @@ export type Product = {
   weight?: string
   video?: string
   material?: string
+  variantLabel?: string
   variants?: ProductVariant[]
   slug?: string
   status?: string

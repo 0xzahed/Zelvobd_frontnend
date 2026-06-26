@@ -63,6 +63,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
 
   const [stock, setStock] = useState<boolean>(initial?.stock ?? true)
   const [availability, setAvailability] = useState<boolean>(initial?.availability ?? true)
+  const [variantLabel, setVariantLabel] = useState(initial?.variantLabel ?? "Size")
 
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -165,12 +166,13 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
       features: initial?.features ?? [],
       isTrending: initial?.isTrending ?? false,
       isFlashSale: initial?.isFlashSale ?? false,
-      stock, 
+      weight: weight.trim() || undefined,
+      material: material.trim() || undefined,
+      stock,
       availability,
       whatsapp: initial?.whatsapp ?? "+8801700000000",
-      weight: weight.trim() || undefined,
       video: video.trim() || undefined,
-      material: material.trim() || undefined,
+      variantLabel,
       variants: cleanVariants,
     }
     onSave(product, descriptionDelta, extraDescriptionDelta, categoryId, subCategoryId)
@@ -302,11 +304,22 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
+              className="inline-flex h-9 shrink-0 items-center rounded-md bg-primary px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
               Add Variant
             </button>
           </div>
+
+          <label className="block text-xs">
+            <span className="mb-1.5 block font-semibold text-foreground">Variant Label (Size, Storage)</span>
+            <input 
+              type="text" 
+              value={variantLabel} 
+              onChange={(e) => setVariantLabel(e.target.value)}
+              placeholder="Size"
+              className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+            />
+          </label>
 
           <p className="text-[11px] text-muted-foreground">
             Minimum one variant is required. Upload a separate image for each.
@@ -392,11 +405,10 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                       </div>
                     </label>
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Size</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">{variantLabel || "Size"}</span>
                       <input
                         value={v.size}
                         onChange={(e) => updateVariant(v.id, { size: e.target.value })}
-                        placeholder="Optional"
                         className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
