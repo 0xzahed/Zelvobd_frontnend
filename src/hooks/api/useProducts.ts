@@ -105,6 +105,14 @@ const buildProductFormData = async (
   formData.append("material", product.material?.trim() || "")
   formData.append("stock", String(product.stock))
   formData.append("availability", String(product.availability))
+  
+  if (product.variantLabel?.trim()) {
+    formData.append("variantLabel", product.variantLabel.trim())
+  }
+  
+  if (product.specifications && product.specifications.length > 0) {
+    formData.append("specifications", JSON.stringify(product.specifications))
+  }
 
   const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
     actualPrice,
