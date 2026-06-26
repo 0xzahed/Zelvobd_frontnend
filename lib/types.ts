@@ -1,6 +1,7 @@
 export type ProductVariant = {
   id: string
   color: string
+  colorCode?: string
   size: string
   actualPrice: number
   discountedPrice: number

@@ -150,7 +150,7 @@ export function ProductInfo({
                 >
                   <span
                     className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-11 md:w-11"
-                    style={{ backgroundColor: colorToHex(c) }}
+                    style={{ backgroundColor: product.variants?.find(v => v.color?.trim().toLowerCase() === c.toLowerCase())?.colorCode || colorToHex(c) }}
                     aria-hidden="true"
                   />
                   <span className="text-sm font-medium">{c}</span>

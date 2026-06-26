@@ -31,7 +31,7 @@ function makeVariantId() {
 }
 
 function emptyVariant(): ProductVariant {
-  return { id: makeVariantId(), color: "", size: "", actualPrice: 0, discountedPrice: 0, image: "" }
+  return { id: makeVariantId(), color: "", colorCode: "#000000", size: "", actualPrice: 0, discountedPrice: 0, image: "" }
 }
 
 const htmlToPlainText = (html: string) => {
@@ -128,6 +128,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
       color: v.color.trim() || "Default",
+      colorCode: v.colorCode?.trim() || undefined,
       size: v.size.trim(),
       actualPrice: Math.max(0, Number(v.actualPrice) || 0),
       discountedPrice: Math.max(0, Number(v.discountedPrice) || 0),
@@ -356,15 +357,39 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                     />
                   </label>
 
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Color</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">Color Name</span>
                       <input
                         value={v.color}
                         onChange={(e) => updateVariant(v.id, { color: e.target.value })}
                         required
                         className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
+                    </label>
+                    <label className="block text-xs">
+                      <span className="mb-1.5 block font-semibold text-foreground">Color Code</span>
+                      <div className="flex h-10 w-full overflow-hidden rounded-md border border-border/80 bg-background focus-within:border-primary/60">
+                        <div className="relative flex h-10 w-12 shrink-0 items-center justify-center border-r border-border/80 bg-muted/30">
+                          <input
+                            type="color"
+                            value={v.colorCode || "#000000"}
+                            onChange={(e) => updateVariant(v.id, { colorCode: e.target.value })}
+                            className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                          />
+                          <div
+                            className="h-6 w-6 rounded-md border border-border/50 shadow-sm"
+                            style={{ backgroundColor: v.colorCode || "#000000" }}
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          value={v.colorCode || ""}
+                          onChange={(e) => updateVariant(v.id, { colorCode: e.target.value })}
+                          placeholder="#000000"
+                          className="h-full flex-1 bg-transparent px-2 text-sm outline-none cursor-text caret-current uppercase"
+                        />
+                      </div>
                     </label>
                     <label className="block text-xs">
                       <span className="mb-1.5 block font-semibold text-foreground">Size</span>

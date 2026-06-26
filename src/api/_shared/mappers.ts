@@ -106,6 +106,7 @@ export const mapProduct = (product: any): Product => {
     variants: rawVariants.map((variant: any) => ({
       id: String(variant.id || variant._id || ""),
       color: toStringSafe(variant.color ?? variant.colorName),
+      colorCode: variant.colorCode || undefined,
       size: toStringSafe(variant.size ?? variant.storage ?? variant.capacity),
       actualPrice: Number(variant.actualPrice || 0),
       discountedPrice: Number(variant.discountedPrice || 0),
