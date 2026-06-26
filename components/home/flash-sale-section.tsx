@@ -395,7 +395,7 @@ export function FlashSaleSection() {
   return (
     <section className="space-y-3">
       <div className="px-1">
-        <h2 className="text-sm font-semibold text-muted-foreground">Flash Sale</h2>
+        <h2 className="text-base font-semibold text-foreground md:text-xl">Flash <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}>Sale</span></h2>
       </div>
       <CampaignStrip />
     </section>
