@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react"
 import { useCategories, useProducts } from "@/lib/use-store-data"
 import { ProductCard } from "@/components/ui/product-card"
 
-const MAX_PER_CATEGORY = 12
+const MAX_PER_CATEGORY = 8
 
 export function CategoryProductsSections() {
   const { categories } = useCategories()

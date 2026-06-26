@@ -5,7 +5,7 @@ import { CategoryCard, MoreCategoriesCard } from "@/components/ui/category-card"
 
 export function CategoriesSection() {
   const { categories } = useCategories()
-  const mobileMax = 6
+  const mobileMax = 8
   const showMore = categories.length > mobileMax
   const mobileCategories = categories.slice(0, showMore ? mobileMax - 1 : mobileMax)
 
@@ -13,7 +13,7 @@ export function CategoriesSection() {
     <section className="space-y-3">
       <h2 className="text-base font-semibold text-foreground md:text-xl">Featured <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}>Categories</span></h2>
 
-      <div className="grid grid-cols-3 gap-1 md:hidden">
+      <div className="grid grid-cols-4 gap-2 md:hidden">
         {mobileCategories.map((c) => (
           <div key={c.id} className="mx-auto w-[90%]">
             <CategoryCard category={c} />

@@ -8,7 +8,7 @@ import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductCard } from "@/components/ui/product-card"
 import type { Product } from "@/lib/types"
 
-const MAX_NEW = 13
+const MAX_NEW = 9
 let newProductsCache: Product[] | null = null
 let newProductsInFlight: Promise<Product[]> | null = null
 
@@ -60,12 +60,12 @@ export function NewProductsSection() {
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-        {newItems.slice(0, 12).map((p) => (
+        {newItems.slice(0, 8).map((p) => (
           <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}
-        {newItems.length > 12 && (
+        {newItems.length > 8 && (
           <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <Link
               href="/new-products"

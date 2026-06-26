@@ -14,7 +14,7 @@ export function FreeDeliveryBanner() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await getFreeDelivery({ limit: 13 })
+        const res = await getFreeDelivery({ limit: 9 })
         setFreeDelivery(
           (res?.data?.products || []).map((product: any) => ({
             ...mapProduct(product),
@@ -49,12 +49,12 @@ export function FreeDeliveryBanner() {
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-        {freeDelivery.slice(0, 12).map((p) => (
+        {freeDelivery.slice(0, 8).map((p) => (
           <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}
-        {freeDelivery.length > 12 && (
+        {freeDelivery.length > 8 && (
           <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
             <Link
               href="/free-delivery"
