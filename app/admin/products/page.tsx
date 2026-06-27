@@ -16,6 +16,7 @@ import {
 } from "@/src/hooks/api/useProducts"
 import { ProductForm } from "@/components/admin/product-form"
 import { ProductViewDialog } from "@/components/admin/product-view-dialog"
+import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
 import {
   Dialog,
   DialogClose,
@@ -37,6 +38,7 @@ export default function AdminProductsPage() {
   const [q, setQ] = useState("")
   const [addOpen, setAddOpen] = useState(false)
   const [viewProductId, setViewProductId] = useState<string | null>(null)
+  const [editProductId, setEditProductId] = useState<string | null>(null)
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
@@ -158,6 +160,16 @@ export default function AdminProductsPage() {
         }}
       />
 
+      <ProductEditDialog
+        productId={editProductId}
+        open={Boolean(editProductId)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditProductId(null)
+          }
+        }}
+      />
+
       {/* Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {isLoading && (
@@ -252,14 +264,15 @@ export default function AdminProductsPage() {
                   <Eye className="h-4 w-4" />
                   <span className="hidden text-[11px] font-semibold sm:inline">View</span>
                 </button>
-                <Link
-                  href={`/admin/products/${p.id}`}
+                <button
+                  type="button"
+                  onClick={() => setEditProductId(p.id)}
                   aria-label="Edit"
                   className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
                 >
                   <Pencil className="h-4 w-4" />
                   <span className="hidden text-[11px] font-semibold sm:inline">Edit</span>
-                </Link>
+                </button>
                 <button
                   onClick={() => handleCopy(p.id)}
                   disabled={copyMutation.isPending}
