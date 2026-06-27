@@ -72,6 +72,7 @@ const buildProductFormData = async (
       actualPrice: variant.actualPrice,
       discountedPrice: variant.discountedPrice,
       color: variant.color,
+      colorCode: variant.colorCode,
       size: variant.size,
       image: variant.image || product.images?.[0] || "",
     }
@@ -114,10 +115,11 @@ const buildProductFormData = async (
     formData.append("specifications", JSON.stringify(product.specifications))
   }
 
-  const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
+  const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, colorCode, size }) => ({
     actualPrice,
     discountedPrice,
     color,
+    colorCode: colorCode?.trim() || undefined,
     size: size?.trim() || "",
   }))
   
