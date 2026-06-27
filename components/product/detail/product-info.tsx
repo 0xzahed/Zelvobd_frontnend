@@ -89,40 +89,40 @@ export function ProductInfo({
     <div className="space-y-5 md:space-y-6">
       {/* Title & Pricing */}
       <div className="space-y-1">
-        <h1 className="wrap-break-word text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
-          {product.name}
-        </h1>
         {product.brand && (
-          <p className="text-sm text-muted-foreground">
-            by: <span className="font-medium text-primary">{product.brand}</span>
+          <p className="text-sm font-medium text-primary uppercase tracking-wide">
+            {product.brand}
           </p>
         )}
+        <h1 className="wrap-break-word text-pretty text-2xl font-semibold leading-snug text-gray-900">
+          {product.name}
+        </h1>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="min-w-0 flex items-baseline flex-wrap gap-2">
-            <span className="text-xl font-medium text-[#292929] md:text-2xl">{formatBDT(price)}</span>
+            <span className="text-[22px] font-bold text-gray-900">{formatBDT(price)}</span>
             {cutPrice > price && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-[16px] font-normal text-[#d6d6d6] line-through">
                 {formatBDT(cutPrice)}
               </span>
             )}
           </div>
-          <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-3 rounded-full bg-[#e5e5e580] p-1.5">
             <button
               type="button"
               onClick={() => onQtyChange(Math.max(1, qty - 1))}
               aria-label="Decrease"
-              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+              className="grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-sm transition hover:bg-gray-50"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-4 w-4" />
             </button>
-            <span className="w-5 text-center text-sm font-medium">{qty}</span>
+            <span className="w-6 text-center text-sm font-bold text-black">{qty}</span>
             <button
               type="button"
               onClick={() => onQtyChange(qty + 1)}
               aria-label="Increase"
-              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+              className="grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-sm transition hover:bg-gray-50"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -130,9 +130,9 @@ export function ProductInfo({
 
       {/* Colors */}
       {uniqueColors.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-foreground">Color</p>
-          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+        <div className="rounded-sm border border-gray-200 p-4 bg-white/50">
+          <p className="mb-3 text-base font-semibold text-gray-900">Color:</p>
+          <div className="flex flex-wrap gap-2">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
               return (
@@ -142,18 +142,18 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex h-full min-w-0 items-center gap-2 rounded-full border bg-transparent px-3 py-1.5 text-left transition md:shrink-0 md:px-4",
+                    "flex h-9 items-center gap-2 rounded-full border bg-white px-3 transition",
                     selected
-                      ? "border-primary text-primary"
-                      : "border-border/60 text-foreground hover:border-border",
+                      ? "border-primary border-[1.5px]"
+                      : "border-gray-200 hover:border-gray-300",
                   )}
                 >
                   <span
-                    className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-11 md:w-11"
+                    className="h-4.5 w-4.5 shrink-0 rounded-full border border-gray-100 shadow-inner"
                     style={{ backgroundColor: product.variants?.find(v => v.color?.trim().toLowerCase() === c.toLowerCase())?.colorCode || colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="text-sm font-medium">{c}</span>
+                  <span className="text-sm font-medium text-gray-700">{c}</span>
                 </button>
               )
             })}

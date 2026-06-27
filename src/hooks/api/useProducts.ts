@@ -104,6 +104,11 @@ const buildProductFormData = async (
   
   formData.append("weight", product.weight?.trim() || "N/A")
   formData.append("material", product.material?.trim() || "")
+  if (typeof product.rating === "number" || typeof product.rating === "string") {
+    formData.append("rating", String(product.rating))
+  } else {
+    formData.append("rating", "") // to clear it if empty
+  }
   formData.append("stock", String(product.stock))
   formData.append("availability", String(product.availability))
   

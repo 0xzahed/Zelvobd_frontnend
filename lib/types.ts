@@ -24,7 +24,7 @@ export type Product = {
   price: number
   cutPrice: number
   discount: number
-  rating: number
+  rating?: number
   reviews: number
   images: string[]
   features: string[]

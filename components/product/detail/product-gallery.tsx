@@ -12,9 +12,10 @@ interface ProductGalleryProps {
   productName: string
   activeImageIndex: number
   onImageChange: (index: number) => void
+  video?: string
 }
 
-export function ProductGallery({ images, productName, activeImageIndex, onImageChange }: ProductGalleryProps) {
+export function ProductGallery({ images, productName, activeImageIndex, onImageChange, video }: ProductGalleryProps) {
   const [zoomOpen, setZoomOpen] = useState(false)
   const variantScrollRef = useRef<HTMLDivElement>(null)
 
@@ -63,21 +64,30 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
       <button
         type="button"
         onClick={() => setZoomOpen(true)}
-        aria-label="View image"
-        className="relative block w-full aspect-square overflow-hidden rounded-lg bg-white"
+        aria-label={activeImageIndex === images.length ? "Play video" : "View image"}
+        className="relative flex w-full aspect-square items-center justify-center overflow-hidden rounded-lg bg-black"
       >
-        <Image
-          src={images[activeImageIndex] || "/placeholder.svg"}
-          alt={productName}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-          priority
-        />
+        {activeImageIndex === images.length && video ? (
+          <video
+            src={video}
+            controls
+            autoPlay
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          <Image
+            src={images[activeImageIndex] || "/placeholder.svg"}
+            alt={productName}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover bg-white"
+            priority
+          />
+        )}
       </button>
 
       {/* Thumbnails */}
-      {images.length > 1 && (
+      {(images.length > 1 || video) && (
         <div className="group relative">
           <div
             ref={variantScrollRef}
@@ -107,9 +117,30 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                 </button>
               )
             })}
+            {video && (
+              <button
+                onClick={() => {
+                  if (dragState.current.moved) return
+                  onImageChange(images.length)
+                }}
+                aria-label="View video"
+                className={cx(
+                  "relative aspect-square shrink-0 snap-start overflow-hidden rounded-md bg-black transition flex items-center justify-center text-white",
+                  "w-[calc((100%-3rem)/4.3)]",
+                  activeImageIndex === images.length ? "border-2 border-primary" : "border border-border/50",
+                )}
+              >
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                  <svg className="h-6 w-6 fill-white" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <video src={video} className="h-full w-full object-cover opacity-60" />
+              </button>
+            )}
           </div>
 
-          {images.length > VISIBLE_THUMBS && (
+          {(images.length + (video ? 1 : 0)) > VISIBLE_THUMBS && (
             <>
               <button
                 type="button"
@@ -149,16 +180,25 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
               <X className="h-5 w-5" />
             </button>
             
-            <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-white shadow-2xl">
-              <Image
-                src={images[activeImageIndex] || "/placeholder.svg"}
-                alt={productName}
-                fill
-                className="object-cover"
-              />
+            <div className="relative flex items-center justify-center w-full aspect-square overflow-hidden rounded-lg bg-black shadow-2xl">
+              {activeImageIndex === images.length && video ? (
+                <video
+                  src={video}
+                  controls
+                  autoPlay
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <Image
+                  src={images[activeImageIndex] || "/placeholder.svg"}
+                  alt={productName}
+                  fill
+                  className="object-cover bg-white"
+                />
+              )}
             </div>
             
-            {images.length > 1 && (
+            {(images.length > 1 || video) && (
               <div className="mt-4 flex justify-center gap-2 overflow-x-auto w-full pb-1 snap-x">
                 {images.map((src, i) => (
                   <button
@@ -172,6 +212,21 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                     <Image src={src || "/placeholder.svg"} alt="" fill className="object-cover p-1" />
                   </button>
                 ))}
+                {video && (
+                  <button
+                    onClick={() => onImageChange(images.length)}
+                    aria-label="View video"
+                    className={cx(
+                      "relative h-16 w-16 shrink-0 snap-center overflow-hidden rounded-md border bg-black transition flex items-center justify-center",
+                      activeImageIndex === images.length ? "border-primary border-2" : "border-transparent opacity-60 hover:opacity-100",
+                    )}
+                  >
+                    <svg className="h-6 w-6 fill-white absolute z-10" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <video src={video} className="h-full w-full object-cover opacity-60" />
+                  </button>
+                )}
               </div>
             )}
           </div>
