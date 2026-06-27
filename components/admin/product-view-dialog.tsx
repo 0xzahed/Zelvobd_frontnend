@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Loader2, PackageOpen, X } from "lucide-react"
+import { Loader2, PackageOpen, X, Star } from "lucide-react"
 import { formatBDT } from "@/lib/format"
 import { useProductDetails } from "@/src/hooks/api/useProducts"
 import {
@@ -163,6 +163,14 @@ export function ProductViewDialog({
                       <dt className="text-muted-foreground">Cut Price</dt>
                       <dd className="font-semibold text-foreground">{formatBDT(product.cutPrice)}</dd>
                     </div>
+                    {typeof product.rating === "number" && (
+                      <div>
+                        <dt className="text-muted-foreground">Rating</dt>
+                        <dd className="font-semibold flex items-center gap-1.5 text-foreground">
+                          <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500" /> {product.rating}
+                        </dd>
+                      </div>
+                    )}
                     <div>
                       <dt className="text-muted-foreground">Weight</dt>
                       <dd className="font-medium text-foreground">{product.weight || "N/A"}</dd>

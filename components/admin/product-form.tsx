@@ -58,6 +58,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   
   const [material, setMaterial] = useState(initial?.material ?? "")
   const [weight, setWeight] = useState(initial?.weight ?? "")
+  const [rating, setRating] = useState<string>(initial?.rating?.toString() ?? "")
   const [video, setVideo] = useState(initial?.video ?? "")
   const [videoName, setVideoName] = useState(() => {
     if (initial?.video) {
@@ -169,7 +170,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
       price,
       cutPrice,
       discount,
-      rating: initial?.rating ?? 4.5,
+      rating: rating.trim() !== "" ? parseFloat(rating) : undefined,
       reviews: initial?.reviews ?? 0,
       images,
       features: initial?.features ?? [],
@@ -329,10 +330,11 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           placeholder="Enter warranty details here..."
         />
 
-        {/* Material & Weight */}
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Material, Weight & Rating */}
+        <div className="grid gap-4 md:grid-cols-3">
           <Text label="Material" value={material} onChange={setMaterial} placeholder="Material" />
           <Text label="Weight" value={weight} onChange={setWeight} placeholder="e.g., 500g, 1.2kg" />
+          <Text label="Rating" value={rating} onChange={setRating} placeholder="e.g., 4.5" type="number" />
         </div>
 
         {/* Stock & Availability Checkboxes */}
@@ -582,12 +584,14 @@ function Text({
   onChange,
   required,
   placeholder,
+  type,
 }: {
   label: string
   value: string
   onChange: (v: string) => void
   required?: boolean
   placeholder?: string
+  type?: string
 }) {
   return (
     <label className="block text-sm">
@@ -595,6 +599,7 @@ function Text({
         {label} {required && <span className="text-accent">*</span>}
       </span>
       <input
+        type={type || "text"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
