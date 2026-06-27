@@ -72,6 +72,7 @@ const buildProductFormData = async (
       actualPrice: variant.actualPrice,
       discountedPrice: variant.discountedPrice,
       color: variant.color,
+      colorCode: variant.colorCode,
       size: variant.size,
       image: variant.image || product.images?.[0] || "",
     }
@@ -105,11 +106,20 @@ const buildProductFormData = async (
   formData.append("material", product.material?.trim() || "")
   formData.append("stock", String(product.stock))
   formData.append("availability", String(product.availability))
+  
+  if (product.variantLabel?.trim()) {
+    formData.append("variantLabel", product.variantLabel.trim())
+  }
+  
+  if (product.specifications && product.specifications.length > 0) {
+    formData.append("specifications", JSON.stringify(product.specifications))
+  }
 
-  const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, size }) => ({
+  const variantJsonPayload = variantPayload.map(({ actualPrice, discountedPrice, color, colorCode, size }) => ({
     actualPrice,
     discountedPrice,
     color,
+    colorCode: colorCode?.trim() || undefined,
     size: size?.trim() || "",
   }))
   
@@ -140,6 +150,8 @@ const buildProductFormData = async (
       console.log(`[buildProductFormData] Video appended:`, videoFile.name)
       formData.append("video", videoFile)
     }
+  } else {
+    formData.append("deleteVideo", "true")
   }
 
   console.log(`[buildProductFormData] FormData complete with ${uploadedImageCount} variant image(s)`)

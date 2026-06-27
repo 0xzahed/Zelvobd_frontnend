@@ -16,6 +16,7 @@ import {
 } from "@/src/hooks/api/useProducts"
 import { ProductForm } from "@/components/admin/product-form"
 import { ProductViewDialog } from "@/components/admin/product-view-dialog"
+import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
 import {
   AdminLoadingState,
   AdminPage,
@@ -45,6 +46,7 @@ export default function AdminProductsPage() {
   const [q, setQ] = useState("")
   const [addOpen, setAddOpen] = useState(false)
   const [viewProductId, setViewProductId] = useState<string | null>(null)
+  const [editProductId, setEditProductId] = useState<string | null>(null)
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
@@ -122,23 +124,22 @@ export default function AdminProductsPage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent
           showCloseButton={false}
-          className="flex max-h-[85dvh] flex-col overflow-hidden sm:max-w-5xl"
+          className="flex h-dvh w-screen max-w-[100vw]! flex-col overflow-hidden rounded-none border-0 p-0 sm:h-auto sm:max-h-[85dvh] sm:max-w-5xl! sm:rounded-2xl sm:border sm:border-border/60 sm:p-6 sm:shadow-2xl"
+          onInteractOutside={(e) => e.preventDefault()}
         >
-          <div className="sticky top-0 z-10 -mx-6 -mt-6 border-b border-border/60 bg-background/95 px-6 pt-1 pb-2 backdrop-blur">
-            <div className="flex items-start justify-between gap-4">
-              <DialogHeader className="text-left">
-                <DialogTitle>New Product</DialogTitle>
-                <DialogDescription>Add a new product to the catalog.</DialogDescription>
-              </DialogHeader>
-              <DialogClose
-                aria-label="Close"
-                className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
-              >
-                <X className="h-4 w-4" />
-              </DialogClose>
-            </div>
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-4">
+            <DialogHeader className="text-left">
+              <DialogTitle className="text-lg font-bold sm:text-xl">New Product</DialogTitle>
+              <DialogDescription className="hidden text-sm sm:block">Add a new product to the catalog.</DialogDescription>
+            </DialogHeader>
+            <DialogClose
+              aria-label="Close"
+              className="grid h-9 w-9 place-items-center rounded-full bg-muted/40 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+            </DialogClose>
           </div>
-          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-0 sm:pt-6">
             <ProductForm
               onSave={handleCreate}
               onCancel={() => setAddOpen(false)}
@@ -155,6 +156,16 @@ export default function AdminProductsPage() {
         onOpenChange={(open) => {
           if (!open) {
             setViewProductId(null)
+          }
+        }}
+      />
+
+      <ProductEditDialog
+        productId={editProductId}
+        open={Boolean(editProductId)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditProductId(null)
           }
         }}
       />
@@ -250,14 +261,15 @@ export default function AdminProductsPage() {
                   <Eye className="h-4 w-4" />
                   <span className="hidden text-[11px] font-semibold sm:inline">View</span>
                 </button>
-                <Link
-                  href={`/admin/products/${p.id}`}
+                <button
+                  type="button"
+                  onClick={() => setEditProductId(p.id)}
                   aria-label="Edit"
                   className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
                 >
                   <Pencil className="h-4 w-4" />
                   <span className="hidden text-[11px] font-semibold sm:inline">Edit</span>
-                </Link>
+                </button>
                 <button
                   onClick={() => handleCopy(p.id)}
                   disabled={copyMutation.isPending}

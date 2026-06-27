@@ -1,11 +1,12 @@
 "use client"
 
 import Image from "next/image"
-import { Loader2, PackageOpen } from "lucide-react"
+import { Loader2, PackageOpen, X } from "lucide-react"
 import { formatBDT } from "@/lib/format"
 import { useProductDetails } from "@/src/hooks/api/useProducts"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -29,11 +30,25 @@ export function ProductViewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88dvh] overflow-y-auto sm:max-w-5xl">
-        <DialogHeader className="text-left">
-          <DialogTitle>Product Details</DialogTitle>
-          <DialogDescription>Detailed admin view for this product.</DialogDescription>
-        </DialogHeader>
+      <DialogContent 
+        showCloseButton={false}
+        className="flex h-dvh w-screen max-w-[100vw]! flex-col overflow-hidden rounded-none border-0 p-0 sm:h-auto sm:max-h-[85dvh] sm:max-w-5xl! sm:rounded-2xl sm:border sm:border-border/60 sm:p-6 sm:shadow-2xl"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-4">
+          <DialogHeader className="text-left">
+            <DialogTitle className="text-lg font-bold sm:text-xl">Product Details</DialogTitle>
+            <DialogDescription className="hidden text-sm sm:block">Detailed admin view for this product.</DialogDescription>
+          </DialogHeader>
+          <DialogClose
+            aria-label="Close"
+            className="grid h-9 w-9 place-items-center rounded-full bg-muted/40 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+          >
+            <X className="h-4 w-4" />
+          </DialogClose>
+        </div>
+
+        <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-0 sm:pt-6">
 
         {isLoading ? (
           <div className="flex min-h-64 flex-col items-center justify-center gap-3">
@@ -85,11 +100,25 @@ export function ProductViewDialog({
 
                 {product.extraDescription && (
                   <div className="rounded-lg border border-border/70 bg-card p-4">
-                    <h3 className="text-sm font-semibold text-foreground">Extra Description</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Warranty</h3>
                     <div
                       className="prose prose-sm mt-3 max-w-none text-foreground"
                       dangerouslySetInnerHTML={{ __html: product.extraDescription }}
                     />
+                  </div>
+                )}
+
+                {product.specifications && product.specifications.length > 0 && (
+                  <div className="rounded-lg border border-border/70 bg-card p-4">
+                    <h3 className="text-sm font-semibold text-foreground">Specifications</h3>
+                    <div className="mt-3 divide-y divide-border/40 rounded-md border border-border/40">
+                      {product.specifications.map((spec, idx) => (
+                        <div key={idx} className="flex grid-cols-3 flex-col sm:grid sm:gap-4 p-3 text-sm">
+                          <dt className="font-medium text-foreground">{spec.title}</dt>
+                          <dd className="col-span-2 text-muted-foreground">{spec.information}</dd>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -186,10 +215,18 @@ export function ProductViewDialog({
                             />
                           </div>
                           <div className="min-w-0 flex-1 space-y-1 text-sm">
-                            <p className="font-medium text-foreground">
-                              {variant.color || "Default color"}
-                              {variant.size ? ` / ${variant.size}` : ""}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              {variant.colorCode && (
+                                <span 
+                                  className="h-3 w-3 shrink-0 rounded-full border border-border/50" 
+                                  style={{ backgroundColor: variant.colorCode }} 
+                                />
+                              )}
+                              <p className="font-medium text-foreground">
+                                {variant.color || "Default color"}
+                                {variant.size ? ` / ${product.variantLabel || "Size"}: ${variant.size}` : ""}
+                              </p>
+                            </div>
                             <p className="text-muted-foreground">
                               Actual: {formatBDT(variant.actualPrice)} | Discounted:{" "}
                               {formatBDT(variant.discountedPrice)}
@@ -211,6 +248,7 @@ export function ProductViewDialog({
             </div>
           </div>
         )}
+        </div>
       </DialogContent>
     </Dialog>
   )

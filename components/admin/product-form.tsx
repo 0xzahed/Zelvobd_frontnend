@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ImagePlus, Plus, Trash2, UploadCloud } from "lucide-react"
+import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import type { Product, ProductVariant } from "@/lib/types"
 import dynamic from "next/dynamic"
 import { useCategories, useSubCategories } from "@/src/hooks/api/useCategories"
@@ -31,7 +31,7 @@ function makeVariantId() {
 }
 
 function emptyVariant(): ProductVariant {
-  return { id: makeVariantId(), color: "", size: "", actualPrice: 0, discountedPrice: 0, image: "" }
+  return { id: makeVariantId(), color: "", colorCode: "#000000", size: "", actualPrice: 0, discountedPrice: 0, image: "" }
 }
 
 const htmlToPlainText = (html: string) => {
@@ -59,10 +59,20 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const [material, setMaterial] = useState(initial?.material ?? "")
   const [weight, setWeight] = useState(initial?.weight ?? "")
   const [video, setVideo] = useState(initial?.video ?? "")
-  const [videoName, setVideoName] = useState("")
+  const [videoName, setVideoName] = useState(() => {
+    if (initial?.video) {
+      const parts = initial.video.split("/")
+      return parts[parts.length - 1]
+    }
+    return ""
+  })
 
   const [stock, setStock] = useState<boolean>(initial?.stock ?? true)
   const [availability, setAvailability] = useState<boolean>(initial?.availability ?? true)
+  const [variantLabel, setVariantLabel] = useState(initial?.variantLabel ?? "Size")
+  const [specifications, setSpecifications] = useState<{title: string; information: string}[]>(
+    initial?.specifications || []
+  )
 
   const videoInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -128,6 +138,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
     const cleanVariants: ProductVariant[] = variants.map((v) => ({
       id: v.id,
       color: v.color.trim() || "Default",
+      colorCode: v.colorCode?.trim() || undefined,
       size: v.size.trim(),
       actualPrice: Math.max(0, Number(v.actualPrice) || 0),
       discountedPrice: Math.max(0, Number(v.discountedPrice) || 0),
@@ -164,12 +175,14 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
       features: initial?.features ?? [],
       isTrending: initial?.isTrending ?? false,
       isFlashSale: initial?.isFlashSale ?? false,
-      stock, 
+      weight: weight.trim() || undefined,
+      material: material.trim() || undefined,
+      stock,
       availability,
       whatsapp: initial?.whatsapp ?? "+8801700000000",
-      weight: weight.trim() || undefined,
       video: video.trim() || undefined,
-      material: material.trim() || undefined,
+      variantLabel,
+      specifications: specifications.filter(s => s.title.trim() !== "" && s.information.trim() !== ""),
       variants: cleanVariants,
     }
     onSave(product, descriptionDelta, extraDescriptionDelta, categoryId, subCategoryId)
@@ -235,6 +248,62 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           <Text label="Brand" value={brand} onChange={setBrand} placeholder="Brand name" />
         </div>
 
+        {/* Specifications */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-foreground">Specifications</span>
+            <button
+              type="button"
+              onClick={() => setSpecifications([...specifications, { title: "", information: "" }])}
+              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md bg-primary/10 px-4 text-xs font-semibold text-primary transition hover:bg-primary/20"
+            >
+              <Plus className="h-4 w-4" /> Add Specification
+            </button>
+          </div>
+          {specifications.length > 0 && (
+            <div className="space-y-3">
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex flex-col gap-3 rounded-md border border-border/40 bg-muted/10 p-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={spec.title}
+                      onChange={(e) => {
+                        const newSpecs = [...specifications];
+                        newSpecs[index].title = e.target.value;
+                        setSpecifications(newSpecs);
+                      }}
+                      className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSpecs = specifications.filter((_, i) => i !== index);
+                        setSpecifications(newSpecs);
+                      }}
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-destructive/20 bg-destructive/10 text-destructive transition hover:bg-destructive/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <textarea
+                    rows={3}
+                    placeholder="Information"
+                    value={spec.information}
+                    onChange={(e) => {
+                      const newSpecs = [...specifications];
+                      newSpecs[index].information = e.target.value;
+                      setSpecifications(newSpecs);
+                    }}
+                    className="w-full resize-y rounded-md border border-border/80 bg-background p-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Description */}
         <QuillEditor
           label="Description"
@@ -248,16 +317,16 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
           placeholder="Detailed product description..."
         />
 
-        {/* Extra description */}
+        {/* Warranty */}
         <QuillEditor
-          label="Extra description"
+          label="Warranty"
           value={extraDescription}
           deltaValue={extraDescriptionDelta}
           onChange={(html, delta) => {
             setExtraDescription(html)
             setExtraDescriptionDelta(delta)
           }}
-          placeholder="Additional info, specs, warranty..."
+          placeholder="Enter warranty details here..."
         />
 
         {/* Material & Weight */}
@@ -301,11 +370,22 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
             <button
               type="button"
               onClick={addVariant}
-              className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
+              className="inline-flex h-9 shrink-0 items-center rounded-md bg-primary px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
               Add Variant
             </button>
           </div>
+
+          <label className="block text-xs">
+            <span className="mb-1.5 block font-semibold text-foreground">Variant Label (Size, Storage)</span>
+            <input 
+              type="text" 
+              value={variantLabel} 
+              onChange={(e) => setVariantLabel(e.target.value)}
+              placeholder="Size"
+              className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
+            />
+          </label>
 
           <p className="text-[11px] text-muted-foreground">
             Minimum one variant is required. Upload a separate image for each.
@@ -356,9 +436,9 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                     />
                   </label>
 
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Color</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">Color Name</span>
                       <input
                         value={v.color}
                         onChange={(e) => updateVariant(v.id, { color: e.target.value })}
@@ -367,11 +447,34 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
                       />
                     </label>
                     <label className="block text-xs">
-                      <span className="mb-1.5 block font-semibold text-foreground">Size</span>
+                      <span className="mb-1.5 block font-semibold text-foreground">Color Code</span>
+                      <div className="flex h-10 w-full overflow-hidden rounded-md border border-border/80 bg-background focus-within:border-primary/60">
+                        <div className="relative flex h-10 w-12 shrink-0 items-center justify-center border-r border-border/80 bg-muted/30">
+                          <input
+                            type="color"
+                            value={v.colorCode || "#000000"}
+                            onChange={(e) => updateVariant(v.id, { colorCode: e.target.value })}
+                            className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                          />
+                          <div
+                            className="h-6 w-6 rounded-md border border-border/50 shadow-sm"
+                            style={{ backgroundColor: v.colorCode || "#000000" }}
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          value={v.colorCode || ""}
+                          onChange={(e) => updateVariant(v.id, { colorCode: e.target.value })}
+                          placeholder="#000000"
+                          className="h-full flex-1 bg-transparent px-2 text-sm outline-none cursor-text caret-current uppercase"
+                        />
+                      </div>
+                    </label>
+                    <label className="block text-xs">
+                      <span className="mb-1.5 block font-semibold text-foreground">{variantLabel || "Size"}</span>
                       <input
                         value={v.size}
                         onChange={(e) => updateVariant(v.id, { size: e.target.value })}
-                        placeholder="Optional"
                         className="h-10 w-full rounded-md border border-border/80 bg-background px-3 text-sm outline-none focus:border-primary/60 cursor-text caret-current"
                       />
                     </label>
@@ -411,19 +514,37 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         {/* Video Upload */}
         <div className="pt-3">
           <span className="mb-2 block text-sm font-semibold text-foreground">Video Upload (Optional)</span>
-          <button
-            type="button"
-            onClick={() => videoInputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-secondary/50 px-4 py-8 text-center transition hover:border-primary/70 hover:bg-secondary"
-          >
-            <UploadCloud className="h-6 w-6 text-primary" />
-            <span className="text-sm font-semibold text-primary">
-              {videoName ? videoName : "Click to upload video"}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Maximum video size 100 MB
-            </span>
-          </button>
+          {video ? (
+            <div className="relative overflow-hidden rounded-lg border-2 border-border/80 bg-black">
+              <video src={video} controls className="h-48 w-full object-contain" />
+              <button
+                type="button"
+                onClick={() => {
+                  setVideo("")
+                  setVideoName("")
+                  if (videoInputRef.current) videoInputRef.current.value = ""
+                }}
+                className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-red-500/80 text-white backdrop-blur transition hover:bg-red-600"
+                aria-label="Remove video"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => videoInputRef.current?.click()}
+              className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-secondary/50 px-4 py-8 text-center transition hover:border-primary/70 hover:bg-secondary"
+            >
+              <UploadCloud className="mb-2 h-6 w-6 text-primary" />
+              <span className="text-sm font-medium text-foreground">
+                Click to upload video
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Maximum video size 100 MB
+              </span>
+            </button>
+          )}
           <input
             ref={videoInputRef}
             type="file"
