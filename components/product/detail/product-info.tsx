@@ -5,6 +5,12 @@ import { useState } from "react"
 import { ListChecks, Minus, Plus, Truck } from "lucide-react"
 import { cx, formatBDT } from "@/lib/format"
 import type { Product, ProductVariant } from "@/lib/types"
+import dynamic from "next/dynamic"
+
+const QuillEditor = dynamic(
+  () => import("@/components/ui/quill-editor").then((mod) => mod.QuillEditor),
+  { ssr: false }
+)
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -257,9 +263,10 @@ export function ProductInfo({
             {product.description ? (
               <div>
                 <h3 className="mb-4 text-2xl font-semibold text-gray-900">Description</h3>
-                <div
-                  className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
+                <QuillEditor 
+                  readOnly 
+                  deltaValue={product.descriptionDelta} 
+                  value={product.description} 
                 />
               </div>
             ) : (
@@ -273,9 +280,10 @@ export function ProductInfo({
           <div className="animate-in fade-in duration-300">
             <h3 className="mb-4 text-2xl font-semibold text-gray-900">Warentee</h3>
             {product.extraDescription ? (
-              <div
-                className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-                dangerouslySetInnerHTML={{ __html: product.extraDescription }}
+              <QuillEditor 
+                readOnly 
+                deltaValue={product.extraDescriptionDelta} 
+                value={product.extraDescription} 
               />
             ) : (
               <p className="text-sm text-gray-500">No warranty information available.</p>
