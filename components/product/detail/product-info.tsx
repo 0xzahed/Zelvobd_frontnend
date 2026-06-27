@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import { ListChecks, Minus, Plus, Truck } from "lucide-react"
 import { cx, formatBDT } from "@/lib/format"
 import type { Product, ProductVariant } from "@/lib/types"
@@ -70,6 +72,8 @@ export function ProductInfo({
   qty,
   onQtyChange,
 }: ProductInfoProps) {
+  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("description")
+
   // If activeVariant is missing, fallback to product level pricing (from mapper)
   const isFlashSale = product.isFlashSale
   const price = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.flashSalePrice : (activeVariant?.discountedPrice || product.price)
@@ -197,9 +201,30 @@ export function ProductInfo({
         </p>
       </div>
 
+      {/* Tabs */}
+      <div className="flex items-center gap-3">
+        {(["specification", "description", "warranty"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={cx(
+              "px-4 py-2 rounded-sm shadow-sm text-[14px] font-medium transition",
+              activeTab === tab 
+                ? "bg-primary text-white" 
+                : "bg-[#fcfcfc] text-[#292929] hover:bg-gray-100"
+            )}
+          >
+            {tab === "specification" && "Specification"}
+            {tab === "description" && "Description"}
+            {tab === "warranty" && "Warentee"}
+          </button>
+        ))}
+      </div>
+
       {/* Description */}
       {product.description && (
-        <div className="border-t border-border/40 pt-4">
+        <div className="pt-4">
           <h3 className="mb-2 text-sm font-medium text-foreground">Description</h3>
           <div
             className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
