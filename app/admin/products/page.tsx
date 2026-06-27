@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Copy, Eye, Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { Copy, Eye, Pencil, Plus, Trash2, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/types"
@@ -17,6 +17,14 @@ import {
 import { ProductForm } from "@/components/admin/product-form"
 import { ProductViewDialog } from "@/components/admin/product-view-dialog"
 import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
+import {
+  AdminLoadingState,
+  AdminPage,
+  AdminPageHeader,
+  AdminPrimaryButton,
+  AdminSearchInput,
+  AdminToolbar,
+} from "@/components/admin/admin-ui"
 import {
   Dialog,
   DialogClose,
@@ -93,33 +101,25 @@ export default function AdminProductsPage() {
   }, [products, q])
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Products</h2>
-          <p className="text-xs text-muted-foreground">{products.length} total</p>
-        </div>
-        <div className="flex w-full items-center gap-2">
-          <div className="flex h-10 min-w-0 flex-3 items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
+    <AdminPage>
+      <AdminPageHeader
+        title="Products"
+        count={`${products.length} total`}
+        actions={
+          <AdminToolbar>
+            <AdminSearchInput
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={setQ}
               placeholder="Search products..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
-          </div>
-          <button
-            type="button"
-            onClick={() => setAddOpen(true)}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
-          >
-            <Plus className="hidden h-4 w-4 md:inline-flex" />
-            <span className="md:hidden">Add</span>
-            <span className="hidden md:inline">Add Product</span>
-          </button>
-        </div>
-      </div>
+            <AdminPrimaryButton onClick={() => setAddOpen(true)}>
+              <Plus className="h-4 w-4" />
+              <span className="md:hidden">Add</span>
+              <span className="hidden md:inline">Add Product</span>
+            </AdminPrimaryButton>
+          </AdminToolbar>
+        }
+      />
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent
@@ -173,20 +173,17 @@ export default function AdminProductsPage() {
       {/* Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {isLoading && (
-          <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
-            <div className="flex flex-col items-center justify-center gap-2">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-xs text-muted-foreground">Loading products...</p>
-            </div>
+          <div className="col-span-full rounded-xl border border-border/70 bg-card">
+            <AdminLoadingState label="Loading products..." />
           </div>
         )}
         {!isLoading && filtered.length === 0 && (
-          <div className="col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+          <div className="col-span-full rounded-xl border border-border/70 bg-card p-10 text-center text-sm text-muted-foreground">
             No products found.
           </div>
         )}
         {!isLoading && filtered.map((p: any) => (
-          <div key={p.id} className="flex flex-col overflow-hidden rounded-sm border border-border/40 bg-card shadow-card transition hover:shadow-lg sm:h-48 sm:flex-row">
+          <div key={p.id} className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card shadow-card transition hover:border-primary/20 hover:shadow-md sm:h-48 sm:flex-row">
             {/* Image */}
             <div className="relative h-48 w-full shrink-0 overflow-hidden bg-muted/10 sm:h-full sm:w-36 sm:border-r sm:border-border/40">
               <Image
@@ -296,6 +293,6 @@ export default function AdminProductsPage() {
           </div>
         ))}
       </div>
-    </div>
+    </AdminPage>
   )
 }

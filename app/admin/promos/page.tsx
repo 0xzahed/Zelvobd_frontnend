@@ -1,10 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { Pencil, Plus, Trash2, X } from "lucide-react"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { notify } from "@/lib/notify"
 import { Switch } from "@/components/ui/switch"
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminPrimaryButton,
+  AdminSearchInput,
+  AdminToolbar,
+} from "@/components/admin/admin-ui"
 import {
   usePromos,
   useCreatePromo,
@@ -110,31 +117,24 @@ export default function AdminPromosPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">Promo Codes</h2>
-          <p className="text-xs text-muted-foreground">{promos.length} total</p>
-        </div>
-        <div className="flex w-full items-center gap-2 md:w-auto">
-          <div className="flex h-10 min-w-0 flex-3 items-center gap-2 rounded-sm bg-card px-3 shadow-sm md:w-64">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
+    <AdminPage>
+      <AdminPageHeader
+        title="Promo Codes"
+        count={`${promos.length} total`}
+        actions={
+          <AdminToolbar>
+            <AdminSearchInput
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={setQ}
               placeholder="Search code..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="md:w-64"
             />
-          </div>
-          <button
-            type="button"
-            onClick={openCreate}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 md:flex-none"
-          >
-            <Plus className="h-4 w-4" /> Add
-          </button>
-        </div>
-      </div>
+            <AdminPrimaryButton onClick={openCreate}>
+              <Plus className="h-4 w-4" /> Add
+            </AdminPrimaryButton>
+          </AdminToolbar>
+        }
+      />
 
       <div className="space-y-3 md:hidden">
         {isLoading && (
@@ -427,6 +427,6 @@ export default function AdminPromosPage() {
           </form>
         </div>
       )}
-    </div>
+    </AdminPage>
   )
 }

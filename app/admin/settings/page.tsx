@@ -1,6 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Save, RotateCcw } from "lucide-react"
+import {
+  AdminField,
+  AdminInput,
+  AdminPage,
+  AdminPageHeader,
+  AdminPanel,
+  AdminPrimaryButton,
+  AdminSecondaryButton,
+} from "@/components/admin/admin-ui"
 
 type Settings = {
   storeName: string
@@ -74,85 +84,76 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-          <p className="text-sm text-muted-foreground">General store configuration.</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={reset}
-            className="h-11 rounded-xl border border-border bg-background px-5 text-sm font-semibold text-foreground"
-          >
-            Reset
-          </button>
-          <button
-            onClick={save}
-            className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-card"
-          >
-            {saved ? "Saved!" : "Save changes"}
-          </button>
-        </div>
-      </header>
+    <AdminPage>
+      <AdminPageHeader
+        title="Settings"
+        description="General store configuration"
+        actions={
+          <>
+            <AdminSecondaryButton onClick={reset}>
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </AdminSecondaryButton>
+            <AdminPrimaryButton onClick={save}>
+              <Save className="h-4 w-4" />
+              {saved ? "Saved!" : "Save changes"}
+            </AdminPrimaryButton>
+          </>
+        }
+      />
 
-      <section className="grid gap-5 rounded-2xl border border-border/70 bg-card p-6 shadow-card md:grid-cols-2">
-        <Field label="Store name">
-          <input
+      <AdminPanel className="grid gap-5 p-6 md:grid-cols-2">
+        <AdminField label="Store name">
+          <AdminInput
             value={settings.storeName}
             onChange={(e) => update("storeName", e.target.value)}
-            className="input"
           />
-        </Field>
-        <Field label="Support email">
-          <input
+        </AdminField>
+        <AdminField label="Support email">
+          <AdminInput
             type="email"
             value={settings.supportEmail}
             onChange={(e) => update("supportEmail", e.target.value)}
-            className="input"
           />
-        </Field>
-        <Field label="Currency">
+        </AdminField>
+        <AdminField label="Currency">
           <select
             value={settings.currency}
             onChange={(e) => update("currency", e.target.value)}
-            className="input"
+            className="admin-input h-11 w-full rounded-xl border border-border bg-background px-3.5 text-sm"
           >
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>
             <option value="BDT">BDT (৳)</option>
           </select>
-        </Field>
-        <Field label="Delivery fee">
-          <input
+        </AdminField>
+        <AdminField label="Delivery fee">
+          <AdminInput
             type="number"
             step="0.01"
             value={settings.deliveryFee}
             onChange={(e) => update("deliveryFee", Number(e.target.value))}
-            className="input"
           />
-        </Field>
-        <Field label="Free delivery threshold">
-          <input
+        </AdminField>
+        <AdminField label="Free delivery threshold">
+          <AdminInput
             type="number"
             step="0.01"
             value={settings.freeDeliveryThreshold}
             onChange={(e) => update("freeDeliveryThreshold", Number(e.target.value))}
-            className="input"
           />
-        </Field>
-        <Field label="Announcement banner" full>
-          <input
+        </AdminField>
+        <AdminField label="Announcement banner" full>
+          <AdminInput
             value={settings.announcement}
             onChange={(e) => update("announcement", e.target.value)}
-            className="input"
           />
-        </Field>
+        </AdminField>
 
-        <Field label="Floating icon images" full>
+        <AdminField label="Floating icon images" full>
           <div className="space-y-3">
-            <input
+            <AdminInput
               type="file"
               accept="image/*"
               multiple
@@ -161,7 +162,6 @@ export default function AdminSettingsPage() {
                 void addFloatingImages(files)
                 e.currentTarget.value = ""
               }}
-              className="input"
             />
             {settings.floatingIconImages.length > 0 ? (
               <div className="flex flex-wrap gap-3">
@@ -183,7 +183,7 @@ export default function AdminSettingsPage() {
                       className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-destructive text-xs font-semibold text-white"
                       aria-label="Remove image"
                     >
-                      x
+                      ×
                     </button>
                   </div>
                 ))}
@@ -192,41 +192,18 @@ export default function AdminSettingsPage() {
               <p className="text-xs text-muted-foreground">No images added yet.</p>
             )}
           </div>
-        </Field>
+        </AdminField>
 
-        <Field label="Floating icon change interval (seconds)" full>
-          <input
+        <AdminField label="Floating icon change interval (seconds)" full>
+          <AdminInput
             type="number"
             min={1}
             step={0.5}
             value={settings.floatingIconIntervalSec}
             onChange={(e) => update("floatingIconIntervalSec", Number(e.target.value) || 1)}
-            className="input"
           />
-        </Field>
-      </section>
-
-      <style jsx>{`
-        :global(.input) {
-          height: 2.75rem;
-          width: 100%;
-          border-radius: 0.75rem;
-          border: 1px solid hsl(var(--border));
-          background: hsl(var(--background));
-          padding: 0 0.875rem;
-          font-size: 0.875rem;
-          color: hsl(var(--foreground));
-        }
-      `}</style>
-    </div>
-  )
-}
-
-function Field({ label, full = false, children }: { label: string; full?: boolean; children: React.ReactNode }) {
-  return (
-    <label className={`flex flex-col gap-1.5 ${full ? "md:col-span-2" : ""}`}>
-      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
-      {children}
-    </label>
+        </AdminField>
+      </AdminPanel>
+    </AdminPage>
   )
 }

@@ -7,6 +7,11 @@ import type { Slider } from "@/lib/types"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { AdminSelect } from "@/components/admin/admin-select"
 import { notify } from "@/lib/notify"
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminPrimaryButton,
+} from "@/components/admin/admin-ui"
 import { useCategories } from "@/src/hooks/api/useCategories"
 import {
   useBanners,
@@ -128,19 +133,16 @@ export default function AdminSliders() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Banners</h2>
-          <p className="text-xs text-muted-foreground">{sliders.length} total</p>
-        </div>
-        <button
-          onClick={openCreate}
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" /> Add Banner
-        </button>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        title="Banners"
+        count={`${sliders.length} total`}
+        actions={
+          <AdminPrimaryButton onClick={openCreate}>
+            <Plus className="h-4 w-4" /> Add Banner
+          </AdminPrimaryButton>
+        }
+      />
 
       {/* Cards */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -350,6 +352,6 @@ export default function AdminSliders() {
           </form>
         </div>
       )}
-    </div>
+    </AdminPage>
   )
 }

@@ -2,10 +2,17 @@
 
 import { useMemo, useRef, useState } from "react"
 import Image from "next/image"
-import { Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { Eye, ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react"
 import type { Category } from "@/lib/types"
 import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminPrimaryButton,
+  AdminSearchInput,
+  AdminToolbar,
+} from "@/components/admin/admin-ui"
 import { getCategoryDetails } from "@/src/api/categoryApi"
 import { toAbsoluteUrl, handleApiError } from "@/lib/api-utils"
 import {
@@ -159,44 +166,37 @@ export default function AdminCategoriesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Categories</h2>
-          <p className="text-xs text-muted-foreground">{categories.length} total</p>
-        </div>
-        <div className="flex w-full items-center gap-2">
-          <div className="flex h-10 min-w-0 flex-[3] items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <input
+    <AdminPage>
+      <AdminPageHeader
+        title="Categories"
+        count={`${categories.length} total`}
+        actions={
+          <AdminToolbar>
+            <AdminSearchInput
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={setQuery}
               placeholder="Search categories..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
-          </div>
-          <button
-            onClick={openAdd}
-            className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
-          >
-            <Plus className="hidden h-4 w-4 md:inline-flex" />
-            <span className="md:hidden">Add</span>
-            <span className="hidden md:inline">Add Category</span>
-          </button>
-        </div>
-      </div>
+            <AdminPrimaryButton onClick={openAdd}>
+              <Plus className="h-4 w-4" />
+              <span className="md:hidden">Add</span>
+              <span className="hidden md:inline">Add Category</span>
+            </AdminPrimaryButton>
+          </AdminToolbar>
+        }
+      />
 
       {/* Cards */}
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {filtered.length === 0 && (
-            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
+            <div className="col-span-full rounded-xl border border-border/70 bg-card p-10 text-center text-sm text-muted-foreground">
               No categories found.
             </div>
           )}
           {filtered.map((cat) => (
             <div
               key={cat.id}
-              className="flex rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 overflow-hidden"
+              className="flex overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm transition hover:border-primary/20 hover:shadow-md"
             >
               <div className="relative h-auto w-28 shrink-0 self-stretch overflow-hidden rounded-l-[8px] border-r border-border/40 bg-muted/10">
                 <Image
@@ -389,6 +389,6 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   )
 }

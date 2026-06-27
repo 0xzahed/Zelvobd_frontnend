@@ -7,6 +7,11 @@ import { notify } from "@/lib/notify"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { useAuth } from "@/contexts/auth-context"
 import { handleApiError } from "@/lib/api-utils"
+import {
+  AdminPage,
+  AdminPageHeader,
+  AdminPrimaryButton,
+} from "@/components/admin/admin-ui"
 
 type AdminUser = {
   id: string
@@ -187,19 +192,16 @@ export default function AdminsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Admins</h2>
-          <p className="text-xs text-muted-foreground">{admins.length} total</p>
-        </div>
-        <button
-          onClick={openAdd}
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" /> Add Admin
-        </button>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        title="Admins"
+        count={`${admins.length} total`}
+        actions={
+          <AdminPrimaryButton onClick={openAdd}>
+            <Plus className="h-4 w-4" /> Add Admin
+          </AdminPrimaryButton>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {!loading && admins.map((a) => (
@@ -325,6 +327,6 @@ export default function AdminsPage() {
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   )
 }

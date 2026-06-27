@@ -62,14 +62,14 @@ export function TrendingSection() {
           See All <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+      <div className="flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
         {trending.slice(0, 8).map((p) => (
-          <div key={p.id} className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
+          <div key={p.id} className="w-[calc((100%-0.25rem)/2.2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}
         {trending.length > 8 && (
-          <div className="w-[calc((100%-0.75rem)/2.2)] shrink-0 md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-3rem)/5)]">
+          <div className="w-[calc((100%-0.25rem)/2.2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
             <Link
               href="/trending"
               className="group flex h-full items-center justify-center rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md"

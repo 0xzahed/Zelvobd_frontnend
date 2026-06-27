@@ -43,43 +43,40 @@ export function ProductCard({
     <Link
       href={productUrl}
       className={cx(
-        "group relative flex h-full snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
+        "group relative flex h-full snap-start flex-col overflow-hidden rounded-sm border border-border/60 bg-card p-1 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md",
         compact
           ? "w-44 shrink-0 md:w-48 lg:w-56"
           : emphasis
-            ? "w-full p-4 md:h-96 md:max-w-225"
-            : "w-full p-2.5 md:h-80 md:max-w-225 md:p-2",
+            ? "w-full p-3 md:h-96 md:max-w-225"
+            : "w-full md:h-80 md:max-w-225",
       )}
     >
+      {/* Discount badge - top left tag using Vector.svg */}
+      {discountPercent > 0 && (
+        <div className="absolute left-2 top-2 z-10">
+          <span
+            className="flex items-center justify-center text-[9px] font-bold text-white"
+            style={{
+              backgroundImage: 'url(/Vector.svg)',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '100% 100%',
+              width: '38px',
+              height: '18px',
+              paddingLeft: '2px',
+            }}
+          >
+            -{discountPercent}%
+          </span>
+        </div>
+      )}
+
       {/* Image */}
       <div
         className={cx(
-          "relative w-full overflow-hidden rounded-xl bg-card",
-          compact ? "aspect-square" : "aspect-5/4 md:aspect-auto md:flex-1 md:min-h-0",
+          "relative w-full overflow-hidden rounded-xl bg-transparent",
+          compact ? "aspect-square" : "aspect-square md:aspect-auto md:flex-1 md:min-h-0",
         )}
       >
-        <div className="absolute right-0.5 top-0.5 z-10 flex flex-col items-center gap-1">
-          {product.isFlashSale && (
-            <div
-              className={cx(
-                "grid shrink-0 place-items-center rounded-full bg-destructive/10",
-                emphasis ? "h-9 w-9 md:h-10 md:w-10" : "h-7 w-7 md:h-8 md:w-8",
-              )}
-            >
-              <Flame className={cx("text-destructive", emphasis ? "h-5 w-5 md:h-6 md:w-6" : "h-4 w-4 md:h-5 md:w-5")} />
-            </div>
-          )}
-          {product.isFreeDelivery && (
-            <div
-              className={cx(
-                "grid shrink-0 place-items-center rounded-full bg-emerald-100",
-                emphasis ? "h-9 w-9 md:h-10 md:w-10" : "h-7 w-7 md:h-8 md:w-8",
-              )}
-            >
-              <Truck className={cx("text-emerald-700", emphasis ? "h-5 w-5 md:h-6 md:w-6" : "h-4 w-4 md:h-5 md:w-5")} />
-            </div>
-          )}
-        </div>
         <Image
           src={src || "/placeholder.svg"}
           alt={product.name}
@@ -89,58 +86,66 @@ export function ProductCard({
         />
       </div>
 
-      <div className="mt-3 flex min-w-0 flex-1 flex-col">
-        {/* Title */}
+      <div className="mt-2 flex min-w-0 flex-1 flex-col">
+        {/* Title - 2 lines, centered */}
         <h3
           className={cx(
-            "block w-full truncate whitespace-nowrap font-semibold leading-tight text-foreground",
+            "line-clamp-2 text-center font-semibold leading-tight text-foreground",
             compact
-              ? "text-sm"
+              ? "text-[14px]"
               : emphasis
-                ? "text-lg md:text-2xl"
-                : "text-base md:text-xl",
+                ? "text-[14px] md:text-lg"
+                : "text-[14px]",
           )}
         >
           {product.name}
         </h3>
 
-        {/* Current price */}
-        <div
-          className={cx(
-            "mt-1 truncate whitespace-nowrap font-medium text-foreground",
-            compact
-              ? "text-[15px]"
-              : emphasis
-                ? "text-base md:text-2xl"
-                : "text-[15px] md:text-xl",
-          )}
-        >
-          {formatBDT(product.price)}
-        </div>
-
-        {/* Keep a fixed row so card height stays consistent on mobile */}
-        <div className="mt-1 min-h-4 flex items-center gap-1 overflow-hidden whitespace-nowrap">
+        {/* Price + Cut price - same line, left aligned, smaller */}
+        <div className="mt-1 flex items-center gap-1.5">
+          <span
+            className={cx(
+              "font-semibold text-foreground",
+              compact
+                ? "text-[11px]"
+                : emphasis
+                  ? "text-xs md:text-base"
+                  : "text-[11px] md:text-sm",
+            )}
+          >
+            {formatBDT(product.price)}
+          </span>
           {product.cutPrice > product.price && (
-            <span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground line-through">
+            <span className="text-[10px] text-muted-foreground line-through">
               {formatBDT(product.cutPrice)}
             </span>
           )}
-          {discountPercent > 0 && (
-            <span className="shrink-0 whitespace-nowrap rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 md:px-2 md:text-[11px]">
-              {discountPercent}% OFF
+        </div>
+
+        {/* Flash / Free Delivery badges - below price, left aligned */}
+        <div className="mt-1 flex items-center gap-1">
+          {product.isFlashSale && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[8px] font-semibold text-red-600">
+              <Flame className="h-2.5 w-2.5" /> Flash Sale
+            </span>
+          )}
+          {product.isFreeDelivery && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[8px] font-semibold text-emerald-700">
+              <Truck className="h-2.5 w-2.5" /> Free Delivery
             </span>
           )}
         </div>
 
         {/* Actions */}
-        <div className="mt-auto flex items-center gap-2 pt-2.5">
+        <div className="mt-auto flex items-center gap-2 pt-2">
           <span
             className={cx(
-              "flex flex-1 items-center justify-center rounded-full border border-border font-medium text-foreground transition-colors duration-200 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground",
-              emphasis ? "h-10 text-base" : "h-9 text-sm",
+              "flex flex-1 items-center justify-center rounded-full text-xs font-semibold text-white",
+              emphasis ? "h-9" : "h-8",
             )}
+            style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}
           >
-            Shop Now
+            Buy Now
           </span>
           <button
             type="button"
@@ -148,10 +153,10 @@ export function ProductCard({
             aria-label="Add to cart"
             className={cx(
               "flex shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted",
-              emphasis ? "h-10 w-10" : "h-9 w-9",
+              emphasis ? "h-9 w-9" : "h-8 w-8",
             )}
           >
-            <ShoppingCart className={cx(emphasis ? "h-5 w-5" : "h-4 w-4")} />
+            <ShoppingCart className={cx(emphasis ? "h-4 w-4" : "h-3.5 w-3.5")} />
           </button>
         </div>
       </div>
