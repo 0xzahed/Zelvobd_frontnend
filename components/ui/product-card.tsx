@@ -55,13 +55,13 @@ export function ProductCard({
       {discountPercent > 0 && (
         <div className="absolute left-2 top-2 z-10">
           <span
-            className="flex items-center justify-center text-[9px] font-bold text-white"
+            className="flex items-center justify-center text-[8px] font-bold text-white"
             style={{
               backgroundImage: 'url(/Vector.svg)',
               backgroundRepeat: 'no-repeat',
               backgroundSize: '100% 100%',
-              width: '38px',
-              height: '18px',
+              width: '52px',
+              height: '20px',
               paddingLeft: '2px',
             }}
           >
