@@ -1,6 +1,6 @@
 "use client"
 
-import { ListChecks, Minus, Plus } from "lucide-react"
+import { ListChecks, Minus, Plus, Truck } from "lucide-react"
 import { cx, formatBDT } from "@/lib/format"
 import type { Product, ProductVariant } from "@/lib/types"
 
@@ -188,6 +188,14 @@ export function ProductInfo({
           </div>
         </div>
       )}
+
+      {/* Delivery Timescale */}
+      <div className="rounded-sm border border-gray-200 p-4 bg-white/50 flex items-center gap-3">
+        <Truck className="h-6 w-6 text-gray-700" strokeWidth={1.5} />
+        <p className="text-base text-[#171717]">
+          Delivery Timescale: <span className="font-semibold">2-5 Days</span>
+        </p>
+      </div>
 
       {/* Description */}
       {product.description && (
