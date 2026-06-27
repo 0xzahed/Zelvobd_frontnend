@@ -79,8 +79,7 @@ export function ProductInfo({
         new Set(
           product.variants
             ?.filter((variant) => variant.color?.trim().toLowerCase() === selectedColor.trim().toLowerCase())
-            .map((variant) => variant.size?.trim())
-            .filter(Boolean) ?? [],
+            .flatMap((variant) => variant.size?.split(',').map(s => s.trim()).filter(Boolean) ?? []) ?? [],
         ),
       )
     : uniqueSizes
@@ -163,8 +162,10 @@ export function ProductInfo({
 
       {/* Sizes */}
       {availableSizes.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-foreground">Size</p>
+        <div className="rounded-sm border border-gray-200 p-4 bg-white/50 mt-4 md:mt-5">
+          <p className="mb-3 text-base font-semibold text-gray-900">
+            {product.variantLabel || "Size"}:
+          </p>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((s) => {
               const selected = selectedSize === s
@@ -174,13 +175,13 @@ export function ProductInfo({
                   key={s}
                   onClick={() => onSizeChange(s)}
                   className={cx(
-                    "rounded-full border bg-transparent px-3 py-1 text-sm transition",
+                    "flex h-9 items-center justify-center rounded-full border bg-white px-4 transition",
                     selected
-                      ? "border-primary text-primary bg-primary/5"
-                      : "border-border/60 text-foreground hover:border-border",
+                      ? "border-primary border-[1.5px]"
+                      : "border-gray-200 hover:border-gray-300",
                   )}
                 >
-                  {s}
+                  <span className="text-sm font-medium text-gray-700">{s}</span>
                 </button>
               )
             })}

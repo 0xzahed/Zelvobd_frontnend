@@ -49,8 +49,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const uniqueSizes = useMemo(() => Array.from(
     new Set(
       variants
-        .map((v) => (v.size || "").trim())
-        .filter(Boolean),
+        .flatMap((v) => (v.size || "").split(",").map(s => s.trim()).filter(Boolean))
     ),
   ), [variants])
 
@@ -81,7 +80,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   // Find exact active variant based on selected color and size
   const activeVariant = useMemo(() => {
     return variants.find(
-      v => norm(v.color) === norm(selectedColor) && norm(v.size) === norm(selectedSize)
+      v => norm(v.color) === norm(selectedColor) && v.size.split(",").map(norm).includes(norm(selectedSize))
     ) || variants.find((v) => norm(v.color) === norm(selectedColor)) || variants[0] || null
   }, [variants, selectedColor, selectedSize])
 
@@ -107,7 +106,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     // Optional: Auto-select a valid size for this color if the current size isn't available in this color
     const availableSizesForColor = variants
       .filter((v) => norm(v.color) === norm(c))
-      .map((v) => v.size)
+      .flatMap((v) => v.size.split(",").map(s => s.trim()).filter(Boolean))
     if (availableSizesForColor.length > 0 && !availableSizesForColor.some((s) => norm(s) === norm(selectedSize))) {
       setSelectedSize(availableSizesForColor[0])
     }
@@ -126,7 +125,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       setSelectedColor(variantForImage.color)
       const availableSizesForColor = variants
         .filter((v) => norm(v.color) === norm(variantForImage.color))
-        .map((v) => v.size)
+        .flatMap((v) => v.size.split(",").map(s => s.trim()).filter(Boolean))
       if (availableSizesForColor.length > 0 && !availableSizesForColor.some((s) => norm(s) === norm(selectedSize))) {
         setSelectedSize(availableSizesForColor[0])
       }
