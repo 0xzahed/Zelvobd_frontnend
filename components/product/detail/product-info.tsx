@@ -89,14 +89,14 @@ export function ProductInfo({
     <div className="space-y-5 md:space-y-6">
       {/* Title & Pricing */}
       <div className="space-y-1">
-        <h1 className="wrap-break-word text-pretty text-xl font-medium leading-snug text-[#292929] md:text-2xl">
-          {product.name}
-        </h1>
         {product.brand && (
-          <p className="text-sm text-muted-foreground">
-            by: <span className="font-medium text-primary">{product.brand}</span>
+          <p className="text-sm font-medium text-primary uppercase tracking-wide">
+            {product.brand}
           </p>
         )}
+        <h1 className="wrap-break-word text-pretty text-2xl font-semibold leading-snug text-gray-900">
+          {product.name}
+        </h1>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="min-w-0 flex items-baseline flex-wrap gap-2">
             <span className="text-xl font-medium text-[#292929] md:text-2xl">{formatBDT(price)}</span>

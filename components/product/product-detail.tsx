@@ -248,6 +248,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
             productName={product.name}
             activeImageIndex={activeImageIndex}
             onImageChange={handleImageChange}
+            video={product.video}
           />
         </div>
 
