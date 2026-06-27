@@ -99,30 +99,30 @@ export function ProductInfo({
         </h1>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="min-w-0 flex items-baseline flex-wrap gap-2">
-            <span className="text-xl font-medium text-[#292929] md:text-2xl">{formatBDT(price)}</span>
+            <span className="text-2xl font-bold text-gray-900">{formatBDT(price)}</span>
             {cutPrice > price && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-[18px] font-normal text-[#d6d6d6] line-through">
                 {formatBDT(cutPrice)}
               </span>
             )}
           </div>
-          <div className="ml-auto flex shrink-0 items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-3 rounded-full bg-[#e5e5e580] p-1.5">
             <button
               type="button"
               onClick={() => onQtyChange(Math.max(1, qty - 1))}
               aria-label="Decrease"
-              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+              className="grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-sm transition hover:bg-gray-50"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-4 w-4" />
             </button>
-            <span className="w-5 text-center text-sm font-medium">{qty}</span>
+            <span className="w-6 text-center text-sm font-bold text-black">{qty}</span>
             <button
               type="button"
               onClick={() => onQtyChange(qty + 1)}
               aria-label="Increase"
-              className="grid h-7 w-7 place-items-center rounded-full border border-border/70 bg-card text-foreground"
+              className="grid h-8 w-8 place-items-center rounded-full bg-white text-black shadow-sm transition hover:bg-gray-50"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
             </button>
           </div>
         </div>
