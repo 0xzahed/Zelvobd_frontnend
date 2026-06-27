@@ -150,6 +150,8 @@ const buildProductFormData = async (
       console.log(`[buildProductFormData] Video appended:`, videoFile.name)
       formData.append("video", videoFile)
     }
+  } else {
+    formData.append("deleteVideo", "true")
   }
 
   console.log(`[buildProductFormData] FormData complete with ${uploadedImageCount} variant image(s)`)

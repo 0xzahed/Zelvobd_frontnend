@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ImagePlus, Plus, Trash2, UploadCloud } from "lucide-react"
+import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import type { Product, ProductVariant } from "@/lib/types"
 import dynamic from "next/dynamic"
 import { useCategories, useSubCategories } from "@/src/hooks/api/useCategories"
@@ -59,7 +59,13 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   const [material, setMaterial] = useState(initial?.material ?? "")
   const [weight, setWeight] = useState(initial?.weight ?? "")
   const [video, setVideo] = useState(initial?.video ?? "")
-  const [videoName, setVideoName] = useState("")
+  const [videoName, setVideoName] = useState(() => {
+    if (initial?.video) {
+      const parts = initial.video.split("/")
+      return parts[parts.length - 1]
+    }
+    return ""
+  })
 
   const [stock, setStock] = useState<boolean>(initial?.stock ?? true)
   const [availability, setAvailability] = useState<boolean>(initial?.availability ?? true)
@@ -508,19 +514,37 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         {/* Video Upload */}
         <div className="pt-3">
           <span className="mb-2 block text-sm font-semibold text-foreground">Video Upload (Optional)</span>
-          <button
-            type="button"
-            onClick={() => videoInputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-secondary/50 px-4 py-8 text-center transition hover:border-primary/70 hover:bg-secondary"
-          >
-            <UploadCloud className="h-6 w-6 text-primary" />
-            <span className="text-sm font-semibold text-primary">
-              {videoName ? videoName : "Click to upload video"}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Maximum video size 100 MB
-            </span>
-          </button>
+          {video ? (
+            <div className="relative overflow-hidden rounded-lg border-2 border-border/80 bg-black">
+              <video src={video} controls className="h-48 w-full object-contain" />
+              <button
+                type="button"
+                onClick={() => {
+                  setVideo("")
+                  setVideoName("")
+                  if (videoInputRef.current) videoInputRef.current.value = ""
+                }}
+                className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-red-500/80 text-white backdrop-blur transition hover:bg-red-600"
+                aria-label="Remove video"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => videoInputRef.current?.click()}
+              className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary/40 bg-secondary/50 px-4 py-8 text-center transition hover:border-primary/70 hover:bg-secondary"
+            >
+              <UploadCloud className="mb-2 h-6 w-6 text-primary" />
+              <span className="text-sm font-medium text-foreground">
+                Click to upload video
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Maximum video size 100 MB
+              </span>
+            </button>
+          )}
           <input
             ref={videoInputRef}
             type="file"
