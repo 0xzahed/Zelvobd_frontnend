@@ -72,7 +72,7 @@ export function ProductInfo({
   qty,
   onQtyChange,
 }: ProductInfoProps) {
-  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("description")
+  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("specification")
 
   // If activeVariant is missing, fallback to product level pricing (from mapper)
   const isFlashSale = product.isFlashSale
@@ -222,27 +222,67 @@ export function ProductInfo({
         ))}
       </div>
 
-      {/* Description */}
-      {product.description && (
-        <div className="pt-4">
-          <h3 className="mb-2 text-sm font-medium text-foreground">Description</h3>
-          <div
-            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
-        </div>
-      )}
+      {/* Tab Content */}
+      <div className="pt-4 md:pt-6">
+        {/* Specification Tab */}
+        {activeTab === "specification" && (
+          <div className="animate-in fade-in duration-300">
+            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Specification</h3>
+            {product.specifications && product.specifications.length > 0 ? (
+              <div className="overflow-hidden rounded-md border border-gray-200">
+                <table className="w-full text-left text-[15px] text-gray-700">
+                  <tbody className="divide-y divide-gray-200">
+                    {product.specifications.map((spec, i) => (
+                      <tr key={i} className="divide-x divide-gray-200">
+                        <td className="bg-gray-50 px-4 py-3 font-medium w-1/3">{spec.title}</td>
+                        <td className="bg-white px-4 py-3">{spec.information}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No specifications available.</p>
+            )}
+          </div>
+        )}
 
-      {/* Extra Description */}
-      {product.extraDescription && (
-        <div className="border-t border-border/40 pt-4">
-          <h3 className="mb-2 text-sm font-medium text-foreground">More Information</h3>
-          <div
-            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: product.extraDescription }}
-          />
-        </div>
-      )}
+        {/* Description Tab */}
+        {activeTab === "description" && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            {product.description && (
+              <div>
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">Description</h3>
+                <div
+                  className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              </div>
+            )}
+
+            {product.extraDescription && (
+              <div className="border-t border-border/40 pt-6">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">More Information</h3>
+                <div
+                  className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: product.extraDescription }}
+                />
+              </div>
+            )}
+            {!product.description && !product.extraDescription && (
+              <p className="text-sm text-gray-500">No description available.</p>
+            )}
+          </div>
+        )}
+
+        {/* Warranty Tab */}
+        {activeTab === "warranty" && (
+          <div className="animate-in fade-in duration-300">
+            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Warranty</h3>
+            <p className="text-sm text-gray-500">Warranty information will be displayed here.</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
