@@ -230,12 +230,16 @@ export function ProductInfo({
             <h3 className="mb-4 text-2xl font-semibold text-gray-900">Specification</h3>
             {product.specifications && product.specifications.length > 0 ? (
               <div className="overflow-hidden rounded-md border border-gray-200">
-                <table className="w-full text-left text-[15px] text-gray-700">
+                <table className="w-full text-left">
                   <tbody className="divide-y divide-gray-200">
                     {product.specifications.map((spec, i) => (
                       <tr key={i} className="divide-x divide-gray-200">
-                        <td className="bg-gray-50 px-4 py-3 font-medium w-1/3">{spec.title}</td>
-                        <td className="bg-white px-4 py-3">{spec.information}</td>
+                        <td className="w-1/3 p-3 align-middle text-base text-[#525252]">
+                          {spec.title}
+                        </td>
+                        <td className="bg-white p-3 align-middle text-base font-semibold text-gray-900">
+                          {spec.information}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -250,26 +254,15 @@ export function ProductInfo({
         {/* Description Tab */}
         {activeTab === "description" && (
           <div className="animate-in fade-in duration-300 space-y-6">
-            {product.description && (
+            {product.description ? (
               <div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">Description</h3>
+                <h3 className="mb-4 text-2xl font-semibold text-gray-900">Description</h3>
                 <div
                   className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               </div>
-            )}
-
-            {product.extraDescription && (
-              <div className="border-t border-border/40 pt-6">
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">More Information</h3>
-                <div
-                  className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-                  dangerouslySetInnerHTML={{ __html: product.extraDescription }}
-                />
-              </div>
-            )}
-            {!product.description && !product.extraDescription && (
+            ) : (
               <p className="text-sm text-gray-500">No description available.</p>
             )}
           </div>
@@ -278,8 +271,15 @@ export function ProductInfo({
         {/* Warranty Tab */}
         {activeTab === "warranty" && (
           <div className="animate-in fade-in duration-300">
-            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Warranty</h3>
-            <p className="text-sm text-gray-500">Warranty information will be displayed here.</p>
+            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Warentee</h3>
+            {product.extraDescription ? (
+              <div
+                className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
+                dangerouslySetInnerHTML={{ __html: product.extraDescription }}
+              />
+            ) : (
+              <p className="text-sm text-gray-500">No warranty information available.</p>
+            )}
           </div>
         )}
       </div>
