@@ -99,9 +99,9 @@ export function ProductInfo({
         </h1>
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <div className="min-w-0 flex items-baseline flex-wrap gap-2">
-            <span className="text-2xl font-bold text-gray-900">{formatBDT(price)}</span>
+            <span className="text-[22px] font-bold text-gray-900">{formatBDT(price)}</span>
             {cutPrice > price && (
-              <span className="text-[18px] font-normal text-[#d6d6d6] line-through">
+              <span className="text-[16px] font-normal text-[#d6d6d6] line-through">
                 {formatBDT(cutPrice)}
               </span>
             )}
@@ -130,9 +130,9 @@ export function ProductInfo({
 
       {/* Colors */}
       {uniqueColors.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-foreground">Color</p>
-          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+        <div className="rounded-sm border border-gray-200 p-4 bg-white/50">
+          <p className="mb-3 text-base font-semibold text-gray-900">Color:</p>
+          <div className="flex flex-wrap gap-2">
             {uniqueColors.map((c) => {
               const selected = selectedColor === c
               return (
@@ -142,18 +142,18 @@ export function ProductInfo({
                   onClick={() => onColorChange(c)}
                   aria-pressed={selected}
                   className={cx(
-                    "flex h-full min-w-0 items-center gap-2 rounded-full border bg-transparent px-3 py-1.5 text-left transition md:shrink-0 md:px-4",
+                    "flex h-9 items-center gap-2 rounded-full border bg-white px-3 transition",
                     selected
-                      ? "border-primary text-primary"
-                      : "border-border/60 text-foreground hover:border-border",
+                      ? "border-primary border-[1.5px]"
+                      : "border-gray-200 hover:border-gray-300",
                   )}
                 >
                   <span
-                    className="h-10 w-10 shrink-0 rounded-full border border-border/40 md:h-11 md:w-11"
+                    className="h-4.5 w-4.5 shrink-0 rounded-full border border-gray-100 shadow-inner"
                     style={{ backgroundColor: product.variants?.find(v => v.color?.trim().toLowerCase() === c.toLowerCase())?.colorCode || colorToHex(c) }}
                     aria-hidden="true"
                   />
-                  <span className="text-sm font-medium">{c}</span>
+                  <span className="text-sm font-medium text-gray-700">{c}</span>
                 </button>
               )
             })}
