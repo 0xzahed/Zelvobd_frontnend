@@ -10,14 +10,14 @@ export function CategoryCard({ category }: { category: Category }) {
       href={`/category/${category.slug}`}
       className="group flex w-full flex-col items-center gap-1.5"
     >
-      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f0f0f2] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#e8e8eb] sm:h-[76px] sm:w-[76px]">
-        <div className="relative h-[46px] w-[46px] sm:h-[52px] sm:w-[52px]">
+      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#F3F4F6] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#E8EAF0] sm:h-[76px] sm:w-[76px]">
+        <div className="relative h-[48px] w-[48px] sm:h-[54px] sm:w-[54px]">
           <Image
             src={category.image || "/placeholder.svg"}
             alt={category.name}
             fill
             sizes="76px"
-            className="object-contain"
+            className="object-cover rounded-full"
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Home } from "lucide-react"
+import { Home, ShoppingCart } from "lucide-react"
 import { BiSolidOffer } from "react-icons/bi"
 import { FiMenu } from "react-icons/fi"
 import Link from "next/link"
@@ -12,6 +12,7 @@ export function BottomNavbar() {
   const navItems = [
     { label: "Home", Icon: Home, path: "/" },
     { label: "Offer", Icon: BiSolidOffer, path: "/offers" },
+    { label: "Cart", Icon: ShoppingCart, path: "/cart" },
     { label: "More", Icon: FiMenu, path: "/more" },
   ]
 
