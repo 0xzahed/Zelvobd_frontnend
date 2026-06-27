@@ -108,6 +108,46 @@ function groupBySection(items: NavItem[]) {
   return groups
 }
 
+const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
+  { match: "/admin/products/new", title: "New Product" },
+  { match: /^\/admin\/products\/[^/]+$/, title: "Edit Product" },
+  { match: "/admin/products", title: "Products" },
+  { match: "/admin/categories/sub", title: "Sub Categories" },
+  { match: "/admin/categories", title: "Categories" },
+  { match: "/admin/trending", title: "Trending Products" },
+  { match: "/admin/free-delivery", title: "Free Delivery" },
+  { match: "/admin/sliders", title: "Banners" },
+  { match: "/admin/promos", title: "Promo Codes" },
+  { match: "/admin/flash-sale", title: "Flash Sales" },
+  { match: "/admin/orders/new", title: "All Orders" },
+  { match: "/admin/orders/pending", title: "Pending Orders" },
+  { match: "/admin/orders/processing", title: "Processing Orders" },
+  { match: "/admin/orders/hold", title: "Hold Orders" },
+  { match: "/admin/orders/pickup", title: "Pickup Orders" },
+  { match: "/admin/orders/delivered", title: "Delivered Orders" },
+  { match: "/admin/orders/customer-cancelled", title: "Customer Cancelled" },
+  { match: "/admin/orders/cancelled", title: "Cancelled Orders" },
+  { match: "/admin/orders/trash", title: "Trash Orders" },
+  { match: "/admin/customers", title: "Customers" },
+  { match: "/admin/chat", title: "Live Chat" },
+  { match: "/admin/admins", title: "Admins" },
+  { match: "/admin/settings", title: "Settings" },
+  { match: "/admin/footer", title: "Footer" },
+  { match: "/admin/notifications", title: "Notifications" },
+  { match: "/admin", title: "Overview" },
+]
+
+function getPageTitle(pathname: string) {
+  for (const entry of PAGE_TITLES) {
+    if (typeof entry.match === "string") {
+      if (pathname === entry.match || pathname.startsWith(entry.match + "/")) return entry.title
+    } else if (entry.match.test(pathname)) {
+      return entry.title
+    }
+  }
+  return "Dashboard"
+}
+
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -194,11 +234,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
     setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }))
 
   const sections = groupBySection(MENU)
+  const pageTitle = getPageTitle(pathname)
 
   if (!ready || authLoading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-surface px-4 text-sm text-muted-foreground">
-        Checking admin session...
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-surface px-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <p className="text-sm text-muted-foreground">Checking admin session...</p>
       </div>
     )
   }
@@ -224,8 +266,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cx(
-          "fixed inset-y-0 left-0 z-40 w-70 transform border-r border-border/60 bg-surface-elevated transition-transform md:w-64 md:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full",
+          "fixed inset-y-0 left-0 z-40 w-70 border-r border-border/60 bg-surface-elevated transition-transform duration-300 ease-out md:w-64 md:translate-x-0",
+          open ? "translate-x-0 shadow-xl" : "-translate-x-full",
         )}
       >
         <div className="flex h-dvh flex-col">
@@ -264,7 +306,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                             prefetch={false}
                             onClick={() => setOpen(false)}
                             className={cx(
-                              "flex items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
+                              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-normal transition-all duration-200",
                               active
                                 ? "border border-border/70 bg-white text-foreground shadow-sm"
                                 : "text-muted-foreground hover:bg-surface hover:text-foreground",
@@ -296,7 +338,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           onClick={() => toggleGroup(item.label)}
                           aria-expanded={isOpen}
                           className={cx(
-                            "flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-[13px] font-normal transition",
+                            "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-normal transition-all duration-200",
                             groupActive
                               ? "border border-border/70 bg-white text-foreground shadow-sm"
                               : "text-muted-foreground hover:bg-surface hover:text-foreground",
@@ -311,13 +353,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           <span className="flex-1 text-left">{item.label}</span>
                           <ChevronRight
                             className={cx(
-                              "h-3.5 w-3.5 transition-transform",
+                              "h-3.5 w-3.5 transition-transform duration-200",
                               isOpen ? "rotate-90" : "rotate-0",
                             )}
                           />
                         </button>
-                        {isOpen && (
-                          <ul className="ml-5.5 mt-0.5 space-y-0.5 border-l border-border/60 pl-3">
+                        <div
+                          className={cx(
+                            "grid transition-all duration-200 ease-out",
+                            isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                          )}
+                        >
+                          <ul className="ml-5.5 overflow-hidden border-l border-border/60 pl-3">
                             {item.children.map((child) => {
                               const active = child.href === activeChildHref
                               return (
@@ -327,9 +374,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                                     prefetch={false}
                                     onClick={() => setOpen(false)}
                                     className={cx(
-                                      "flex items-center rounded-sm px-3 py-1.5 text-[13px] font-normal transition",
+                                      "my-0.5 flex items-center rounded-lg px-3 py-1.5 text-[13px] font-normal transition-colors duration-150",
                                       active
-                                        ? "bg-white text-foreground shadow-sm"
+                                        ? "bg-white font-medium text-foreground shadow-sm"
                                         : "text-muted-foreground hover:text-foreground",
                                     )}
                                   >
@@ -339,7 +386,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                               )
                             })}
                           </ul>
-                        )}
+                        </div>
                       </li>
                     )
                   })}
@@ -375,18 +422,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Top bar */}
-      <header className="sticky top-0 z-20 ml-0 flex h-14 items-center justify-between border-b border-border/70 bg-surface-elevated/95 px-3 backdrop-blur md:ml-64 md:h-16 md:px-6">
+      <header className="sticky top-0 z-20 ml-0 flex h-14 items-center justify-between border-b border-border/70 bg-surface-elevated/95 px-3 backdrop-blur-md md:ml-64 md:h-16 md:px-6">
         <button
           onClick={() => setOpen(true)}
-          className="grid h-9 w-9 place-items-center rounded-md hover:bg-surface md:hidden"
+          className="grid h-9 w-9 place-items-center rounded-xl transition hover:bg-surface md:hidden"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
         </button>
-        <p className="hidden text-sm font-semibold text-foreground md:block">Dashboard</p>
+        <p className="text-sm font-semibold text-foreground md:text-base">{pageTitle}</p>
+        <div className="hidden w-9 md:block" />
       </header>
 
-      <main className="ml-0 p-3 sm:p-4 md:ml-64 md:p-6">{children}</main>
+      <main className="ml-0 min-h-[calc(100dvh-3.5rem)] p-3 sm:p-4 md:ml-64 md:min-h-[calc(100dvh-4rem)] md:p-6">
+        {children}
+      </main>
     </div>
   )
 }

@@ -153,7 +153,7 @@ export default function AdminOverview() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="admin-page space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-foreground md:text-2xl">

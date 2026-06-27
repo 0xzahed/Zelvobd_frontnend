@@ -8,20 +8,20 @@ export function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
       href={`/category/${category.slug}`}
-      className="flex w-full flex-col items-center gap-2 transition hover:-translate-y-0.5"
+      className="group flex w-full flex-col items-center gap-1.5"
     >
-      <div className="flex aspect-square w-full items-center justify-center rounded-full bg-[#F3F4F6] p-3">
-        <div className="relative h-full w-full overflow-hidden rounded-lg">
+      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f0f0f2] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#e8e8eb] sm:h-[76px] sm:w-[76px]">
+        <div className="relative h-[46px] w-[46px] sm:h-[52px] sm:w-[52px]">
           <Image
             src={category.image || "/placeholder.svg"}
             alt={category.name}
             fill
-            sizes="(max-width: 768px) 28vw, 10vw"
+            sizes="76px"
             className="object-contain"
           />
         </div>
       </div>
-      <span className="shrink-0 truncate text-center text-xs font-medium text-muted-foreground">
+      <span className="w-full truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:text-xs">
         {category.name}
       </span>
     </Link>
@@ -32,20 +32,20 @@ export function SubCategoryCard({ subCategory, categorySlug }: { subCategory: an
   return (
     <Link
       href={`/category/${categorySlug}/${subCategory.slug}`}
-      className="flex w-full flex-col items-center gap-2 transition hover:-translate-y-0.5"
+      className="group flex w-full flex-col items-center gap-2"
     >
-      <div className="flex aspect-square w-full items-center justify-center rounded-full bg-[#F3F4F6] p-3">
-        <div className="relative h-full w-full overflow-hidden rounded-lg">
+      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-[76px] sm:w-[76px]">
+        <div className="relative h-[46px] w-[46px] sm:h-[52px] sm:w-[52px]">
           <Image
             src={subCategory.image || "/placeholder.svg"}
             alt={subCategory.name}
             fill
-            sizes="(max-width: 768px) 28vw, 10vw"
+            sizes="76px"
             className="object-contain"
           />
         </div>
       </div>
-      <span className="shrink-0 truncate text-center text-xs font-medium text-muted-foreground">
+      <span className="w-full max-w-[76px] truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-[84px] sm:text-xs">
         {subCategory.name}
       </span>
     </Link>
@@ -57,17 +57,17 @@ export function MoreCategoriesCard({ extras: _extras }: { extras: Category[] }) 
     <Link
       href="/categories"
       aria-label="See more categories"
-      className="flex w-full flex-col items-center gap-2 transition hover:-translate-y-0.5"
+      className="group flex w-full flex-col items-center gap-2"
     >
-      <div className="flex aspect-square w-full items-center justify-center rounded-full bg-[#F3F4F6] p-3">
-        <div className="grid h-10 w-10 grid-cols-2 grid-rows-2 place-items-center gap-1">
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-[76px] sm:w-[76px]">
+        <div className="grid h-8 w-8 grid-cols-2 grid-rows-2 place-items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-[#374151]" />
+          <span className="h-2 w-2 rounded-full bg-[#374151]" />
+          <span className="h-2 w-2 rounded-full bg-[#374151]" />
+          <span className="h-2 w-2 rounded-full bg-[#374151]" />
         </div>
       </div>
-      <span className="shrink-0 truncate text-center text-xs font-medium text-muted-foreground">
+      <span className="w-full max-w-[76px] truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-[84px] sm:text-xs">
         More
       </span>
     </Link>
