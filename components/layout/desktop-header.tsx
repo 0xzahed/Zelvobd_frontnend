@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import {
   Flame,
@@ -87,10 +88,14 @@ export function DesktopHeader() {
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-6">
           {/* Brand */}
           <Link href="/" className="flex shrink-0 items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
-              E
-            </span>
-            <span className="text-xl font-bold text-foreground">Zelvobd</span>
+            <Image 
+              src="/logo.png" 
+              alt="Zelvobd" 
+              width={140} 
+              height={40} 
+              className="h-14 w-auto object-contain" 
+              priority 
+            />
           </Link>
 
           {/* Primary navigation — grows to fill, icons on the right */}

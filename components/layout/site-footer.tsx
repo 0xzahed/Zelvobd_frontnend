@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react"
 type FooterNavLink = { label: string; href: string }
 type FooterNavGroup = { title: string; links: FooterNavLink[] }
@@ -46,17 +47,16 @@ const DEFAULT_FOOTER: FooterSettings = {
       title: "Company",
       links: [
         { label: "About Us", href: "#" },
-        { label: "Careers", href: "#" },
         { label: "Privacy Policy", href: "#" },
         { label: "Terms of Service", href: "#" },
       ],
     },
   ],
   socials: [
-    { label: "Facebook", href: "#", icon: "facebook" },
-    { label: "Instagram", href: "#", icon: "instagram" },
-    { label: "Twitter", href: "#", icon: "twitter" },
-    { label: "YouTube", href: "#", icon: "youtube" },
+    { label: "Facebook", href: "https://www.facebook.com/share/17t5znWx2J", icon: "facebook" },
+    { label: "Instagram", href: "https://www.instagram.com/zelvobd/", icon: "instagram" },
+    { label: "Twitter", href: "https://twitter.com/zelvobd", icon: "twitter" },
+    { label: "YouTube", href: "https://www.youtube.com/@zelvobd", icon: "youtube" },
   ],
 }
 
@@ -96,9 +96,17 @@ export function SiteFooter() {
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-4">
-            <Link href="/" className="flex items-center gap-2 text-xl font-bold text-foreground">
-              {footer.brandName}
+            <div className="flex items-center p-1 bg-white rounded-full w-fit">
+              <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/logo.png"
+                alt="Zelvobd"
+                width={120}
+                height={32}
+                className="h-10 w-auto object-contain"
+              />
             </Link>
+            </div>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
               {footer.brandTagline}
             </p>
@@ -152,6 +160,8 @@ export function SiteFooter() {
                     key={label}
                     href={href}
                     aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="grid h-9 w-9 place-items-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-primary hover:text-primary"
                   >
                     {Icon ? <Icon className="h-4 w-4" /> : <span className="text-xs font-semibold">{fallback}</span>}

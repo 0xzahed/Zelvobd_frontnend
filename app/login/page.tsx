@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
@@ -48,10 +49,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-8">
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-4">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="mb-2">
-            <h1 className="text-2xl font-bold text-foreground">Zelvobd</h1>
+          <div className="">
+            <Image 
+              src="/logo.png" 
+              alt="Zelvobd" 
+              width={160} 
+              height={80} 
+              className="h-20 w-auto object-contain" 
+              priority 
+            />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-semibold text-foreground">Admin Login</h1>
