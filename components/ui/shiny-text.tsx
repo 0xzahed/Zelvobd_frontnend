@@ -32,10 +32,11 @@ export function ShinyText({ text, className, disabled = false }: ShinyTextProps)
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: shine 3s linear infinite;
+          animation: shine 8s linear infinite;
         }
         @keyframes shine {
           0% { background-position: 200% center; }
+          20% { background-position: -200% center; }
           100% { background-position: -200% center; }
         }
       `}</style>
