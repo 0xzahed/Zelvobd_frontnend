@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowUp, HelpCircle } from "lucide-react"
+import { ArrowUp, Headset } from "lucide-react"
 
 export function FloatingRotatingIcon() {
   const [showArrow, setShowArrow] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     const updateArrow = () => {
@@ -14,6 +15,16 @@ export function FloatingRotatingIcon() {
     updateArrow()
     window.addEventListener("scroll", updateArrow, { passive: true })
     return () => window.removeEventListener("scroll", updateArrow)
+  }, [])
+
+  useEffect(() => {
+    setExpanded(false)
+    const expandTimer = setTimeout(() => setExpanded(true), 1000)
+    const retractTimer = setTimeout(() => setExpanded(false), 6000)
+    return () => {
+      clearTimeout(expandTimer)
+      clearTimeout(retractTimer)
+    }
   }, [])
 
   return (
@@ -31,13 +42,34 @@ export function FloatingRotatingIcon() {
         )}
         <a
           href="tel:01744546898"
-          className="grid h-14 w-14 place-items-center rounded-full border border-border/60 bg-white shadow-[0_8px_18px_rgba(15,23,42,0.12)] transition hover:-translate-y-0.5"
-          aria-label="Call help"
+          className="animate-float group flex items-center overflow-hidden rounded-full bg-[linear-gradient(45deg,#052F84,#7BA4F7)] transition-transform hover:scale-105"
+          aria-label="Contact Us"
         >
-          <HelpCircle className="h-7 w-7 text-emerald-600" />
-          <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.65)] animate-pulse" />
+          <span
+            className={`flex h-12 items-center whitespace-nowrap text-sm font-semibold text-white transition-all duration-500 ease-out ${expanded ? "max-w-[100px] px-3 opacity-100" : "max-w-0 px-0 opacity-0"}`}
+          >
+            Contact Us
+          </span>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center">
+            <Headset className="h-5 w-5 text-white" />
+          </div>
         </a>
+        <FloatStyles />
       </div>
     </div>
+  )
+}
+
+function FloatStyles() {
+  return (
+    <style>{`
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+    `}</style>
   )
 }

@@ -75,10 +75,16 @@ export function YoutubeVideoSection() {
                   {/* Bottom gradient */}
                   <div className='absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent' />
 
-                  {/* Play Button */}
+                  {/* Play Button with radiating rings */}
                   <div className='absolute inset-0 flex items-center justify-center'>
-                    <div className='animate-glow flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg shadow-blue-500/40 transition-transform group-hover:scale-110'>
-                      <Play className='ml-1 h-5 w-5 text-[#6C95E9]' fill='currentColor' />
+                    <div className='relative flex h-12 w-12 items-center justify-center'>
+                      {/* Pulse rings */}
+                      <div className='animate-ring absolute inset-0 rounded-full border-2 border-blue-400/60' />
+                      <div className='animate-ring-delayed absolute inset-0 rounded-full border-2 border-blue-400/40' />
+                      {/* Button */}
+                      <div className='animate-glow relative flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg shadow-blue-500/40 transition-transform group-hover:scale-110'>
+                        <Play className='ml-1 h-5 w-5 text-[#6C95E9]' fill='currentColor' />
+                      </div>
                     </div>
                   </div>
 
@@ -131,6 +137,23 @@ function GlowStyles() {
       }
       .animate-glow {
         animation: glow-pulse 2.5s ease-in-out infinite;
+      }
+      @keyframes ring-expand {
+        0% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+      .animate-ring {
+        animation: ring-expand 2s ease-out infinite;
+      }
+      .animate-ring-delayed {
+        animation: ring-expand 2s ease-out infinite;
+        animation-delay: 1s;
       }
     `}</style>
   );
