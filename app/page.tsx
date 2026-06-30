@@ -1,8 +1,10 @@
 "use client"
 
 import { useSliders } from "@/lib/use-store-data"
+import { useHomePageBanners } from "@/src/hooks/api/useBanners"
 import { AppShell } from "@/components/layout/app-shell"
 import { SliderBanner } from "@/components/ui/slider-banner"
+import { SliderBannerSkeleton } from "@/components/ui/slider-banner-skeleton"
 import { CategoriesSection } from "@/components/home/categories-section"
 import { FlashSaleSection } from "@/components/home/flash-sale-section"
 import { FreeDeliveryBanner } from "@/components/home/free-delivery-banner"
@@ -13,12 +15,13 @@ import { YoutubeVideoSection } from "@/components/home/youtube-video-section"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 export default function HomePage() {
-  const { sliders, loaded } = useSliders()
+  const { data: sliders, isLoading: isSlidersLoading } = useHomePageBanners()
+  const { loaded } = useSliders() // keeping temporarily for other dependencies if any
 
   return (
     <AppShell>
       <div className="space-y-5 py-4 md:space-y-8 md:py-6">
-        <SliderBanner slides={sliders} />
+        {isSlidersLoading ? <SliderBannerSkeleton /> : <SliderBanner slides={sliders || []} />}
         <CategoriesSection />
         <FlashSaleSection />
         <FreeDeliveryBanner />

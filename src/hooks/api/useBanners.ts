@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError, fileFromUrl } from "@/lib/api-utils"
 import { getBanners } from "@/src/api/banner/getBanners"
+import { getHomePageBanners } from "@/src/api/banner/getHomePageBanners"
 import { createBanner } from "@/src/api/banner/createBanner"
 import { updateBanner } from "@/src/api/banner/updateBanner"
 import { deleteBanner } from "@/src/api/banner/deleteBanner"
@@ -99,5 +100,19 @@ export function useDeleteBanner() {
       notify.success({ title: "Deleted", message: "Banner removed." })
     },
     onError: (error) => handleApiError(error),
+  })
+}
+
+export const HOME_BANNER_KEYS = {
+  all: ["home-banners"] as const,
+}
+
+export function useHomePageBanners() {
+  return useQuery({
+    queryKey: HOME_BANNER_KEYS.all,
+    queryFn: async () => {
+      const res = await getHomePageBanners()
+      return (res?.data || []).map(mapBanner)
+    },
   })
 }
