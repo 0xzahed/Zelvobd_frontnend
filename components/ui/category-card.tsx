@@ -10,8 +10,8 @@ export function CategoryCard({ category }: { category: Category }) {
       href={`/category/${category.slug}`}
       className="group flex w-full flex-col items-center gap-1.5"
     >
-      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#F3F4F6] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#E8EAF0] sm:h-[76px] sm:w-[76px]">
-        <div className="relative h-[48px] w-[48px] sm:h-[54px] sm:w-[54px]">
+      <div className="flex h-17 w-17 items-center justify-center rounded-full bg-[#F3F4F6] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#E8EAF0] sm:h-19 sm:w-19">
+        <div className="relative h-12 w-12 sm:h-13.5 sm:w-13.5">
           <Image
             src={category.image || "/placeholder.svg"}
             alt={category.name}
@@ -21,7 +21,7 @@ export function CategoryCard({ category }: { category: Category }) {
           />
         </div>
       </div>
-      <span className="w-full truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:text-xs">
+      <span className="w-full line-clamp-2 text-center text-[11px] font-semibold leading-tight text-[#374151] sm:text-xs min-h-7">
         {category.name}
       </span>
     </Link>
@@ -34,8 +34,8 @@ export function SubCategoryCard({ subCategory, categorySlug }: { subCategory: an
       href={`/category/${categorySlug}/${subCategory.slug}`}
       className="group flex w-full flex-col items-center gap-2"
     >
-      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-[76px] sm:w-[76px]">
-        <div className="relative h-[46px] w-[46px] sm:h-[52px] sm:w-[52px]">
+      <div className="flex h-17 w-17 items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-19 sm:w-19">
+        <div className="relative h-11.5 w-11.5 sm:h-13 sm:w-13">
           <Image
             src={subCategory.image || "/placeholder.svg"}
             alt={subCategory.name}
@@ -45,7 +45,7 @@ export function SubCategoryCard({ subCategory, categorySlug }: { subCategory: an
           />
         </div>
       </div>
-      <span className="w-full max-w-[76px] truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-[84px] sm:text-xs">
+      <span className="w-full max-w-19 line-clamp-2 text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-21 sm:text-xs min-h-7">
         {subCategory.name}
       </span>
     </Link>
@@ -59,7 +59,7 @@ export function MoreCategoriesCard({ extras: _extras }: { extras: Category[] }) 
       aria-label="See more categories"
       className="group flex w-full flex-col items-center gap-2"
     >
-      <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-[76px] sm:w-[76px]">
+      <div className="flex h-17 w-17 items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-19 sm:w-19">
         <div className="grid h-8 w-8 grid-cols-2 grid-rows-2 place-items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-[#374151]" />
           <span className="h-2 w-2 rounded-full bg-[#374151]" />
@@ -67,7 +67,7 @@ export function MoreCategoriesCard({ extras: _extras }: { extras: Category[] }) 
           <span className="h-2 w-2 rounded-full bg-[#374151]" />
         </div>
       </div>
-      <span className="w-full max-w-[76px] truncate text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-[84px] sm:text-xs">
+      <span className="w-full max-w-19 line-clamp-2 text-center text-[11px] font-semibold leading-tight text-[#374151] sm:max-w-21 sm:text-xs min-h-7">
         More
       </span>
     </Link>
