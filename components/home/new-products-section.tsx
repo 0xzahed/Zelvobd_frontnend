@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
-import { ChevronRight } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
+import { ChevronRight, ChevronLeft } from "lucide-react"
 import { getProducts } from "@/src/api/products/getProducts"
 import { mapProduct } from "@/src/api/_shared/mappers"
 import { ProductCard } from "@/components/ui/product-card"
@@ -14,6 +14,7 @@ let newProductsInFlight: Promise<Product[]> | null = null
 
 export function NewProductsSection() {
   const [newItems, setNewItems] = useState<Product[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -43,6 +44,12 @@ export function NewProductsSection() {
     }
   }, [])
 
+  const scroll = (dir: "left" | "right") => {
+    if (!scrollRef.current) return
+    const amount = scrollRef.current.clientWidth / 2
+    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" })
+  }
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
@@ -59,14 +66,30 @@ export function NewProductsSection() {
         </Link>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+      <div className="relative">
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+
+        <div ref={scrollRef} className="flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
         {newItems.slice(0, 8).map((p) => (
-          <div key={p.id} className="w-[calc((100%-0.25rem)/2.2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
+          <div key={p.id} className="w-[calc((100%-0.25rem)/2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
             <ProductCard product={p} />
           </div>
         ))}
         {newItems.length > 8 && (
-          <div className="w-[calc((100%-0.25rem)/2.2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
+          <div className="w-[calc((100%-0.25rem)/2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
             <Link
               href="/new-products"
               className="group flex h-full items-center justify-center rounded-sm border border-border/60 bg-card p-3 shadow-[0_0_14px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-md"
@@ -81,6 +104,7 @@ export function NewProductsSection() {
           </div>
         )}
       </div>
+    </div>
     </section>
   )
 }

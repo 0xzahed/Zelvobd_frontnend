@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Flame, Truck } from "lucide-react"
+import { ShoppingCart, Flame, Truck, Star } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
 import { useCart } from "@/contexts/cart-context"
@@ -51,20 +51,10 @@ export function ProductCard({
             : "w-full md:h-80 md:max-w-225",
       )}
     >
-      {/* Discount badge - top left tag using Vector.svg */}
+      {/* Discount badge - circular */}
       {discountPercent > 0 && (
-        <div className="absolute left-2 top-2 z-10">
-          <span
-            className="flex items-center justify-center text-[8px] font-bold text-white"
-            style={{
-              backgroundImage: 'url(/Vector.svg)',
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: '100% 100%',
-              width: '52px',
-              height: '20px',
-              paddingLeft: '2px',
-            }}
-          >
+        <div className="absolute left-1.5 top-1.5 z-10">
+          <span className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-red-500 text-[7px] font-bold text-white">
             -{discountPercent}%
           </span>
         </div>
@@ -91,39 +81,31 @@ export function ProductCard({
         <h3
           className={cx(
             "line-clamp-2 text-center font-semibold leading-tight text-foreground",
-            compact
-              ? "text-[14px]"
-              : emphasis
-                ? "text-[14px] md:text-lg"
-                : "text-[14px]",
+            compact ? "text-[14px]" : "text-[16px]",
           )}
         >
           {product.name}
         </h3>
 
         {/* Price + Cut price - same line, left aligned, smaller */}
-        <div className="mt-1 flex items-center gap-1.5">
+        <div className="mt-1 flex items-center justify-center gap-1.5">
           <span
             className={cx(
               "font-semibold text-foreground",
-              compact
-                ? "text-[11px]"
-                : emphasis
-                  ? "text-xs md:text-base"
-                  : "text-[11px] md:text-sm",
+              compact ? "text-[11px]" : "text-[14px]",
             )}
           >
-            {formatBDT(product.price)}
+              {formatBDT(product.price)}
           </span>
           {product.cutPrice > product.price && (
-            <span className="text-[10px] text-muted-foreground line-through">
+            <span className="text-[12px] text-muted-foreground line-through">
               {formatBDT(product.cutPrice)}
             </span>
           )}
         </div>
 
         {/* Flash / Free Delivery badges - below price, left aligned */}
-        <div className="mt-1 flex items-center gap-1">
+        <div className="mt-1 flex items-center justify-center gap-1">
           {product.isFlashSale && (
             <span className="inline-flex items-center gap-0.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[8px] font-semibold text-red-600">
               <Flame className="h-2.5 w-2.5" /> Flash Sale
@@ -136,14 +118,37 @@ export function ProductCard({
           )}
         </div>
 
+        {/* Rating */}
+        {typeof product.rating === "number" && (
+          <div className="mt-1 flex items-center justify-center gap-1">
+            <div className="flex items-center">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={cx(
+                    "h-3 w-3",
+                    i < Math.round(product.rating || 0)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "fill-gray-200 text-gray-200"
+                  )}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] font-medium text-muted-foreground">
+              ({product.rating.toFixed(1)})
+            </span>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="mt-auto flex items-center gap-2 pt-2">
           <span
             className={cx(
-              "flex flex-1 items-center justify-center rounded-full text-xs font-semibold text-white",
+              "flex flex-1 items-center justify-center rounded-full text-xs font-semibold transition-all duration-300",
+              "border border-[#6C95E9] text-[#6C95E9] bg-[#EBF1FD]",
+              "hover:border-transparent hover:text-white hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)]",
               emphasis ? "h-9" : "h-8",
             )}
-            style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}
           >
             Buy Now
           </span>

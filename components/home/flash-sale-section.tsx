@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import type { ReactNode } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { ProductCard } from "@/components/ui/product-card"
 import type { Product } from "@/lib/types"
 
@@ -22,8 +23,9 @@ function useCountdown(target: Date): TimeLeft {
       seconds: Math.floor((diff % 60000) / 1000),
     }
   }
-  const [left, setLeft] = useState<TimeLeft>(calc)
+  const [left, setLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   useEffect(() => {
+    setLeft(calc())
     const t = setInterval(() => setLeft(calc()), 1000)
     return () => clearInterval(t)
   }, [])
@@ -366,6 +368,14 @@ const campaignProducts: Product[] = [
 ]
 
 export function CampaignProductGrid() {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scroll = (dir: "left" | "right") => {
+    if (!scrollRef.current) return
+    const amount = scrollRef.current.clientWidth / 2
+    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" })
+  }
+
   return (
     <div
       style={{
@@ -380,12 +390,29 @@ export function CampaignProductGrid() {
     >
       <CampaignSparkles />
 
-      <div className="relative z-10 flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
-        {campaignProducts.map((p) => (
-          <div key={p.id} className="w-[calc((100%-0.25rem)/2.2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
-            <ProductCard product={p} />
-          </div>
-        ))}
+      <div className="relative">
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+
+        <div ref={scrollRef} className="relative z-10 flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
+          {campaignProducts.map((p) => (
+            <div key={p.id} className="w-[calc((100%-0.25rem)/2)] shrink-0 md:w-[calc((100%-0.75rem)/4)] lg:w-[calc((100%-1rem)/5)]">
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
