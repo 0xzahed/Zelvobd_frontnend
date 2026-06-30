@@ -3,13 +3,13 @@
 import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { ChevronRight, ChevronLeft } from "lucide-react"
-import { getFreeDelivery } from "@/src/api/freeDelivery/getFreeDelivery"
-import { mapProduct } from "@/src/api/_shared/mappers"
+import { useStorefrontFreeDelivery } from "@/src/hooks/api/useFreeDelivery"
 import { ProductCard } from "@/components/ui/product-card"
 import type { Product } from "@/lib/types"
+import { ProductSliderSkeleton } from "@/components/ui/skeletons/product-slider-skeleton"
 
 export function FreeDeliveryBanner() {
-  const [freeDelivery, setFreeDelivery] = useState<Product[]>([])
+  const { data: freeDelivery = [], isLoading } = useStorefrontFreeDelivery()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showLeft, setShowLeft] = useState(false)
   const [showRight, setShowRight] = useState(true)
@@ -34,22 +34,9 @@ export function FreeDeliveryBanner() {
     }
   }, [])
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await getFreeDelivery({ limit: 9 })
-        setFreeDelivery(
-          (res?.data?.products || []).map((product: any) => ({
-            ...mapProduct(product),
-            isFreeDelivery: true,
-          })),
-        )
-      } catch {
-        setFreeDelivery([])
-      }
-    }
-    void load()
-  }, [])
+  if (isLoading) {
+    return <ProductSliderSkeleton title="Free" highlight="Delivery" />
+  }
 
   if (freeDelivery.length === 0) {
     return null
