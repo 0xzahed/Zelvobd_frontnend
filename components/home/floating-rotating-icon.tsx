@@ -70,7 +70,7 @@ export function FloatingRotatingIcon({ compact = false }: { compact?: boolean })
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm md:items-center" onClick={() => setModalOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" onClick={() => setModalOpen(false)}>
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Contact Us</h2>
@@ -80,11 +80,11 @@ export function FloatingRotatingIcon({ compact = false }: { compact?: boolean })
             </div>
 
             <p className="mb-6 text-center text-sm text-muted-foreground">
-              You are welcome to visit our office for any information related to Service. You can also reach us through the hotline number or messenger.
+              For any queries regarding products, orders, or delivery, feel free to contact us. You can also reach us through the hotline number or messenger.
             </p>
 
             <div className="mb-6 flex justify-center">
-              <img src="https://cdn-icons-png.flaticon.com/512/2345/2345337.png" alt="Support" className="h-20 w-20 object-contain" />
+              <img src="/customer-support-icon-color-outline-vector.jpg" alt="Support" className="h-24 w-24 object-contain" />
             </div>
 
             <div className="mb-4 grid grid-cols-2 gap-3">
@@ -105,16 +105,17 @@ export function FloatingRotatingIcon({ compact = false }: { compact?: boolean })
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-500/30 bg-blue-50 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.744 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.975 12-11.111C24 4.975 18.627 0 12 0zm1.193 14.963l-3.056-3.26-5.963 3.26 6.559-6.963 3.13 3.26 5.889-3.26-6.559 6.963z"/>
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="12" fill="#1877F2"/>
+                  <path fill="#FFF" d="M16.671 15.468l.441-2.868h-2.75V9.82c0-.784.384-1.548 1.615-1.548h1.25V5.79s-1.134-.194-2.218-.194c-2.265 0-3.745 1.372-3.745 3.854v2.15H8.642v2.868h2.622v6.933c.525.083 1.06.127 1.605.127.546 0 1.08-.044 1.606-.127v-6.933h1.196z"/>
                 </svg>
-                Messenger
+                Facebook
               </a>
             </div>
 
             <a
               href={`tel:${PHONE}`}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-red-500 py-3 text-center text-sm font-semibold text-white transition hover:bg-red-600"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(45deg,#052F84,#7BA4F7)] py-3 text-center text-sm font-semibold text-white transition hover:opacity-90"
             >
               <Phone className="h-4 w-4" />
               {PHONE}
