@@ -23,7 +23,7 @@ export default async function CheckoutSuccessPage({
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-foreground md:text-2xl">অর্ডার সফল হয়েছে!</h1>
           <p className="text-sm text-muted-foreground">
-            আপনার অর্ডারটি অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।
+            অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।
           </p>
         </div>
 

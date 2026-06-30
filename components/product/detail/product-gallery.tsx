@@ -84,6 +84,27 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
             priority
           />
         )}
+
+        {/* Play button overlay - only show when video exists and image is active */}
+        {video && activeImageIndex !== images.length && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onImageChange(images.length)
+            }}
+            className="absolute bottom-4 right-5 z-10 flex h-10 w-10 items-center justify-center"
+            aria-label="Play video"
+          >
+            <div className='absolute inset-0 rounded-full border-2 border-blue-400/60 animate-ring' />
+            <div className='absolute inset-0 rounded-full border-2 border-blue-400/40 animate-ring-delayed' />
+            <div className='animate-glow relative flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg shadow-blue-500/40 transition-transform hover:scale-110'>
+              <svg className="ml-0.5 h-4 w-4 fill-[#6C95E9]" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </button>
+        )}
       </button>
 
       {/* Thumbnails */}
@@ -232,6 +253,42 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
           </div>
         </div>
       )}
+      <GalleryStyles />
     </div>
+  )
+}
+
+function GalleryStyles() {
+  return (
+    <style>{`
+      @keyframes glow-pulse {
+        0%, 100% {
+          box-shadow: 0 4px 16px rgba(108,149,233,0.6), 0 8px 32px rgba(108,149,233,0.4), 0 12px 48px rgba(108,149,233,0.2);
+        }
+        50% {
+          box-shadow: 0 4px 24px rgba(108,149,233,0.9), 0 8px 48px rgba(108,149,233,0.6), 0 16px 64px rgba(108,149,233,0.35);
+        }
+      }
+      .animate-glow {
+        animation: glow-pulse 2.5s ease-in-out infinite;
+      }
+      @keyframes ring-expand {
+        0% {
+          transform: scale(1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+      .animate-ring {
+        animation: ring-expand 2s ease-out infinite;
+      }
+      .animate-ring-delayed {
+        animation: ring-expand 2s ease-out infinite;
+        animation-delay: 1s;
+      }
+    `}</style>
   )
 }
