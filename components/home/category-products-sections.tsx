@@ -3,8 +3,10 @@
 import { useMemo, useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { ChevronRight, ChevronLeft } from "lucide-react"
-import { useCategories, useProducts } from "@/lib/use-store-data"
+import { useCategories } from "@/src/hooks/api/useCategories"
+import { useProducts } from "@/src/hooks/api/useProducts"
 import { ProductCard } from "@/components/ui/product-card"
+import { ProductSliderSkeleton } from "@/components/ui/skeletons/product-slider-skeleton"
 
 const MAX_PER_CATEGORY = 8
 
@@ -124,8 +126,8 @@ function CategorySection({
 }
 
 export function CategoryProductsSections() {
-  const { categories } = useCategories()
-  const { products } = useProducts()
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories()
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts()
   const productsByCategory = useMemo(() => {
     const grouped = new Map<string, typeof products>()
     for (const product of products) {
@@ -140,6 +142,15 @@ export function CategoryProductsSections() {
     }
     return grouped
   }, [products])
+
+  if (isLoadingCategories || isLoadingProducts) {
+    return (
+      <div className="space-y-6 md:space-y-8">
+        <ProductSliderSkeleton title="Loading" highlight="Category" />
+        <ProductSliderSkeleton title="Loading" highlight="Category" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6 md:space-y-8">
