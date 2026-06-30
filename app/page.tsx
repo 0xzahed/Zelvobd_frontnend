@@ -25,7 +25,7 @@ export default function HomePage() {
         <CategoriesSection />
         {/* <FlashSaleSection /> */}
         <FreeDeliveryBanner />
-        <TrendingSection />
+        {/* <TrendingSection /> */}
         <NewProductsSection />
         <CategoryProductsSections />
         <YoutubeVideoSection />
