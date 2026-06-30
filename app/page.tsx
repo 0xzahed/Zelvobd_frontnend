@@ -4,9 +4,9 @@ import { useSliders } from "@/lib/use-store-data"
 import { useHomePageBanners } from "@/src/hooks/api/useBanners"
 import { AppShell } from "@/components/layout/app-shell"
 import { SliderBanner } from "@/components/ui/slider-banner"
-import { SliderBannerSkeleton } from "@/components/ui/slider-banner-skeleton"
+import { SliderBannerSkeleton } from "@/components/ui/skeletons/slider-banner-skeleton"
 import { CategoriesSection } from "@/components/home/categories-section"
-import { FlashSaleSection } from "@/components/home/flash-sale-section"
+// import { FlashSaleSection } from "@/components/home/flash-sale-section"
 import { FreeDeliveryBanner } from "@/components/home/free-delivery-banner"
 import { TrendingSection } from "@/components/home/trending-section"
 import { NewProductsSection } from "@/components/home/new-products-section"
@@ -23,7 +23,7 @@ export default function HomePage() {
       <div className="space-y-5 py-4 md:space-y-8 md:py-6">
         {isSlidersLoading ? <SliderBannerSkeleton /> : <SliderBanner slides={sliders || []} />}
         <CategoriesSection />
-        <FlashSaleSection />
+        {/* <FlashSaleSection /> */}
         <FreeDeliveryBanner />
         <TrendingSection />
         <NewProductsSection />

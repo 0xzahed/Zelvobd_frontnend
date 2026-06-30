@@ -1,14 +1,15 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { useCategories } from "@/lib/use-store-data"
+import { useCategories } from "@/src/hooks/api/useCategories"
 import { CategoryCard } from "@/components/ui/category-card"
+import { CategoriesSkeleton } from "@/components/ui/skeletons/categories-skeleton"
 
 const ITEMS_PER_PAGE = 8
 const COLS = 4
 
 export function CategoriesSection() {
-  const { categories } = useCategories()
+  const { data: categories = [], isLoading } = useCategories()
   const [page, setPage] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -34,6 +35,7 @@ export function CategoriesSection() {
     return () => el.removeEventListener("scroll", onScroll)
   }, [totalPages])
 
+  if (isLoading) return <CategoriesSkeleton />
   if (categories.length === 0) return null
 
   return (
