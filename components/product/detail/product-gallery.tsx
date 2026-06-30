@@ -65,7 +65,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
         type="button"
         onClick={() => setZoomOpen(true)}
         aria-label={activeImageIndex === images.length ? "Play video" : "View image"}
-        className="relative flex w-full aspect-square items-center justify-center overflow-hidden rounded-lg bg-black"
+        className="relative flex w-full aspect-square items-center justify-center overflow-hidden rounded-lg"
       >
         {activeImageIndex === images.length && video ? (
           <video
@@ -80,7 +80,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
             alt={productName}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover bg-white"
+            className="object-cover"
             priority
           />
         )}
@@ -108,7 +108,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                   }}
                   aria-label={`View image ${i + 1}`}
                   className={cx(
-                    "relative aspect-square shrink-0 snap-start overflow-hidden rounded-md bg-white transition",
+                    "relative aspect-square shrink-0 snap-start overflow-hidden rounded-md transition",
                     "w-[calc((100%-3rem)/4.3)]",
                     selected ? "border-2 border-primary" : "border border-border/50",
                   )}
@@ -180,7 +180,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
               <X className="h-5 w-5" />
             </button>
             
-            <div className="relative flex items-center justify-center w-full aspect-square overflow-hidden rounded-lg bg-black shadow-2xl">
+            <div className="relative flex items-center justify-center w-full aspect-square overflow-hidden rounded-lg shadow-2xl">
               {activeImageIndex === images.length && video ? (
                 <video
                   src={video}
@@ -193,7 +193,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                   src={images[activeImageIndex] || "/placeholder.svg"}
                   alt={productName}
                   fill
-                  className="object-cover bg-white"
+                  className="object-cover"
                 />
               )}
             </div>
@@ -205,7 +205,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                     key={i}
                     onClick={() => onImageChange(i)}
                     className={cx(
-                      "relative h-16 w-16 shrink-0 snap-center overflow-hidden rounded-md border bg-white transition",
+                      "relative h-16 w-16 shrink-0 snap-center overflow-hidden rounded-md border transition",
                       activeImageIndex === i ? "border-primary border-2" : "border-transparent opacity-60 hover:opacity-100",
                     )}
                   >

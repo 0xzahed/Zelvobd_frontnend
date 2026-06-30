@@ -287,17 +287,17 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 border-t border-border/60 bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md md:hidden">
         <button
           type="button"
-          onClick={handleBuy}
+          onClick={handleAdd}
           className="relative z-10 h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md"
         >
-          Buy Now
+          Add to Cart
         </button>
         <button
           type="button"
-          onClick={handleAdd}
+          onClick={handleBuy}
           className="relative z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
         >
-          Add to Cart
+          Buy Now
         </button>
       </div>
 
@@ -313,7 +313,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           </div>
         </section>
       )}
-
+{/* 
       {trendingProducts.length > 0 && (
         <section className="mt-8 space-y-3">
           <h2 className="text-base font-medium text-foreground md:text-xl">Trending Products</h2>
@@ -325,7 +325,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
             ))}
           </div>
         </section>
-      )}
+      )} */}
 
       <CartBottomSheet open={cartOpen} onClose={() => setCartOpen(false)} />
       <FloatingRotatingIcon compact />

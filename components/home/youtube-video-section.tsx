@@ -24,7 +24,7 @@ export function YoutubeVideoSection() {
   if (!isLoading && videos.length === 0) return null;
 
   return (
-    <section className='px-4 py-4 md:px-6'>
+    <section className='px-4 py-1 md:px-6'>
       {isLoading ? (
         <SliderBannerSkeleton />
       ) : (

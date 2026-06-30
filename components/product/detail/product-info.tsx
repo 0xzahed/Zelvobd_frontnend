@@ -203,7 +203,7 @@ export function ProductInfo({
       <div className="rounded-sm border border-gray-200 p-4 bg-white/50 flex items-center gap-3">
         <Truck className="h-6 w-6 text-gray-700" strokeWidth={1.5} />
         <p className="text-base text-[#171717]">
-          Delivery Timescale: <span className="font-semibold">2-5 Days</span>
+          Delivery Timescale: <span className="font-semibold">24 Hours - 3 Days</span>
         </p>
       </div>
 
