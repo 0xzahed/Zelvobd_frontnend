@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Search } from "lucide-react"
 import { BackHeader } from "@/components/layout/back-header"
@@ -101,7 +101,7 @@ const SmallDot = () => (
   />
 )
 
-export default function TrackOrderPage() {
+function TrackOrderContent() {
   const searchParams = useSearchParams()
   const [searchInput, setSearchInput] = useState("")
   const [foundOrder, setFoundOrder] = useState<{ status: string; events: TimelineEvent[] } | null>(null)
@@ -172,7 +172,7 @@ export default function TrackOrderPage() {
               </div>
               <button
                 onClick={handleSearch}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-md active:scale-95"
+                className="px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition shadow-md active:scale-95"
               >
                 Track
               </button>
@@ -336,5 +336,22 @@ export default function TrackOrderPage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function TrackOrderPage() {
+  return (
+    <Suspense fallback={
+      <AppShell>
+        <div className="min-h-screen bg-white">
+          <BackHeader title="Track Your Order" />
+          <div className="flex h-64 items-center justify-center text-muted-foreground">
+            Loading...
+          </div>
+        </div>
+      </AppShell>
+    }>
+      <TrackOrderContent />
+    </Suspense>
   )
 }

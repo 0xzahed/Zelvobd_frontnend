@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { useBanners } from "@/src/hooks/api/useBanners"
 import type { Slider } from "@/lib/types"
+import { OfferSkeleton } from "@/components/ui/skeletons/offer-skeleton"
 
 function formatDateTime(dateString?: string) {
   if (!dateString) return { time: "", date: "" }
@@ -25,11 +26,11 @@ export default function OffersPage() {
 
       <div className="mx-auto max-w-md space-y-4 py-4">
         {isLoading ? (
-          <div className="flex h-40 items-center justify-center rounded-2xl border border-border/50 bg-card">
-            <span className="text-sm text-muted-foreground">
-              Loading offers...
-            </span>
-          </div>
+          <>
+            <OfferSkeleton />
+            <OfferSkeleton />
+            <OfferSkeleton />
+          </>
         ) : banners.length > 0 ? (
           banners.map((slide: Slider) => (
             <Link
@@ -39,7 +40,7 @@ export default function OffersPage() {
             >
               {/* Image on top */}
               {slide.image && (
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-b-lg">
+                <div className="relative aspect-video w-full overflow-hidden rounded-b-lg">
                   <Image
                     src={slide.image}
                     alt={slide.title || "Offer"}

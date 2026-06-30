@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Play, X } from 'lucide-react';
-import { useStorefrontYoutubeVideos } from '@/lib/use-store-data';
+import { useYoutubeVideos } from '@/src/hooks/api/useYoutubeVideos';
 import { toAbsoluteUrl } from '@/lib/api-utils';
+import { SliderBannerSkeleton } from '@/components/ui/skeletons/slider-banner-skeleton';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -17,15 +18,15 @@ function getYouTubeId(url: string) {
 }
 
 export function YoutubeVideoSection() {
-  const { videos, loaded } = useStorefrontYoutubeVideos();
+  const { data: videos = [], isLoading } = useYoutubeVideos();
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
 
-  if (loaded && videos.length === 0) return null;
+  if (!isLoading && videos.length === 0) return null;
 
   return (
     <section className='px-4 py-4 md:px-6'>
-      {!loaded ? (
-        <div className='h-48 w-full animate-pulse rounded-xl bg-secondary md:h-80'></div>
+      {isLoading ? (
+        <SliderBannerSkeleton />
       ) : (
         <div className='banner-swiper relative w-full overflow-hidden rounded-xl'>
           <Swiper
@@ -73,7 +74,7 @@ export function YoutubeVideoSection() {
                   <div className='absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/40' />
 
                   {/* Bottom gradient */}
-                  <div className='absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent' />
+                  <div className='absolute bottom-0 left-0 right-0 h-1/3 bg-linear-to-t from-black/50 to-transparent' />
 
                   {/* Play Button with radiating rings */}
                   <div className='absolute inset-0 flex items-center justify-center'>

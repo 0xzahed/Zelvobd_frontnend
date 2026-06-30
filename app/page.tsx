@@ -20,7 +20,7 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      <div className="space-y-5 py-4 md:space-y-8 md:py-6">
+      <div className="space-y-5 py-4 md:space-y-8 md:py-4">
         {isSlidersLoading ? <SliderBannerSkeleton /> : <SliderBanner slides={sliders || []} />}
         <CategoriesSection />
         {/* <FlashSaleSection /> */}
