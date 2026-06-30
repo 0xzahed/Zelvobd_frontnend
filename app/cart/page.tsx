@@ -400,7 +400,7 @@ export default function CartPage() {
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-bold text-foreground md:text-2xl">অর্ডার সফল হয়েছে!</h1>
-            <p className="text-sm text-muted-foreground">আপনার অর্ডারটি অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।</p>
+            <p className="text-sm text-muted-foreground"> অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।</p>
           </div>
           <button onClick={() => router.push("/")} className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white">
             হোমে ফিরে যান

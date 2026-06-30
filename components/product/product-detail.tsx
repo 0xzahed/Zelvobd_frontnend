@@ -14,6 +14,7 @@ import { notify } from "@/lib/notify"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
+import { TrendingSection } from "../home/trending-section"
 
 interface ProductDetailProps {
   product: Product
@@ -132,18 +133,18 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     }
   }
 
-  const handleAdd = () => {
-    addItem({ 
-      productId: product.id, 
-      quantity: qty, 
-      color: selectedColor, 
-      storage: selectedSize // Mapped to storage for backward compatibility with cart if needed
+  const handleAdd = (silent = false) => {
+    addItem({
+      productId: product.id,
+      quantity: qty,
+      color: selectedColor,
+      storage: selectedSize
     })
-    notify.success("Added to cart")
+    if (!silent) notify.success("Added to cart")
   }
 
   const handleBuy = () => {
-    handleAdd()
+    handleAdd(true)
     router.push("/cart")
   }
 
@@ -274,7 +275,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
               Buy Now
             </button>
             <button
-              onClick={handleAdd}
+              onClick={() => handleAdd()}
               className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white hover:bg-primary/90"
             >
               Add to Cart
@@ -287,7 +288,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-2 border-t border-border/60 bg-white/95 p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] backdrop-blur-md md:hidden">
         <button
           type="button"
-          onClick={handleAdd}
+          onClick={() => handleAdd()}
           className="relative z-10 h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md"
         >
           Add to Cart
@@ -300,6 +301,10 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           Buy Now
         </button>
       </div>
+
+    <div className="mt-8">
+        <TrendingSection />
+    </div>
 
       {relatedProducts.length > 0 && (
         <section className="mt-8 space-y-3">
