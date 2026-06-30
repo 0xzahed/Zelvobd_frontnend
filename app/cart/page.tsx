@@ -27,6 +27,9 @@ import { applyPromoAPI } from "@/src/api/promo/applyPromo";
 import { notify } from "@/lib/notify";
 import { getProductDetails } from "@/src/api/products/getProductDetails";
 import { mapProduct } from "@/src/api/_shared/mappers";
+import { placeOrderAPI } from "@/src/api/orders/placeOrder";
+import { ShinyText } from "@/components/ui/shiny-text";
+import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon";
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -78,6 +81,22 @@ export default function CartPage() {
   
   const [promoCodeInput, setPromoCodeInput] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
+
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    district: "",
+    union: "",
+    notes: "",
+  })
+  const [districts, setDistricts] = useState<{ id: string; district: string }[]>([])
+  const [unions, setUnions] = useState<string[]>([])
+  const [districtLoading, setDistrictLoading] = useState(false)
+  const [unionLoading, setUnionLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [orderCode, setOrderCode] = useState("")
 
   const enriched = items
     .map((item) => {
@@ -258,6 +277,139 @@ export default function CartPage() {
     }
   }
 
+  const updateForm = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const selectedDistrict = districts.find((d) => d.district === form.district)
+
+  const onCheckout = async () => {
+    if (!form.name || !form.phone || !form.address || !form.district) {
+      notify.error({ title: "Validation Error", message: "Please fill in all required fields (Name, Phone, Address, District)" })
+      return
+    }
+
+    if (items.length === 0) {
+      notify.error({ title: "Error", message: "Your cart is empty." })
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      const payload = {
+        customerName: form.name,
+        customerPhone: form.phone,
+        address: form.address,
+        district: form.district,
+        union: form.union || null,
+        orderNotes: form.notes || null,
+        promoCode: appliedPromo?.code || null,
+        items: items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          color: item.color || null,
+          size: item.storage || null
+        }))
+      }
+
+      const orderData = await placeOrderAPI(payload)
+
+      setOrderCode(orderData.code)
+      setIsSuccess(true)
+      clearCart()
+      window.scrollTo({ top: 0, behavior: "smooth" })
+
+    } catch (error: any) {
+      notify.error({
+        title: "Checkout Failed",
+        message: error.message || "An unexpected error occurred. Please try again."
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    const loadDistricts = async () => {
+      try {
+        setDistrictLoading(true)
+        const res = await fetch(`https://bdapi.vercel.app/api/v.1/district`)
+        const json = await res.json()
+        const rows = Array.isArray(json?.data) ? json.data : []
+        const list = rows
+          .filter((item: { id?: string; name?: string }) => item?.id && item?.name)
+          .map((item: { id: string; name: string }) => ({ id: item.id, district: item.name }))
+          .sort((a: { id: string; district: string }, b: { id: string; district: string }) => a.district.localeCompare(b.district))
+        if (!cancelled) setDistricts(list)
+      } catch {
+        if (!cancelled) setDistricts([])
+      } finally {
+        if (!cancelled) setDistrictLoading(false)
+      }
+    }
+    void loadDistricts()
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadUnions = async () => {
+      if (!selectedDistrict) {
+        setUnions([])
+        return
+      }
+      try {
+        setUnionLoading(true)
+        const upRes = await fetch(`https://bdapi.vercel.app/api/v.1/upazilla/${encodeURIComponent(selectedDistrict.id)}`)
+        const upJson = await upRes.json()
+        const upazillas: { id: string }[] = Array.isArray(upJson?.data) ? upJson.data : []
+        const results = await Promise.all(
+          upazillas.map((u) =>
+            fetch(`https://bdapi.vercel.app/api/v.1/union/${encodeURIComponent(u.id)}`)
+              .then((r) => r.json())
+              .then((j) => (Array.isArray(j?.data) ? j.data : []))
+              .catch(() => [])
+          )
+        )
+        const list: string[] = results
+          .flat()
+          .map((item: { name?: string }) => item?.name)
+          .filter((v): v is string => Boolean(v))
+          .sort((a: string, b: string) => a.localeCompare(b))
+        if (!cancelled) setUnions(list)
+      } catch {
+        if (!cancelled) setUnions([])
+      } finally {
+        if (!cancelled) setUnionLoading(false)
+      }
+    }
+    void loadUnions()
+    return () => { cancelled = true }
+  }, [selectedDistrict])
+
+  if (isSuccess) {
+    return (
+      <AppShell>
+        <div className="mx-auto flex min-h-[calc(100dvh-140px)] max-w-md flex-col items-center justify-center gap-5 px-4 text-center">
+          <div className="relative grid h-24 w-24 place-items-center rounded-full bg-emerald-500">
+            <svg className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-xl font-bold text-foreground md:text-2xl">অর্ডার সফল হয়েছে!</h1>
+            <p className="text-sm text-muted-foreground">আপনার অর্ডারটি অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।</p>
+          </div>
+          <button onClick={() => router.push("/")} className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white">
+            হোমে ফিরে যান
+          </button>
+        </div>
+        <FloatingRotatingIcon />
+      </AppShell>
+    )
+  }
 
   return (
     <AppShell>
@@ -300,7 +452,7 @@ export default function CartPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-[1fr_340px]">
+          <div className="grid gap-6 pb-24 md:grid-cols-[1fr_340px] md:pb-0">
             <ul className="space-y-3">
               <li className="flex items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2">
                 <button
@@ -506,13 +658,85 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => router.push("/checkout")}
-                className="block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white transition-transform active:scale-[0.98]"
-              >
-                Checkout
-              </button>
+              <div className="space-y-3 rounded-2xl border border-border/60 bg-card p-4">
+                <h3 className="text-base font-semibold text-foreground">Shipping Information</h3>
+                <div className="grid gap-3">
+                  <input
+                    value={form.name}
+                    onChange={(e) => updateForm("name", e.target.value)}
+                    placeholder="Full Name"
+                    className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <input
+                    value={form.phone}
+                    onChange={(e) => updateForm("phone", e.target.value)}
+                    placeholder="Phone Number"
+                    className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <textarea
+                    value={form.address}
+                    onChange={(e) => updateForm("address", e.target.value)}
+                    placeholder="Address"
+                    rows={2}
+                    className="w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <select
+                      value={form.district}
+                      onChange={(e) => {
+                        const district = e.target.value
+                        setForm((prev) => ({ ...prev, district, union: "" }))
+                      }}
+                      className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="">{districtLoading ? "Loading districts..." : "Select District"}</option>
+                      {districts.map((d) => (
+                        <option key={d.id} value={d.district}>
+                          {d.district}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={form.union}
+                      onChange={(e) => updateForm("union", e.target.value)}
+                      disabled={!form.district || unionLoading}
+                      className="h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-60 focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="">
+                        {!form.district
+                          ? "Select District First"
+                          : unionLoading
+                            ? "Loading unions..."
+                            : "Select Union"}
+                      </option>
+                      {unions.map((union) => (
+                        <option key={union} value={union}>
+                          {union}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <textarea
+                    value={form.notes}
+                    onChange={(e) => updateForm("notes", e.target.value)}
+                    placeholder="Order Notes (optional)"
+                    rows={2}
+                    className="w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="fixed bottom-[72px] left-0 right-0 z-[60] px-4 md:static md:z-auto md:bottom-0 md:p-0">
+                <button
+                  type="button"
+                  onClick={onCheckout}
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-[#6C95E9] bg-[#EBF1FD] py-3.5 text-center text-sm font-semibold text-[#6C95E9] transition-all duration-300 hover:border-transparent hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)] hover:text-white active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100"
+                >
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isSubmitting ? "Processing..." : <ShinyText text="Checkout" />}
+                </button>
+              </div>
             </div>
           </div>
         )}

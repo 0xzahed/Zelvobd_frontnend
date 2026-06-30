@@ -14,6 +14,7 @@ import { notify } from "@/lib/notify"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { WhatsAppFab } from "./detail/whatsapp-fab"
+import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 interface ProductDetailProps {
   product: Product
@@ -329,6 +330,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
       <CartBottomSheet open={cartOpen} onClose={() => setCartOpen(false)} />
       <WhatsAppFab number={product.whatsapp} />
+      <FloatingRotatingIcon compact />
     </div>
   )
 }
