@@ -21,11 +21,11 @@ type FooterSettings = {
 const STORAGE_KEY = "zelvobd_footer"
 
 const DEFAULT_FOOTER: FooterSettings = {
-  brandName: "Zelvobd",
-  brandTagline: "Everyday essentials and the latest tech, delivered fast with care.",
-  supportEmail: "support@zelvobd.app",
-  supportPhone: "+880 1700 000 000",
-  supportAddress: "Dhaka, Bangladesh",
+  brandName: "ZELVO BD",
+  brandTagline: "All Types of Home & Kitchen Appliances Available",
+  supportEmail: "admin@zelvobd.com",
+  supportPhone: "+8801994040246",
+  supportAddress: "136/137, Mudi Market, 2nd Floor, Kachabazar, Dhaka New Market, Dhaka - 1205",
   navGroups: [
     {
       title: "Shop",
@@ -100,7 +100,7 @@ export function SiteFooter() {
               <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/logo.png"
-                alt="Zelvobd"
+                alt="ZELVO BD"
                 width={120}
                 height={32}
                 className="h-10 w-auto object-contain"
@@ -172,13 +172,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-slate-800 pt-5">
-          <div className="flex justify-center">
-            <Link href="/" className="flex items-center gap-2 text-lg font-bold text-foreground" aria-label={`${footer.brandName} home`}>
-              {footer.brandName}
-            </Link>
-          </div>
-
+        <div className="mt-8 border-t border-slate-800">
           <p className="mt-4 text-center text-xs tracking-wide text-slate-500">
             © {new Date().getFullYear()} — {footer.brandName}. All rights reserved.
           </p>
