@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Flame, Truck, Star } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
+import { ShinyText } from "@/components/ui/shiny-text"
 
 export function ProductCard({
   product,
@@ -138,7 +139,7 @@ export function ProductCard({
               emphasis ? "h-9" : "h-8",
             )}
           >
-            Buy Now
+            <ShinyText text="Buy Now" />
           </span>
         </div>
       </div>
