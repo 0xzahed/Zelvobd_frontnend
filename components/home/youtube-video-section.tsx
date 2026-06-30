@@ -23,11 +23,7 @@ export function YoutubeVideoSection() {
   if (loaded && videos.length === 0) return null;
 
   return (
-    <section className='bg-surface px-4 py-4 md:px-6'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-lg font-bold text-foreground'>Featured Videos</h2>
-      </div>
-
+    <section className='px-4 py-4 md:px-6'>
       {!loaded ? (
         <div className='h-48 w-full animate-pulse rounded-xl bg-secondary md:h-80'></div>
       ) : (
@@ -76,19 +72,16 @@ export function YoutubeVideoSection() {
                   {/* Overlay */}
                   <div className='absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/40' />
 
+                  {/* Bottom gradient */}
+                  <div className='absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent' />
+
                   {/* Play Button */}
                   <div className='absolute inset-0 flex items-center justify-center'>
-                    <div className='flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110'>
-                      <Play className='ml-1 h-6 w-6 text-red-600' fill='currentColor' />
+                    <div className='animate-glow flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg shadow-blue-500/40 transition-transform group-hover:scale-110'>
+                      <Play className='ml-1 h-5 w-5 text-[#6C95E9]' fill='currentColor' />
                     </div>
                   </div>
 
-                  {/* Title */}
-                  <div className='absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-4 pb-8 md:pb-10'>
-                    <h3 className='line-clamp-2 text-base font-medium text-white md:text-xl'>
-                      {video.title}
-                    </h3>
-                  </div>
                 </div>
               </SwiperSlide>
             ))}
@@ -97,9 +90,10 @@ export function YoutubeVideoSection() {
       )}
 
       {/* Video Modal */}
+      <GlowStyles />
       {activeVideoUrl && (
         <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm'
+          className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-lg'
           onClick={() => setActiveVideoUrl(null)}
         >
           <div className='relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl'>
@@ -121,5 +115,23 @@ export function YoutubeVideoSection() {
         </div>
       )}
     </section>
+  );
+}
+
+function GlowStyles() {
+  return (
+    <style>{`
+      @keyframes glow-pulse {
+        0%, 100% { 
+          box-shadow: 0 4px 16px rgba(108,149,233,0.6), 0 8px 32px rgba(108,149,233,0.4), 0 12px 48px rgba(108,149,233,0.2);
+        }
+        50% { 
+          box-shadow: 0 4px 24px rgba(108,149,233,0.9), 0 8px 48px rgba(108,149,233,0.6), 0 16px 64px rgba(108,149,233,0.35);
+        }
+      }
+      .animate-glow {
+        animation: glow-pulse 2.5s ease-in-out infinite;
+      }
+    `}</style>
   );
 }
