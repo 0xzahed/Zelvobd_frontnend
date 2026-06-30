@@ -15,6 +15,28 @@ let newProductsInFlight: Promise<Product[]> | null = null
 export function NewProductsSection() {
   const [newItems, setNewItems] = useState<Product[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [showLeft, setShowLeft] = useState(false)
+  const [showRight, setShowRight] = useState(true)
+
+  const checkScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setShowLeft(el.scrollLeft > 5)
+    const hasOverflow = el.scrollWidth > el.clientWidth + 5
+    setShowRight(hasOverflow && el.scrollLeft + el.clientWidth < el.scrollWidth - 5)
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    checkScroll()
+    el.addEventListener("scroll", checkScroll, { passive: true })
+    window.addEventListener("resize", checkScroll)
+    return () => {
+      el.removeEventListener("scroll", checkScroll)
+      window.removeEventListener("resize", checkScroll)
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -48,6 +70,7 @@ export function NewProductsSection() {
     if (!scrollRef.current) return
     const amount = scrollRef.current.clientWidth / 2
     scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" })
+    setTimeout(checkScroll, 350)
   }
 
   return (
@@ -67,20 +90,24 @@ export function NewProductsSection() {
       </div>
 
       <div className="relative">
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+        {showLeft && (
+          <button
+            onClick={() => scroll("left")}
+            className="absolute left-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        )}
+        {showRight && (
+          <button
+            onClick={() => scroll("right")}
+            className="absolute right-1 top-1/2 z-10 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-full border border-border/60 bg-white shadow-sm transition hover:border-primary hover:text-primary"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
 
         <div ref={scrollRef} className="flex gap-1 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">
         {newItems.slice(0, 8).map((p) => (
