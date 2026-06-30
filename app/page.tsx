@@ -9,6 +9,7 @@ import { FreeDeliveryBanner } from "@/components/home/free-delivery-banner"
 import { TrendingSection } from "@/components/home/trending-section"
 import { NewProductsSection } from "@/components/home/new-products-section"
 import { CategoryProductsSections } from "@/components/home/category-products-sections"
+import { YoutubeVideoSection } from "@/components/home/youtube-video-section"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 export default function HomePage() {
@@ -24,6 +25,7 @@ export default function HomePage() {
         <TrendingSection />
         <NewProductsSection />
         <CategoryProductsSections />
+        <YoutubeVideoSection />
       </div>
       <FloatingRotatingIcon />
     </AppShell>
