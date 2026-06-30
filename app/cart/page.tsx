@@ -22,8 +22,9 @@ import type { Product } from "@/lib/types";
 import { AppShell } from "@/components/layout/app-shell";
 import { useCart } from "@/contexts/cart-context";
 import { formatBDT } from "@/lib/format";
-import { useProducts } from "@/lib/use-store-data";
+import { useProducts } from "@/src/hooks/api/useProducts";
 import { applyPromoAPI } from "@/src/api/promo/applyPromo";
+import { CartSkeleton } from "@/components/ui/skeletons/cart-skeleton";
 import { notify } from "@/lib/notify";
 import { getProductDetails } from "@/src/api/products/getProductDetails";
 import { mapProduct } from "@/src/api/_shared/mappers";
@@ -75,7 +76,7 @@ function colorToHex(name: string): string {
 export default function CartPage() {
   const router = useRouter();
   const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo } = useCart();
-  const { products } = useProducts();
+  const { data: products = [], isLoading: isLoadingProducts } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [detailMap, setDetailMap] = useState<Record<string, Product>>({});
   
@@ -407,6 +408,14 @@ export default function CartPage() {
           </button>
         </div>
         <FloatingRotatingIcon />
+      </AppShell>
+    )
+  }
+
+  if (items.length > 0 && isLoadingProducts) {
+    return (
+      <AppShell>
+        <CartSkeleton />
       </AppShell>
     )
   }
