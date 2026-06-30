@@ -11,10 +11,14 @@ import type { Category, Product, Slider } from "@/lib/types"
 let categoriesCache: Category[] | null = null
 let productsCache: Product[] | null = null
 let slidersCache: Slider[] | null = null
+let youtubeVideosCache: any[] | null = null
 
 let categoriesInFlight: Promise<Category[]> | null = null
 let productsInFlight: Promise<Product[]> | null = null
 let slidersInFlight: Promise<Slider[]> | null = null
+let youtubeVideosInFlight: Promise<any[]> | null = null
+
+import { BASE_URL } from "@/src/api/_shared/client"
 
 export function useCategories() {
   const pathname = usePathname()
@@ -176,6 +180,58 @@ export function useSliders() {
   }, [pathname])
 
   return { sliders, loaded }
+}
+
+export function useStorefrontYoutubeVideos() {
+  const pathname = usePathname()
+  const [videos, setVideos] = useState<any[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (pathname?.startsWith("/admin")) {
+      setVideos([])
+      setLoaded(true)
+      return
+    }
+
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        if (youtubeVideosCache) {
+          if (!cancelled) setVideos(youtubeVideosCache)
+          return
+        }
+
+        if (!youtubeVideosInFlight) {
+          youtubeVideosInFlight = (async () => {
+            const res = await fetch(`${BASE_URL}/youtube-videos`)
+            const data = await res.json()
+            const fetchedVideos = data?.data || []
+            youtubeVideosCache = fetchedVideos
+            return fetchedVideos
+          })().finally(() => {
+            youtubeVideosInFlight = null
+          })
+        }
+
+        const nextVideos = await youtubeVideosInFlight
+        if (!cancelled) setVideos(nextVideos)
+      } catch {
+        if (!cancelled) setVideos([])
+      } finally {
+        if (!cancelled) setLoaded(true)
+      }
+    }
+
+    void load()
+
+    return () => {
+      cancelled = true
+    }
+  }, [pathname])
+
+  return { videos, loaded }
 }
 
 export function getStaticCategories(): Category[] {

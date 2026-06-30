@@ -2,11 +2,9 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Flame, Truck, Star } from "lucide-react"
+import { Flame, Truck, Star } from "lucide-react"
 import type { Product } from "@/lib/types"
 import { formatBDT, cx } from "@/lib/format"
-import { useCart } from "@/contexts/cart-context"
-import { notify } from "@/lib/notify"
 
 export function ProductCard({
   product,
@@ -17,7 +15,6 @@ export function ProductCard({
   compact?: boolean
   emphasis?: boolean
 }) {
-  const { addItem } = useCart()
   const src =
     product.images?.[0] ||
     `/placeholder.svg?height=400&width=400&query=${encodeURIComponent(product.name)}`
@@ -26,13 +23,6 @@ export function ProductCard({
     product.cutPrice > product.price && product.cutPrice > 0
       ? Math.round((savings / product.cutPrice) * 100)
       : 0
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    addItem({ productId: product.id, quantity: 1 })
-    notify.success("Added to cart")
-  }
 
   const categorySlug = product.categorySlug || 'uncategorized'
   const subCategorySlug = product.subCategorySlug || 'all'
@@ -152,17 +142,15 @@ export function ProductCard({
           >
             Buy Now
           </span>
-          <button
-            type="button"
-            onClick={handleAdd}
-            aria-label="Add to cart"
+          <div
             className={cx(
-              "flex shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted",
-              emphasis ? "h-9 w-9" : "h-8 w-8",
+              "flex shrink-0 items-center justify-center gap-1 font-semibold text-gray-800",
+              emphasis ? "h-9" : "h-8",
             )}
           >
-            <ShoppingCart className={cx(emphasis ? "h-4 w-4" : "h-3.5 w-3.5")} />
-          </button>
+            <Star className={cx("fill-yellow-400 text-yellow-400", emphasis ? "h-4 w-4" : "h-3.5 w-3.5")} />
+            <span>{product.rating ? product.rating.toFixed(1) : "0.0"}</span>
+          </div>
         </div>
       </div>
     </Link>

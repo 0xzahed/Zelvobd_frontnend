@@ -1,8 +1,16 @@
 "use client"
 
-import { ListChecks, Minus, Plus } from "lucide-react"
+import { useState } from "react"
+
+import { ListChecks, Minus, Plus, Truck } from "lucide-react"
 import { cx, formatBDT } from "@/lib/format"
 import type { Product, ProductVariant } from "@/lib/types"
+import dynamic from "next/dynamic"
+
+const QuillEditor = dynamic(
+  () => import("@/components/ui/quill-editor").then((mod) => mod.QuillEditor),
+  { ssr: false }
+)
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -70,6 +78,8 @@ export function ProductInfo({
   qty,
   onQtyChange,
 }: ProductInfoProps) {
+  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("specification")
+
   // If activeVariant is missing, fallback to product level pricing (from mapper)
   const isFlashSale = product.isFlashSale
   const price = isFlashSale && activeVariant?.flashSalePrice != null ? activeVariant.flashSalePrice : (activeVariant?.discountedPrice || product.price)
@@ -79,8 +89,7 @@ export function ProductInfo({
         new Set(
           product.variants
             ?.filter((variant) => variant.color?.trim().toLowerCase() === selectedColor.trim().toLowerCase())
-            .map((variant) => variant.size?.trim())
-            .filter(Boolean) ?? [],
+            .flatMap((variant) => variant.size?.split(',').map(s => s.trim()).filter(Boolean) ?? []) ?? [],
         ),
       )
     : uniqueSizes
@@ -163,8 +172,10 @@ export function ProductInfo({
 
       {/* Sizes */}
       {availableSizes.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-foreground">Size</p>
+        <div className="rounded-sm border border-gray-200 p-4 bg-white/50 mt-4 md:mt-5">
+          <p className="mb-3 text-base font-semibold text-gray-900">
+            {product.variantLabel || "Size"}:
+          </p>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((s) => {
               const selected = selectedSize === s
@@ -174,13 +185,13 @@ export function ProductInfo({
                   key={s}
                   onClick={() => onSizeChange(s)}
                   className={cx(
-                    "rounded-full border bg-transparent px-3 py-1 text-sm transition",
+                    "flex h-9 items-center justify-center rounded-full border bg-white px-4 transition",
                     selected
-                      ? "border-primary text-primary bg-primary/5"
-                      : "border-border/60 text-foreground hover:border-border",
+                      ? "border-primary border-[1.5px]"
+                      : "border-gray-200 hover:border-gray-300",
                   )}
                 >
-                  {s}
+                  <span className="text-sm font-medium text-gray-700">{s}</span>
                 </button>
               )
             })}
@@ -188,27 +199,98 @@ export function ProductInfo({
         </div>
       )}
 
-      {/* Description */}
-      {product.description && (
-        <div className="border-t border-border/40 pt-4">
-          <h3 className="mb-2 text-sm font-medium text-foreground">Description</h3>
-          <div
-            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
-        </div>
-      )}
+      {/* Delivery Timescale */}
+      <div className="rounded-sm border border-gray-200 p-4 bg-white/50 flex items-center gap-3">
+        <Truck className="h-6 w-6 text-gray-700" strokeWidth={1.5} />
+        <p className="text-base text-[#171717]">
+          Delivery Timescale: <span className="font-semibold">2-5 Days</span>
+        </p>
+      </div>
 
-      {/* Extra Description */}
-      {product.extraDescription && (
-        <div className="border-t border-border/40 pt-4">
-          <h3 className="mb-2 text-sm font-medium text-foreground">More Information</h3>
-          <div
-            className="ql-editor p-0 max-w-none wrap-break-word text-justify text-[15px] leading-relaxed text-muted-foreground md:text-base [&_img]:h-auto [&_img]:max-w-full [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: product.extraDescription }}
-          />
-        </div>
-      )}
+      {/* Tabs */}
+      <div className="flex items-center gap-3">
+        {(["specification", "description", "warranty"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={cx(
+              "px-4 py-2 rounded-sm shadow-sm text-[14px] font-medium transition",
+              activeTab === tab 
+                ? "bg-primary text-white" 
+                : "bg-[#fcfcfc] text-[#292929] hover:bg-gray-100"
+            )}
+          >
+            {tab === "specification" && "Specification"}
+            {tab === "description" && "Description"}
+            {tab === "warranty" && "Warentee"}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="pt-4 md:pt-6">
+        {/* Specification Tab */}
+        {activeTab === "specification" && (
+          <div className="animate-in fade-in duration-300">
+            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Specification</h3>
+            {product.specifications && product.specifications.length > 0 ? (
+              <div className="overflow-hidden rounded-md border border-gray-200">
+                <table className="w-full text-left">
+                  <tbody className="divide-y divide-gray-200">
+                    {product.specifications.map((spec, i) => (
+                      <tr key={i} className="divide-x divide-gray-200">
+                        <td className="w-1/3 p-3 align-middle text-base text-[#525252]">
+                          {spec.title}
+                        </td>
+                        <td className="bg-white p-3 align-middle text-base font-semibold text-gray-900">
+                          {spec.information}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No specifications available.</p>
+            )}
+          </div>
+        )}
+
+        {/* Description Tab */}
+        {activeTab === "description" && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            {product.description ? (
+              <div>
+                <h3 className="mb-4 text-2xl font-semibold text-gray-900">Description</h3>
+                <QuillEditor 
+                  readOnly 
+                  deltaValue={product.descriptionDelta} 
+                  value={product.description} 
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No description available.</p>
+            )}
+          </div>
+        )}
+
+        {/* Warranty Tab */}
+        {activeTab === "warranty" && (
+          <div className="animate-in fade-in duration-300">
+            <h3 className="mb-4 text-2xl font-semibold text-gray-900">Warentee</h3>
+            {product.extraDescription ? (
+              <QuillEditor 
+                readOnly 
+                deltaValue={product.extraDescriptionDelta} 
+                value={product.extraDescription} 
+              />
+            ) : (
+              <p className="text-sm text-gray-500">No warranty information available.</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

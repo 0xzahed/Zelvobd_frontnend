@@ -11,12 +11,13 @@ import { LucideIconModal } from "./quill/lucide-icon-modal"
 import "./quill/quill-custom.css"
 
 type QuillEditorProps = {
-  label: string
-  value: string
+  label?: string
+  value?: string
   deltaValue?: any
-  onChange: (html: string, delta?: any) => void
+  onChange?: (html: string, delta?: any) => void
   placeholder?: string
   required?: boolean
+  readOnly?: boolean
 }
 
 const FONT_SIZES = ["12px", "14px", "16px", "18px", "20px", "24px", "32px", "48px"]
@@ -105,6 +106,7 @@ export function QuillEditor({
   onChange,
   placeholder,
   required,
+  readOnly = false,
 }: QuillEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const quillRef = useRef<Quill | null>(null)
@@ -181,8 +183,9 @@ export function QuillEditor({
     const quill = new Quill(hostRef.current, {
       theme: "snow",
       placeholder: placeholder || "",
+      readOnly: readOnly,
       modules: {
-        toolbar: {
+        toolbar: readOnly ? false : {
           container: TOOLBAR,
           handlers: {
             image: imageHandler,
@@ -197,11 +200,13 @@ export function QuillEditor({
     })
     quillRef.current = quill
 
-    // Set custom SVG for the lucideIcon toolbar button
-    const customIconButton = document.querySelector('.ql-lucideIcon')
-    if (customIconButton) {
-      customIconButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`
-      customIconButton.setAttribute('title', 'Insert Lucide Icon')
+    if (!readOnly) {
+      // Set custom SVG for the lucideIcon toolbar button
+      const customIconButton = document.querySelector('.ql-lucideIcon')
+      if (customIconButton) {
+        customIconButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`
+        customIconButton.setAttribute('title', 'Insert Lucide Icon')
+      }
     }
 
     quill.on("text-change", () => {
@@ -209,7 +214,7 @@ export function QuillEditor({
       const delta = quill.getContents()
       currentRef.current = html
       currentDeltaRef.current = JSON.stringify(delta)
-      onChange(html, delta)
+      if (onChange) onChange(html, delta)
     })
   }, [onChange, placeholder, imageHandler, lucideIconHandler])
 
@@ -217,14 +222,34 @@ export function QuillEditor({
     const quill = quillRef.current
     if (!quill) return
 
-    const serializedDelta = deltaValue ? JSON.stringify(deltaValue) : ""
-    if (serializedDelta && serializedDelta !== currentDeltaRef.current) {
-      quill.setContents(deltaValue, "silent")
-      currentRef.current = quill.root.innerHTML
-      currentDeltaRef.current = serializedDelta
-      return
+    let parsedDelta = deltaValue
+    if (typeof deltaValue === "string") {
+      try {
+        parsedDelta = JSON.parse(deltaValue)
+      } catch (e) {
+        console.error("Failed to parse deltaValue", e)
+      }
     }
 
+    const serializedDelta = parsedDelta ? JSON.stringify(parsedDelta) : ""
+    
+    // If we have a deltaValue, always use it and ignore HTML value to prevent overwriting
+    // rich formats that don't survive HTML serialization
+    if (serializedDelta) {
+      if (serializedDelta !== currentDeltaRef.current) {
+        try {
+          quill.setContents(parsedDelta, "silent")
+          console.log("SETTING DELTA IN QUILL", parsedDelta)
+        } catch (e) {
+          console.error("Failed to setContents on quill", e)
+        }
+        currentRef.current = quill.root.innerHTML
+        currentDeltaRef.current = serializedDelta
+      }
+      return // Stop here if we are managing via delta
+    }
+
+    // Fallback to HTML value if no delta is provided
     if (value === currentRef.current) return
 
     const normalized = stripDuplicateListPrefixes(value || "")
@@ -244,18 +269,26 @@ export function QuillEditor({
   }
 
   return (
-    <div className="text-sm">
-      <label className="mb-1 block text-foreground">
-        {label} {required && <span className="text-accent">*</span>}
-      </label>
-      <div className="relative w-full overflow-hidden rounded-lg border border-border/80 bg-background shadow-sm transition-shadow focus-within:border-primary/40 focus-within:shadow-md">
-        <div ref={hostRef} className="min-h-72 w-full" />
-        {required && (
+    <div className="relative text-sm">
+      {label && (
+        <label className="mb-1 block text-foreground">
+          {label} {required && <span className="text-accent">*</span>}
+        </label>
+      )}
+      <div
+        className={
+          readOnly
+            ? "quill-readonly-container" 
+            : "relative w-full overflow-hidden rounded-lg border border-border/80 bg-background shadow-sm transition-shadow focus-within:border-primary/40 focus-within:shadow-md"
+        }
+      >
+        <div ref={hostRef} className={readOnly ? "ql-editor-readonly border-none! [&>.ql-editor]:p-0!" : "min-h-72 w-full"} />
+        {required && !readOnly && (
           <input
             tabIndex={-1}
             readOnly
             required
-            value={getPlainText(value)}
+            value={getPlainText(value || "")}
             className="pointer-events-none absolute h-0 w-0 opacity-0"
           />
         )}

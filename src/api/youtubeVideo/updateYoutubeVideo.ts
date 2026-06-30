@@ -1,14 +1,13 @@
 import { adminFetch } from "@/src/api/_shared/adminFetch"
 import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
 
-export const updateYoutubeVideo = async (id: string, body: Record<string, unknown>) => {
+export const updateYoutubeVideo = async (id: string, body: FormData) => {
   const response = await adminFetch(`${BASE_URL}/youtube-videos/${id}`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json",
       ...authHeaders(),
     },
-    body: JSON.stringify(body || {}),
+    body,
   })
 
   const payload = await response.json().catch(() => null)
