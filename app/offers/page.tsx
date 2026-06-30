@@ -15,7 +15,7 @@ export default function OffersPage() {
     <AppShell>
       <BackHeader title="Offers" />
 
-      <div className="mx-auto max-w-md space-y-3 py-3">
+      <div className="mx-auto max-w-md space-y-4 py-4">
         {isLoading ? (
           <div className="flex h-40 items-center justify-center rounded-2xl border border-border/50 bg-card">
             <span className="text-muted-foreground text-sm">Loading offers...</span>
@@ -25,30 +25,34 @@ export default function OffersPage() {
             <Link
               key={slide.id}
               href={slide.link}
-              className="block rounded-[8px] border border-border/60 bg-card p-3 shadow-sm transition-all hover:shadow-md active:scale-[0.995]"
+              className="block rounded-xl border border-border/60 bg-card overflow-hidden shadow-sm transition-all hover:shadow-md active:scale-[0.995]"
             >
-              <div className="min-w-0 space-y-2">
-                <h3 className="text-base font-semibold leading-snug text-foreground">
+              {/* Image on top */}
+              {slide.image && (
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
+                  <Image
+                    src={slide.image}
+                    alt={slide.title || "Offer"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="p-4 space-y-2">
+                {/* Title */}
+                <h3 className="text-lg font-bold leading-snug text-foreground">
                   {slide.title || "Untitled"}
                 </h3>
+
+                {/* Description */}
                 {slide.subtitle && (
-                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                  <p className="text-[15px] leading-snug text-muted-foreground">
                     {slide.subtitle}
                   </p>
                 )}
 
-                {/* Image card */}
-                {slide.image && (
-                  <div className="relative mt-1 aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-border/30">
-                    <Image
-                      src={slide.image}
-                      alt={slide.title || "Offer"}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-
+                {/* Time & Date */}
                 <p className="pt-1 text-xs font-medium text-muted-foreground">
                   {formatRelativeTime(slide.createdAt)}
                 </p>
