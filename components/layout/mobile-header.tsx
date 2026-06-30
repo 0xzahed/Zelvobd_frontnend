@@ -1,7 +1,8 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { Search, ShoppingCart } from "lucide-react"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
@@ -43,7 +44,14 @@ export function MobileHeader() {
         <div className="flex h-14 items-center gap-2 px-4">
           {/* Logo — hide the wordmark when search is open to prevent layout overflow */}
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-1.5 text-lg font-bold text-foreground">
-            Zelvobd
+            <Image 
+              src="/logo.png" 
+              alt="Zelvobd" 
+              width={100} 
+              height={28} 
+              className="h-10 w-auto object-contain" 
+              priority 
+            />
           </Link>
 
           {/* Expanding inline search input. Uses min-w-0 so flex can shrink without overflow. */}
