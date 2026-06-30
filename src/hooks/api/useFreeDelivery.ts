@@ -95,3 +95,23 @@ export function useUpdateFreeDeliveryProducts() {
     },
   })
 }
+
+import { getFreeDelivery } from "@/src/api/freeDelivery/getFreeDelivery"
+import { mapProduct } from "@/src/api/_shared/mappers"
+
+export const FREE_DELIVERY_KEYS = {
+  storefront: ["free-delivery-storefront"] as const,
+}
+
+export function useStorefrontFreeDelivery() {
+  return useQuery({
+    queryKey: FREE_DELIVERY_KEYS.storefront,
+    queryFn: async () => {
+      const res = await getFreeDelivery({ limit: 9 })
+      return (res?.data?.products || []).map((product: any) => ({
+        ...mapProduct(product),
+        isFreeDelivery: true,
+      }))
+    },
+  })
+}

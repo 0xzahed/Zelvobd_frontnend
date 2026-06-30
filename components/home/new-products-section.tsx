@@ -3,17 +3,13 @@
 import Link from "next/link"
 import { useEffect, useState, useRef } from "react"
 import { ChevronRight, ChevronLeft } from "lucide-react"
-import { getProducts } from "@/src/api/products/getProducts"
-import { mapProduct } from "@/src/api/_shared/mappers"
+import { useNewProducts } from "@/src/hooks/api/useProducts"
 import { ProductCard } from "@/components/ui/product-card"
 import type { Product } from "@/lib/types"
-
-const MAX_NEW = 9
-let newProductsCache: Product[] | null = null
-let newProductsInFlight: Promise<Product[]> | null = null
+import { ProductSliderSkeleton } from "@/components/ui/skeletons/product-slider-skeleton"
 
 export function NewProductsSection() {
-  const [newItems, setNewItems] = useState<Product[]>([])
+  const { data: newItems = [], isLoading } = useNewProducts()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showLeft, setShowLeft] = useState(false)
   const [showRight, setShowRight] = useState(true)
@@ -38,33 +34,11 @@ export function NewProductsSection() {
     }
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    const load = async () => {
-      try {
-        if (newProductsCache) {
-          if (!cancelled) setNewItems(newProductsCache)
-          return
-        }
-        if (!newProductsInFlight) {
-          newProductsInFlight = getProducts({ limit: MAX_NEW, sortBy: "createdAt", sortOrder: "desc" })
-            .then((res) => (res?.data?.products || []).map(mapProduct) as Product[])
-            .finally(() => {
-              newProductsInFlight = null
-            })
-        }
-        const products = await newProductsInFlight
-        newProductsCache = products
-        if (!cancelled) setNewItems(products)
-      } catch {
-        if (!cancelled) setNewItems([])
-      }
-    }
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  if (isLoading) {
+    return <ProductSliderSkeleton title="New" highlight="Products" />
+  }
+
+  if (newItems.length === 0) return null
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return

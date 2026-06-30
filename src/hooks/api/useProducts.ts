@@ -288,3 +288,17 @@ export function useToggleProductField() {
     onError: (error) => handleApiError(error),
   })
 }
+
+export const NEW_PRODUCT_KEYS = {
+  all: ["new-products"] as const,
+}
+
+export function useNewProducts() {
+  return useQuery({
+    queryKey: NEW_PRODUCT_KEYS.all,
+    queryFn: async () => {
+      const res = await getProducts({ limit: 9, sortBy: "createdAt", sortOrder: "desc" })
+      return (res?.data?.products || []).map(mapProduct) as Product[]
+    },
+  })
+}
