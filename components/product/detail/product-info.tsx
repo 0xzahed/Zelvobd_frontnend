@@ -78,7 +78,7 @@ export function ProductInfo({
   qty,
   onQtyChange,
 }: ProductInfoProps) {
-  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("specification")
+  const [activeTab, setActiveTab] = useState<"specification" | "description" | "warranty">("description")
 
   // If activeVariant is missing, fallback to product level pricing (from mapper)
   const isFlashSale = product.isFlashSale
@@ -208,8 +208,8 @@ export function ProductInfo({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-3">
-        {(["specification", "description", "warranty"] as const).map((tab) => (
+      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+        {(["description", "warranty", "specification"] as const).map((tab) => (
           <button
             key={tab}
             type="button"

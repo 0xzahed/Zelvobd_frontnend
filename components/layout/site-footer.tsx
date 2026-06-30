@@ -121,7 +121,7 @@ export function SiteFooter() {
                 <span>{footer.supportPhone}</span>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
+                <MapPin className="h-6 w-6 text-primary" />
                 <span>{footer.supportAddress}</span>
               </li>
             </ul>

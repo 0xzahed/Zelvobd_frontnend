@@ -94,8 +94,6 @@ export default function MorePage() {
             </li>
           ))}
         </ul>
-
-        <p className="text-center text-[11px] text-muted-foreground">Zelvobd v1.0.0</p>
       </div>
     </AppShell>
   )
