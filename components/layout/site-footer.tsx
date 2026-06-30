@@ -23,7 +23,7 @@ const STORAGE_KEY = "zelvobd_footer"
 const DEFAULT_FOOTER: FooterSettings = {
   brandName: "ZELVO BD",
   brandTagline: "All Types of Home & Kitchen Appliances Available",
-  supportEmail: "admin@zelvobd.com",
+  supportEmail: "support@zelvobd.com",
   supportPhone: "+8801994040246",
   supportAddress: "136/137, Mudi Market, 2nd Floor, Kachabazar, Dhaka New Market, Dhaka - 1205",
   navGroups: [

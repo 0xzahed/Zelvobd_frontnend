@@ -42,10 +42,10 @@ export function ProductCard({
             : "w-full md:h-80 md:max-w-225",
       )}
     >
-      {/* Discount badge - circular */}
+      {/* Discount badge */}
       {discountPercent > 0 && (
         <div className="absolute left-1.5 top-1.5 z-10">
-          <span className="flex items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-2 py-1">
+          <span className="flex h-4 items-center justify-center rounded-full border border-red-500 bg-red-50 px-1.5 text-[10px] font-bold leading-none text-red-500">
             -{discountPercent}%
           </span>
         </div>
@@ -67,7 +67,7 @@ export function ProductCard({
         />
       </div>
 
-      <div className="mt-2 flex min-w-0 flex-1 flex-col">
+      <div className="mt-2 flex min-w-0 flex-1 flex-col px-1">
         {/* Title - 2 lines, centered */}
         <h3
           className={cx(
