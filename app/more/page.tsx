@@ -3,29 +3,21 @@
 import Link from "next/link"
 import {
   ChevronRight,
-  HelpCircle,
-  Package,
   Info,
   Mail,
   Shield,
   FileText,
-  Star,
-  Share2,
   MessageCircleQuestion,
 } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
 
 export default function MorePage() {
   const menu = [
-    { icon: Package, label: "My Tracking Orders", href: "/track-order" },
     { icon: Info, label: "About Us", href: "/about" },
     { icon: Mail, label: "Contact Us", href: "/contact" },
     { icon: MessageCircleQuestion, label: "FAQ", href: "/faq" },
     { icon: Shield, label: "Privacy Policy", href: "/privacy" },
     { icon: FileText, label: "Terms & Conditions", href: "/terms" },
-    { icon: HelpCircle, label: "Help & Support", href: "/help" },
-    { icon: Star, label: "Rate App", href: "#" },
-    { icon: Share2, label: "Share App", href: "#" },
   ]
 
   return (
