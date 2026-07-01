@@ -109,17 +109,20 @@ export default function CartPage() {
   }>;
 
   const subtotal = enriched.reduce((s, i) => s + i.product.price * i.quantity, 0);
-  const hasFreeDelivery = enriched.some((i) => i.product.isFreeDelivery);
-  const shippingTax =
-    subtotal === 0
-      ? 0
-      : hasFreeDelivery
-        ? 0
-        : location === 'Inside Dhaka'
-          ? 100
-          : location === 'Outside Dhaka'
-            ? 150
-            : 0;
+  const paidDeliveryItems = enriched.filter((i) => !i.product.isFreeDelivery);
+  const allItemsFree = enriched.length > 0 && paidDeliveryItems.length === 0;
+
+  let shippingTax = 0;
+  if (subtotal > 0 && !allItemsFree && location) {
+    const baseCharge = location === 'Inside Dhaka' ? 100 : 150;
+    const totalWeight = paidDeliveryItems.reduce(
+      (sum, item) => sum + (parseFloat(item.product.weight || '0') || 0) * item.quantity,
+      0
+    );
+    const extraWeight = Math.max(0, totalWeight - 1);
+    const extraCharge = extraWeight * 20;
+    shippingTax = baseCharge + extraCharge;
+  }
   const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0;
   const total = Math.max(0, subtotal + shippingTax - discountAmount);
 
@@ -597,10 +600,10 @@ export default function CartPage() {
                   <span className='font-medium text-foreground'>
                     {subtotal === 0
                       ? formatBDT(0)
-                      : hasFreeDelivery
-                        ? 'Free'
-                        : location === ''
-                          ? 'Select Location'
+                      : location === ''
+                        ? 'Select Location'
+                        : allItemsFree
+                          ? 'Free'
                           : formatBDT(shippingTax)}
                   </span>
                 </div>
