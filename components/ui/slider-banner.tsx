@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay, Pagination } from "swiper/modules"
 import type { Slider } from "@/lib/types"
@@ -26,7 +27,7 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
         pagination={{ clickable: true }}
         className="w-full"
       >
-        {slides.map((slide) => (
+        {slides.map((slide, index) => (
           <SwiperSlide key={slide.id}>
             <Link
               href={slide.link || "#"}
@@ -35,11 +36,13 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
             >
               <div className="relative aspect-[2/1] w-full overflow-hidden bg-[#f5f5f7] md:aspect-[16/5]">
                 {slide.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={slide.image}
                     alt={slide.title || "Banner"}
-                    className="h-full w-full object-cover"
+                    fill
+                    priority={index === 0}
+                    sizes="(max-width: 768px) 100vw, 100vw"
+                    className="object-cover"
                     draggable={false}
                   />
                 ) : (
