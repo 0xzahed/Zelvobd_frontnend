@@ -24,6 +24,7 @@ import {
 } from "@/src/hooks/api/useOrders"
 import { formatBDT } from "@/lib/format"
 import { OrderCard } from "./order-card"
+import { useFraudCheck } from "@/src/hooks/api/useSteadfast"
 
 const STATUS_OPTIONS: { value: OrderStatus | ""; label: string }[] = [
   { value: "", label: "All Statuses" },
@@ -77,6 +78,8 @@ export function OrderList({
 
   const orders = data?.orders || []
   const meta = data?.meta
+
+  const { data: fraudData, isLoading: isFraudLoading, isError: isFraudError, error: fraudError } = useFraudCheck(fraudPhone)
 
   const updateStatusMutation = useUpdateOrderStatus()
   const deleteMutation = useDeleteOrder()
@@ -206,9 +209,50 @@ export function OrderList({
               <p className="mb-4 text-sm text-muted-foreground">
                 Checking fraud status for phone: <span className="font-bold text-foreground">{fraudPhone}</span>
               </p>
-              <div className="text-xs text-orange-600 bg-orange-50 p-4 rounded-lg border border-orange-200">
-                Integration coming in Phase 3...
-              </div>
+              
+              {isFraudLoading ? (
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                  <p className="mt-2 text-xs text-muted-foreground">Contacting Steadfast...</p>
+                </div>
+              ) : isFraudError ? (
+                <div className="text-xs text-red-600 bg-red-50 p-4 rounded-lg border border-red-200 text-left">
+                  <p className="font-semibold mb-1">Error checking status:</p>
+                  <p>{fraudError instanceof Error ? fraudError.message : "Unknown error occurred"}</p>
+                </div>
+              ) : fraudData ? (
+                <div className="grid grid-cols-2 gap-3 text-left">
+                  <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground">Total Parcels</p>
+                    <p className="text-lg font-bold text-foreground">{fraudData.Total_parcels}</p>
+                  </div>
+                  <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground">Delivered</p>
+                    <p className="text-lg font-bold text-green-600">{fraudData.total_delivered}</p>
+                  </div>
+                  <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
+                    <p className="text-xs text-muted-foreground">Cancelled</p>
+                    <p className="text-lg font-bold text-red-600">{fraudData.total_cancelled}</p>
+                  </div>
+                  <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                    <p className="text-xs font-medium text-orange-800">Fraud Reports</p>
+                    <p className="text-lg font-bold text-orange-600">
+                      {fraudData.total_fraud_reports?.length || 0}
+                    </p>
+                  </div>
+                  
+                  {/* Steadfast Ratio Info */}
+                  <div className="col-span-2 mt-2 rounded-lg border border-border/50 bg-card p-3">
+                    <p className="text-xs text-muted-foreground text-center">
+                      Success Rate: <span className="font-bold text-foreground">
+                        {fraudData.Total_parcels > 0 
+                          ? Math.round((fraudData.total_delivered / fraudData.Total_parcels) * 100) 
+                          : 0}%
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              ) : null}
             </div>
             <div className="flex justify-end gap-2 border-t border-border/50 bg-muted/20 px-4 py-3">
               <button
