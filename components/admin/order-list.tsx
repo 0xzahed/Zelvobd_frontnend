@@ -24,7 +24,7 @@ import {
 } from "@/src/hooks/api/useOrders"
 import { formatBDT } from "@/lib/format"
 import { OrderCard } from "./order-card"
-import { useFraudCheck } from "@/src/hooks/api/useSteadfast"
+import { useFraudCheck, useSyncOrders } from "@/src/hooks/api/useSteadfast"
 
 const STATUS_OPTIONS: { value: OrderStatus | ""; label: string }[] = [
   { value: "", label: "All Statuses" },
@@ -68,6 +68,7 @@ export function OrderList({
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "">(defaultStatus)
   const [fraudPhone, setFraudPhone] = useState<string | null>(null)
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([])
 
   const { data, isLoading } = useOrders({
     page,
@@ -83,7 +84,40 @@ export function OrderList({
 
   const updateStatusMutation = useUpdateOrderStatus()
   const deleteMutation = useDeleteOrder()
+  const syncOrdersMutation = useSyncOrders()
   const confirm = useConfirm()
+
+  const handleToggleSelect = (orderId: string) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
+    )
+  }
+
+  const handleSelectAll = () => {
+    if (selectedOrders.length === orders.length) {
+      setSelectedOrders([])
+    } else {
+      setSelectedOrders(orders.map(o => o.id))
+    }
+  }
+
+  const handleSyncSteadfast = async () => {
+    if (selectedOrders.length === 0) return;
+    
+    const ok = await confirm({
+      title: "Send to Steadfast Courier",
+      message: `Are you sure you want to send ${selectedOrders.length} order(s) to Steadfast? Their local status will automatically update to PROCESSING.`,
+      confirmText: "Sync Orders"
+    });
+
+    if (ok) {
+      syncOrdersMutation.mutate(selectedOrders, {
+        onSuccess: () => {
+          setSelectedOrders([]); // Clear selection on success
+        }
+      });
+    }
+  }
 
   const handleDelete = async (order: Order) => {
     const ok = await confirm({
@@ -135,9 +169,19 @@ export function OrderList({
               </AdminSelect>
             )}
             {showSteadfast && (
-              <AdminPrimaryButton className="bg-secondary text-primary hover:bg-secondary/80">
-                <Truck className="h-4 w-4" />
-                <span className="hidden sm:inline">Steadfast</span>
+              <AdminPrimaryButton 
+                onClick={handleSyncSteadfast}
+                disabled={selectedOrders.length === 0 || syncOrdersMutation.isPending}
+                className="bg-secondary text-primary hover:bg-secondary/80 disabled:opacity-50"
+              >
+                {syncOrdersMutation.isPending ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                ) : (
+                  <Truck className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {selectedOrders.length > 0 ? `Send ${selectedOrders.length} to Steadfast` : 'Steadfast'}
+                </span>
               </AdminPrimaryButton>
             )}
           </AdminToolbar>
@@ -145,6 +189,21 @@ export function OrderList({
       />
 
       <AdminPanel>
+        {orders.length > 0 && showSteadfast && (
+          <div className="mb-4 flex items-center gap-2 px-1">
+            <input
+              type="checkbox"
+              id="selectAll"
+              checked={selectedOrders.length === orders.length && orders.length > 0}
+              onChange={handleSelectAll}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label htmlFor="selectAll" className="text-sm font-medium cursor-pointer text-muted-foreground select-none">
+              Select All on Page
+            </label>
+          </div>
+        )}
+
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {isLoading ? (
             <div className="col-span-full">
@@ -163,6 +222,8 @@ export function OrderList({
               <OrderCard 
                 key={order.id} 
                 order={order} 
+                isSelected={selectedOrders.includes(order.id)}
+                onToggleSelect={showSteadfast ? handleToggleSelect : undefined}
                 onDelete={handleDelete}
                 onFraudCheck={(phone) => setFraudPhone(phone)} 
               />

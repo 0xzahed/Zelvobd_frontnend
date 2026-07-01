@@ -30,24 +30,38 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 
 type OrderCardProps = {
   order: Order
+  isSelected?: boolean
+  onToggleSelect?: (orderId: string) => void
   onDelete: (order: Order) => void
   onFraudCheck: (phone: string) => void
 }
 
-export function OrderCard({ order, onDelete, onFraudCheck }: OrderCardProps) {
+export function OrderCard({ order, isSelected, onToggleSelect, onDelete, onFraudCheck }: OrderCardProps) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-all hover:shadow-md">
+    <div className={`flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md ${isSelected ? 'border-primary ring-1 ring-primary/20' : 'border-border/60'}`}>
       {/* Header section */}
       <div className="flex items-start justify-between border-b border-border/50 bg-muted/20 p-4">
-        <div>
-          <h3 className="text-sm font-bold text-primary">{order.code}</h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {new Date(order.createdAt).toLocaleDateString()} at{" "}
-            {new Date(order.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
+        <div className="flex items-start gap-3">
+          {onToggleSelect && (
+            <div className="mt-1">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => onToggleSelect(order.id)}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+            </div>
+          )}
+          <div>
+            <h3 className="text-sm font-bold text-primary">{order.code}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {new Date(order.createdAt).toLocaleDateString()} at{" "}
+              {new Date(order.createdAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
         </div>
         <span
           className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${

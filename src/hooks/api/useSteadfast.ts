@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminFetch } from '@/src/api/_shared/adminFetch';
 import { BASE_URL } from '@/src/api/_shared/client';
+import { notify } from '@/lib/notify';
 
 export type FraudStatus = {
   Total_parcels: number;
@@ -27,5 +28,38 @@ export const useFraudCheck = (phone: string | null) => {
     enabled: !!phone,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
+  });
+};
+
+export const syncOrdersToSteadfast = async (orderIds: string[]) => {
+  const response = await adminFetch(`${BASE_URL}/steadfast/sync-orders`, {
+    method: 'POST',
+    body: JSON.stringify({ orderIds }),
+  });
+  
+  const payload = await response.json();
+
+  if (!response.ok || payload?.status === false) {
+    throw new Error(payload?.message || 'Failed to sync orders to Steadfast');
+  }
+
+  return payload.data;
+};
+
+export const useSyncOrders = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: syncOrdersToSteadfast,
+    onSuccess: (data) => {
+      notify.success(`Successfully synced ${data.success} order(s) to Steadfast!`);
+      if (data.failed > 0) {
+        notify.error(`Failed to sync ${data.failed} order(s). Check logs.`);
+      }
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error: any) => {
+      notify.error(error.message || 'Failed to sync orders');
+    },
   });
 };
