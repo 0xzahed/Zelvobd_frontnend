@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Eye, ShoppingCart, Trash2, Truck } from "lucide-react"
+import { ChevronLeft, ChevronRight, ShoppingCart, Truck, ShieldAlert } from "lucide-react"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import {
   AdminEmptyState,
@@ -23,6 +23,7 @@ import {
   type OrderStatus,
 } from "@/src/hooks/api/useOrders"
 import { formatBDT } from "@/lib/format"
+import { OrderCard } from "./order-card"
 
 const STATUS_OPTIONS: { value: OrderStatus | ""; label: string }[] = [
   { value: "", label: "All Statuses" },
@@ -65,6 +66,7 @@ export function OrderList({
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "">(defaultStatus)
+  const [fraudPhone, setFraudPhone] = useState<string | null>(null)
 
   const { data, isLoading } = useOrders({
     page,
@@ -140,109 +142,29 @@ export function OrderList({
       />
 
       <AdminPanel>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-5 py-3 font-medium">Order ID</th>
-                <th className="px-5 py-3 font-medium">Date</th>
-                <th className="px-5 py-3 font-medium">Customer</th>
-                <th className="px-5 py-3 font-medium">Total</th>
-                <th className="px-5 py-3 font-medium">Status</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={6}>
-                    <AdminLoadingState label="Loading orders..." />
-                  </td>
-                </tr>
-              )}
-              {!isLoading && orders.length === 0 && (
-                <tr>
-                  <td colSpan={6}>
-                    <AdminEmptyState
-                      icon={ShoppingCart}
-                      title="No orders found"
-                      description="There are no orders matching your filters at the moment."
-                    />
-                  </td>
-                </tr>
-              )}
-              {!isLoading &&
-                orders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-border/50 transition-colors hover:bg-muted/30 last:border-b-0"
-                  >
-                    <td className="px-5 py-3.5">
-                      <div className="font-bold tracking-wide text-primary">{order.code}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground">
-                        {order.items.length} item(s)
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-muted-foreground">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                      <br />
-                      <span className="text-xs">
-                        {new Date(order.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-medium text-foreground">{order.customerName}</div>
-                      <div className="text-xs text-muted-foreground">{order.customerPhone}</div>
-                    </td>
-                    <td className="px-5 py-3.5 font-medium text-foreground">
-                      {formatBDT(order.total)}
-                      {order.promoCode && (
-                        <div className="mt-0.5 text-[10px] font-semibold text-accent">
-                          PROMO: {order.promoCode}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          handleStatusChange(order.id, e.target.value as OrderStatus)
-                        }
-                        disabled={
-                          updateStatusMutation.isPending &&
-                          updateStatusMutation.variables?.id === order.id
-                        }
-                        className={`h-8 rounded-lg border border-border/60 px-2 text-xs font-semibold outline-none transition focus:ring-2 focus:ring-primary/20 ${STATUS_COLORS[order.status]}`}
-                      >
-                        {STATUS_OPTIONS.filter((opt) => opt.value !== "").map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex justify-end gap-1">
-                        <AdminIconButton aria-label="View Details" variant="primary">
-                          <Eye className="h-3.5 w-3.5" />
-                        </AdminIconButton>
-                        <AdminIconButton
-                          aria-label="Delete"
-                          variant="danger"
-                          onClick={() => handleDelete(order)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </AdminIconButton>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {isLoading ? (
+            <div className="col-span-full">
+              <AdminLoadingState label="Loading orders..." />
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="col-span-full">
+              <AdminEmptyState
+                icon={ShoppingCart}
+                title="No orders found"
+                description="There are no orders matching your filters at the moment."
+              />
+            </div>
+          ) : (
+            orders.map((order) => (
+              <OrderCard 
+                key={order.id} 
+                order={order} 
+                onDelete={handleDelete}
+                onFraudCheck={(phone) => setFraudPhone(phone)} 
+              />
+            ))
+          )}
         </div>
 
         {meta && meta.totalPage > 1 && (
@@ -269,6 +191,36 @@ export function OrderList({
           </div>
         )}
       </AdminPanel>
+
+      {/* Fraud Modal Placeholder */}
+      {fraudPhone && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md overflow-hidden rounded-xl bg-card shadow-2xl">
+            <div className="border-b border-border/50 bg-muted/20 px-4 py-3">
+              <h3 className="flex items-center gap-2 font-semibold text-foreground">
+                <ShieldAlert className="h-5 w-5 text-orange-500" />
+                Fraud Check
+              </h3>
+            </div>
+            <div className="p-6 text-center">
+              <p className="mb-4 text-sm text-muted-foreground">
+                Checking fraud status for phone: <span className="font-bold text-foreground">{fraudPhone}</span>
+              </p>
+              <div className="text-xs text-orange-600 bg-orange-50 p-4 rounded-lg border border-orange-200">
+                Integration coming in Phase 3...
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 border-t border-border/50 bg-muted/20 px-4 py-3">
+              <button
+                onClick={() => setFraudPhone(null)}
+                className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition hover:bg-muted"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminPage>
   )
 }

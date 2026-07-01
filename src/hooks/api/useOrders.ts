@@ -46,6 +46,8 @@ export type Order = {
   discountAmount: number
   total: number
   promoCode: string | null
+  consignmentId: string | null
+  trackingCode: string | null
   status: OrderStatus
   items: OrderItem[]
   createdAt: string
