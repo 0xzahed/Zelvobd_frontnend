@@ -53,6 +53,7 @@ const MENU: NavItem[] = [
     children: [
       { href: '/admin/categories', label: 'Category' },
       { href: '/admin/categories/sub', label: 'Sub Category' },
+      { href: '/admin/category-banners', label: 'Category Banner' },
     ],
   },
   { section: 'Catalog', label: 'Products', icon: Package, href: '/admin/products' },
@@ -116,6 +117,7 @@ const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
   { match: '/admin/products', title: 'Products' },
   { match: '/admin/categories/sub', title: 'Sub Categories' },
   { match: '/admin/categories', title: 'Categories' },
+  { match: '/admin/category-banners', title: 'Category Banners' },
   { match: '/admin/trending', title: 'Trending Products' },
   { match: '/admin/free-delivery', title: 'Free Delivery' },
   { match: '/admin/sliders', title: 'Banners' },
