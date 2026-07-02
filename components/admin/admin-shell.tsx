@@ -73,7 +73,6 @@ const MENU: NavItem[] = [
     label: 'Orders',
     icon: ShoppingBag,
     children: [
-      { href: '/admin/orders/new', label: 'New Orders' },
       { href: '/admin/orders/pending', label: 'Pending Orders' },
       { href: '/admin/orders/processing', label: 'Processing Orders' },
       { href: '/admin/orders/hold', label: 'Hold Orders' },
@@ -124,7 +123,6 @@ const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
   { match: '/admin/youtube', title: 'YouTube Videos' },
   { match: '/admin/promos', title: 'Promo Codes' },
   { match: '/admin/flash-sale', title: 'Flash Sales' },
-  { match: '/admin/orders/new', title: 'All Orders' },
   { match: '/admin/orders/pending', title: 'Pending Orders' },
   { match: '/admin/orders/processing', title: 'Processing Orders' },
   { match: '/admin/orders/hold', title: 'Hold Orders' },
