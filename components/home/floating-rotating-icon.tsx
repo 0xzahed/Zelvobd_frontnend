@@ -42,10 +42,10 @@ export function FloatingRotatingIcon({ compact = false }: { compact?: boolean })
             <button
               type='button'
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className='grid h-9 w-9 place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5'
+              className='grid h-12 w-12 place-items-center rounded-full bg-white shadow-[0_6px_14px_rgba(15,23,42,0.16)] transition hover:-translate-y-0.5'
               aria-label='Scroll to top'
             >
-              <ArrowUp className='h-5 w-5 text-primary' />
+              <ArrowUp className='h-6 w-6 text-primary' />
             </button>
           )}
           <button
@@ -56,13 +56,13 @@ export function FloatingRotatingIcon({ compact = false }: { compact?: boolean })
           >
             {!compact && (
               <span
-                className={`flex h-12 items-center whitespace-nowrap text-sm font-semibold text-white transition-all duration-500 ease-out ${expanded ? 'max-w-25 px-3 opacity-100' : 'max-w-0 px-0 opacity-0'}`}
+                className={`flex h-12 items-center whitespace-nowrap text-sm font-semibold text-white transition-all duration-500 ease-out ${expanded ? 'max-w-25 pl-3 opacity-100' : 'max-w-0 px-0 opacity-0'}`}
               >
                 Contact Us
               </span>
             )}
             <div className='flex h-12 w-12 shrink-0 items-center justify-center'>
-              <Headset className='h-5 w-5 text-white' />
+              <Headset className='h-6 w-6 text-white' />
             </div>
           </button>
           <FloatStyles />
