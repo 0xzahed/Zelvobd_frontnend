@@ -98,7 +98,8 @@ export default function CartPage() {
 
   const enriched = items
     .map((item) => {
-      const p = detailMap[item.productId] || products.find((prod: Product) => prod.id === item.productId);
+      const p =
+        detailMap[item.productId] || products.find((prod: Product) => prod.id === item.productId);
       return p ? { ...item, product: p } : null;
     })
     .filter(Boolean) as Array<{
@@ -111,7 +112,8 @@ export default function CartPage() {
 
   const getDisplayVariant = (item: { color?: string; storage?: string; product: Product }) => {
     const variants = item.product.variants || [];
-    if (variants.length === 0) return { color: item.color, size: item.storage, image: undefined, data: null };
+    if (variants.length === 0)
+      return { color: item.color, size: item.storage, image: undefined, data: null };
 
     const norm = (val?: string) => (val || '').trim().toLowerCase();
     const itemColor = norm(item.color);
@@ -131,7 +133,7 @@ export default function CartPage() {
         color: item.color,
         size: item.storage || byColor.size.split(',')[0].trim(),
         image: byColor.image,
-        data: byColor
+        data: byColor,
       };
     }
 
@@ -141,7 +143,7 @@ export default function CartPage() {
         color: item.color || bySize.color,
         size: item.storage,
         image: bySize.image,
-        data: bySize
+        data: bySize,
       };
     }
 
@@ -149,7 +151,7 @@ export default function CartPage() {
       color: item.color || variants[0]?.color,
       size: item.storage || variants[0]?.size.split(',')[0].trim(),
       image: variants[0]?.image,
-      data: variants[0] || null
+      data: variants[0] || null,
     };
   };
 
@@ -163,7 +165,7 @@ export default function CartPage() {
   const keyForItem = (item: { productId: string; color?: string; storage?: string }) =>
     `${item.productId}__${item.color || ''}__${item.storage || ''}`;
 
-  const selectedEnriched = enriched.filter(item => selectedKeys.has(keyForItem(item)));
+  const selectedEnriched = enriched.filter((item) => selectedKeys.has(keyForItem(item)));
 
   const subtotal = selectedEnriched.reduce((s, i) => {
     const displayVariant = getDisplayVariant(i);
@@ -179,7 +181,7 @@ export default function CartPage() {
     const baseCharge = location === 'Inside Dhaka' ? 100 : 150;
     const totalWeight = paidDeliveryItems.reduce(
       (sum, item) => sum + (parseFloat(item.product.weight || '0') || 0) * item.quantity,
-      0
+      0,
     );
     const extraWeight = Math.max(0, totalWeight - 1);
     const extraCharge = extraWeight * 20;
@@ -219,8 +221,7 @@ export default function CartPage() {
     let cancelled = false;
 
     const loadDetails = async () => {
-      const targets = items
-        .filter((item) => !detailMap[item.productId]);
+      const targets = items.filter((item) => !detailMap[item.productId]);
 
       if (targets.length === 0) {
         setIsLoadingDetails(false);
@@ -240,7 +241,7 @@ export default function CartPage() {
           // ignore detail errors
         }
       }
-      
+
       if (!cancelled) {
         setIsLoadingDetails(false);
       }
@@ -480,9 +481,12 @@ export default function CartPage() {
                 const isSelected = selectedKeys.has(itemKey);
                 const variantLabels = getVariantLabels({ ...item, product: p });
                 const displayVariant = getDisplayVariant({ ...item, product: p });
-                const imageToUse = displayVariant.image || p.images?.[0] || `/placeholder.svg?height=200&width=200&query=${imgQuery}`;
+                const imageToUse =
+                  displayVariant.image ||
+                  p.images?.[0] ||
+                  `/placeholder.svg?height=200&width=200&query=${imgQuery}`;
                 const activePrice = getVariantPrice(p, displayVariant.data);
-                
+
                 return (
                   <li
                     key={`${p.id}-${item.color}-${item.storage}`}
@@ -501,12 +505,7 @@ export default function CartPage() {
                         )}
                       </button>
                       <div className='relative h-24 w-24 shrink-0 overflow-hidden rounded-sm bg-muted'>
-                        <Image
-                          src={imageToUse}
-                          alt={p.name}
-                          fill
-                          className='object-cover'
-                        />
+                        <Image src={imageToUse} alt={p.name} fill className='object-cover' />
                       </div>
                       <div className='flex min-w-0 flex-1 flex-col'>
                         <Link
@@ -635,7 +634,7 @@ export default function CartPage() {
                   <span className='font-medium text-foreground'>{formatBDT(subtotal)}</span>
                 </div>
                 <div className='flex justify-between text-sm'>
-                  <span className='text-muted-foreground'>Shipping &amp; Tax</span>
+                  <span className='text-muted-foreground'>Delivery Charge</span>
                   <span className='font-medium text-foreground'>
                     {subtotal === 0
                       ? formatBDT(0)
