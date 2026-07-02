@@ -467,129 +467,196 @@ export default function CartPage() {
             </Link>
           </div>
         ) : (
-          <div className='grid gap-6 pb-24 md:grid-cols-[1fr_340px] md:pb-0'>
-            <ul className='space-y-3'>
-              <li className='flex items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2'>
-                <button
-                  onClick={toggleAll}
-                  className='inline-flex items-center gap-2 text-sm font-medium text-foreground'
-                >
-                  {allSelected ? (
-                    <CheckSquare className='h-4 w-4 text-primary' />
-                  ) : (
-                    <Square className='h-4 w-4 text-muted-foreground' />
-                  )}
-                  Select All
-                </button>
-                <span className='text-xs text-muted-foreground'>{selectedKeys.size} selected</span>
-              </li>
-              {enriched.map((item) => {
-                const p = detailMap[item.productId] || item.product;
-                const imgQuery = encodeURIComponent(`${p.name} product photo`);
-                const itemKey = keyForItem(item);
-                const isSelected = selectedKeys.has(itemKey);
-                const variantLabels = getVariantLabels({ ...item, product: p });
-                const displayVariant = getDisplayVariant({ ...item, product: p });
-                const imageToUse =
-                  displayVariant.image ||
-                  p.images?.[0] ||
-                  `/placeholder.svg?height=200&width=200&query=${imgQuery}`;
-                const activePrice = getVariantPrice(p, displayVariant.data);
+          <div className='grid gap-6 pb-24 md:grid-cols-[1fr_400px] lg:grid-cols-[1fr_450px] md:pb-0'>
+            {/* Left Column: Shipping Form */}
+            <div className='space-y-4'>
+              <div className='space-y-4 rounded-2xl border border-border/60 bg-card p-4 md:p-6'>
+                <h3 className='text-base font-semibold text-foreground md:text-lg'>Shipping Information</h3>
+                <div className='grid gap-4'>
+                  <div className='grid grid-cols-2 gap-3'>
+                    <input
+                      value={form.name}
+                      onChange={(e) => updateForm('name', e.target.value)}
+                      placeholder='Full Name'
+                      className='h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all'
+                    />
+                    <input
+                      value={form.phone}
+                      onChange={(e) => updateForm('phone', e.target.value)}
+                      placeholder='Phone Number'
+                      className='h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all'
+                    />
+                  </div>
+                  <textarea
+                    value={form.address}
+                    onChange={(e) => updateForm('address', e.target.value)}
+                    placeholder='Address'
+                    rows={2}
+                    className='w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all'
+                  />
+                  <div className='grid grid-cols-2 gap-3'>
+                    <label className='flex items-center gap-2 rounded-xl border border-border/60 p-3 md:p-4 cursor-pointer hover:bg-muted/50 transition-colors'>
+                      <input
+                        type='radio'
+                        name='location'
+                        value='Inside Dhaka'
+                        checked={location === 'Inside Dhaka'}
+                        onChange={(e) => setLocation(e.target.value as 'Inside Dhaka')}
+                        className='h-4 w-4 shrink-0 text-primary focus:ring-primary'
+                      />
+                      <span className='text-xs font-medium md:text-sm line-clamp-1'>Inside Dhaka</span>
+                    </label>
+                    <label className='flex items-center gap-2 rounded-xl border border-border/60 p-3 md:p-4 cursor-pointer hover:bg-muted/50 transition-colors'>
+                      <input
+                        type='radio'
+                        name='location'
+                        value='Outside Dhaka'
+                        checked={location === 'Outside Dhaka'}
+                        onChange={(e) => setLocation(e.target.value as 'Outside Dhaka')}
+                        className='h-4 w-4 shrink-0 text-primary focus:ring-primary'
+                      />
+                      <span className='text-xs font-medium md:text-sm line-clamp-1'>Outside Dhaka</span>
+                    </label>
+                  </div>
+                  <textarea
+                    value={form.notes}
+                    onChange={(e) => updateForm('notes', e.target.value)}
+                    placeholder='Order Notes (optional)'
+                    rows={2}
+                    className='w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all'
+                  />
+                </div>
+              </div>
+            </div>
 
-                return (
-                  <li
-                    key={`${p.id}-${item.color}-${item.storage}`}
-                    className={`rounded-2xl bg-card p-3 ${isSelected ? 'ring-1 ring-primary/40' : ''}`}
+            {/* Right Column: Order Items & Summary */}
+            <div className='space-y-4 md:sticky md:top-24 md:self-start'>
+              {/* Product List */}
+              <div className='space-y-3 rounded-2xl border border-border/60 bg-card p-4'>
+                <div className='flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 px-3 py-2'>
+                  <button
+                    onClick={toggleAll}
+                    className='inline-flex items-center gap-2 text-sm font-medium text-foreground'
                   >
-                    <div className='flex gap-3'>
-                      <button
-                        onClick={() => toggleOne(itemKey)}
-                        aria-label={isSelected ? 'Unselect item' : 'Select item'}
-                        className='mt-1 shrink-0 text-muted-foreground'
+                    {allSelected ? (
+                      <CheckSquare className='h-4 w-4 text-primary' />
+                    ) : (
+                      <Square className='h-4 w-4 text-muted-foreground' />
+                    )}
+                    Select All
+                  </button>
+                  <span className='text-xs text-muted-foreground'>{selectedKeys.size} selected</span>
+                </div>
+                <ul className='space-y-3 max-h-[45vh] overflow-y-auto pr-1 custom-scrollbar'>
+                  {enriched.map((item) => {
+                    const p = detailMap[item.productId] || item.product;
+                    const imgQuery = encodeURIComponent(`${p.name} product photo`);
+                    const itemKey = keyForItem(item);
+                    const isSelected = selectedKeys.has(itemKey);
+                    const variantLabels = getVariantLabels({ ...item, product: p });
+                    const displayVariant = getDisplayVariant({ ...item, product: p });
+                    const imageToUse =
+                      displayVariant.image ||
+                      p.images?.[0] ||
+                      `/placeholder.svg?height=200&width=200&query=${imgQuery}`;
+                    const activePrice = getVariantPrice(p, displayVariant.data);
+
+                    return (
+                      <li
+                        key={`${p.id}-${item.color}-${item.storage}`}
+                        className={`rounded-xl border bg-card p-3 ${isSelected ? 'border-primary/40 ring-1 ring-primary/40' : 'border-border/60'}`}
                       >
-                        {isSelected ? (
-                          <CheckSquare className='h-4 w-4 text-primary' />
-                        ) : (
-                          <Square className='h-4 w-4' />
-                        )}
-                      </button>
-                      <div className='relative h-24 w-24 shrink-0 overflow-hidden rounded-sm bg-muted'>
-                        <Image src={imageToUse} alt={p.name} fill className='object-cover' />
-                      </div>
-                      <div className='flex min-w-0 flex-1 flex-col'>
-                        <Link
-                          href={`/${p.categorySlug || 'all'}/${p.subCategorySlug || 'all'}/${p.slug || p.id}`}
-                          className='line-clamp-1 text-base font-semibold text-foreground'
-                        >
-                          {p.name}
-                        </Link>
-                        <p className='text-sm font-medium text-primary'>{p.brand}</p>
-                        <p className='mt-1 text-base font-bold text-foreground'>
-                          {formatBDT(activePrice)}
-                        </p>
-                        {variantLabels.shouldShow && (
-                          <div className='mt-2 flex flex-wrap items-center gap-2 text-xs'>
-                            {variantLabels.color && (
-                              <span className='inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-2 py-1'>
-                                <span
-                                  className='h-3 w-3 rounded-full border border-border/60'
-                                  style={{ backgroundColor: colorToHex(variantLabels.color) }}
-                                  aria-hidden='true'
-                                />
-                                <span className='font-semibold text-foreground'>
-                                  {variantLabels.color}
-                                </span>
-                              </span>
+                        <div className='flex gap-3'>
+                          <button
+                            onClick={() => toggleOne(itemKey)}
+                            aria-label={isSelected ? 'Unselect item' : 'Select item'}
+                            className='mt-1 shrink-0 text-muted-foreground'
+                          >
+                            {isSelected ? (
+                              <CheckSquare className='h-4 w-4 text-primary' />
+                            ) : (
+                              <Square className='h-4 w-4' />
                             )}
-                            {variantLabels.size && (
-                              <span className='inline-flex items-center rounded-full border border-border/60 bg-card px-2 py-1 font-semibold text-foreground'>
-                                {variantLabels.size}
-                              </span>
+                          </button>
+                          <div className='relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted'>
+                            <Image src={imageToUse} alt={p.name} fill className='object-cover' />
+                          </div>
+                          <div className='flex min-w-0 flex-1 flex-col'>
+                            <Link
+                              href={`/${p.categorySlug || 'all'}/${p.subCategorySlug || 'all'}/${p.slug || p.id}`}
+                              className='line-clamp-1 text-sm font-semibold text-foreground'
+                            >
+                              {p.name}
+                            </Link>
+                            <p className='text-xs font-medium text-primary mt-0.5'>{p.brand}</p>
+                            <p className='mt-1 text-sm font-bold text-foreground'>
+                              {formatBDT(activePrice)}
+                            </p>
+                            {variantLabels.shouldShow && (
+                              <div className='mt-2 flex flex-wrap items-center gap-2 text-xs'>
+                                {variantLabels.color && (
+                                  <span className='inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-2 py-1'>
+                                    <span
+                                      className='h-3 w-3 rounded-full border border-border/60'
+                                      style={{ backgroundColor: colorToHex(variantLabels.color) }}
+                                      aria-hidden='true'
+                                    />
+                                    <span className='font-semibold text-foreground'>
+                                      {variantLabels.color}
+                                    </span>
+                                  </span>
+                                )}
+                                {variantLabels.size && (
+                                  <span className='inline-flex items-center rounded-full border border-border/60 bg-card px-2 py-1 font-semibold text-foreground'>
+                                    {variantLabels.size}
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className='mt-3 flex items-center justify-between border-t border-border/60 pt-3'>
-                      <button
-                        onClick={() => router.push(getEditUrl({ ...item, product: p }))}
-                        className='inline-flex items-center gap-1 text-sm font-medium text-primary'
-                      >
-                        <Pencil className='h-3.5 w-3.5' /> Edit
-                      </button>
-                      <div className='flex items-center gap-3'>
-                        <button
-                          onClick={() =>
-                            updateQuantity(p.id, item.quantity - 1, item.color, item.storage)
-                          }
-                          className='grid h-7 w-7 place-items-center rounded-full border border-border text-foreground'
-                        >
-                          <Minus className='h-3 w-3' />
-                        </button>
-                        <span className='w-4 text-center text-sm font-semibold'>
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(p.id, item.quantity + 1, item.color, item.storage)
-                          }
-                          className='grid h-7 w-7 place-items-center rounded-full border border-primary text-primary'
-                        >
-                          <Plus className='h-3 w-3' />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeItem(p.id, item.color, item.storage)}
-                        className='grid h-8 w-8 place-items-center rounded-full text-foreground/60 hover:bg-foreground/5'
-                      >
-                        <Trash2 className='h-4 w-4' />
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className='space-y-4 md:sticky md:top-20 md:self-start'>
+                        </div>
+                        <div className='mt-3 flex items-center justify-between border-t border-border/60 pt-3'>
+                          <button
+                            onClick={() => router.push(getEditUrl({ ...item, product: p }))}
+                            className='inline-flex items-center gap-1 text-xs font-medium text-primary'
+                          >
+                            <Pencil className='h-3.5 w-3.5' /> Edit
+                          </button>
+                          <div className='flex items-center gap-3'>
+                            <button
+                              onClick={() =>
+                                updateQuantity(p.id, item.quantity - 1, item.color, item.storage)
+                              }
+                              className='grid h-6 w-6 place-items-center rounded-full border border-border text-foreground'
+                            >
+                              <Minus className='h-3 w-3' />
+                            </button>
+                            <span className='w-4 text-center text-xs font-semibold'>
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateQuantity(p.id, item.quantity + 1, item.color, item.storage)
+                              }
+                              className='grid h-6 w-6 place-items-center rounded-full border border-primary text-primary'
+                            >
+                              <Plus className='h-3 w-3' />
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => removeItem(p.id, item.color, item.storage)}
+                            className='grid h-7 w-7 place-items-center rounded-full text-foreground/60 hover:bg-foreground/5'
+                          >
+                            <Trash2 className='h-3.5 w-3.5' />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* Promo Code */}
               {appliedPromo ? (
                 <div className='flex items-center justify-between rounded-full border border-primary/30 bg-primary/5 px-4 py-2.5'>
                   <div className='flex items-center gap-2'>
@@ -637,6 +704,7 @@ export default function CartPage() {
                 </div>
               )}
 
+              {/* Order Summary */}
               <div className='space-y-3 rounded-2xl border border-border/60 bg-card p-4'>
                 <div className='flex justify-between text-sm'>
                   <span className='text-muted-foreground'>Sub Total</span>
@@ -662,68 +730,13 @@ export default function CartPage() {
                     </span>
                   </div>
                 )}
-                <div className='flex justify-between pt-1 border-t border-border/60 mt-1'>
+                <div className='flex justify-between pt-2 border-t border-border/60 mt-2'>
                   <span className='text-base font-semibold text-foreground'>Total</span>
-                  <span className='text-base font-bold text-foreground'>{formatBDT(total)}</span>
+                  <span className='text-lg font-bold text-primary'>{formatBDT(total)}</span>
                 </div>
               </div>
 
-              <div className='space-y-3 rounded-2xl border border-border/60 bg-card p-4'>
-                <h3 className='text-base font-semibold text-foreground'>Shipping Information</h3>
-                <div className='grid gap-3'>
-                  <input
-                    value={form.name}
-                    onChange={(e) => updateForm('name', e.target.value)}
-                    placeholder='Full Name'
-                    className='h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary'
-                  />
-                  <input
-                    value={form.phone}
-                    onChange={(e) => updateForm('phone', e.target.value)}
-                    placeholder='Phone Number'
-                    className='h-11 w-full rounded-xl border border-border/60 bg-transparent px-4 text-sm outline-none focus:ring-1 focus:ring-primary'
-                  />
-                  <textarea
-                    value={form.address}
-                    onChange={(e) => updateForm('address', e.target.value)}
-                    placeholder='Address'
-                    rows={2}
-                    className='w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary'
-                  />
-                  <div className='grid gap-3 sm:grid-cols-2'>
-                    <label className='flex items-center gap-3 rounded-xl border border-border/60 p-4 cursor-pointer hover:bg-muted/50 transition-colors'>
-                      <input
-                        type='radio'
-                        name='location'
-                        value='Inside Dhaka'
-                        checked={location === 'Inside Dhaka'}
-                        onChange={(e) => setLocation(e.target.value as 'Inside Dhaka')}
-                        className='h-4 w-4 text-primary focus:ring-primary'
-                      />
-                      <span className='text-sm font-medium'>Inside Dhaka</span>
-                    </label>
-                    <label className='flex items-center gap-3 rounded-xl border border-border/60 p-4 cursor-pointer hover:bg-muted/50 transition-colors'>
-                      <input
-                        type='radio'
-                        name='location'
-                        value='Outside Dhaka'
-                        checked={location === 'Outside Dhaka'}
-                        onChange={(e) => setLocation(e.target.value as 'Outside Dhaka')}
-                        className='h-4 w-4 text-primary focus:ring-primary'
-                      />
-                      <span className='text-sm font-medium'>Outside Dhaka</span>
-                    </label>
-                  </div>
-                  <textarea
-                    value={form.notes}
-                    onChange={(e) => updateForm('notes', e.target.value)}
-                    placeholder='Order Notes (optional)'
-                    rows={2}
-                    className='w-full resize-none rounded-xl border border-border/60 bg-transparent px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary'
-                  />
-                </div>
-              </div>
-
+              {/* Checkout Button */}
               <div className='fixed bottom-18 left-0 right-0 z-60 px-4 md:static md:z-auto md:bottom-0 md:p-0'>
                 <button
                   type='button'
@@ -732,7 +745,7 @@ export default function CartPage() {
                   className='flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-primary/90 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100'
                 >
                   {isSubmitting && <Loader2 className='h-4 w-4 animate-spin' />}
-                  {isSubmitting ? 'Processing...' : <ShinyText text='Checkout' />}
+                  {isSubmitting ? 'Processing...' : <ShinyText text='Confirm Order' />}
                 </button>
               </div>
             </div>
