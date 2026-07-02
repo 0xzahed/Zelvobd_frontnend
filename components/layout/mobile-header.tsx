@@ -4,14 +4,10 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
-import { Search, ShoppingCart } from "lucide-react"
-import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
-import { useCart } from "@/contexts/cart-context"
+import { Search } from "lucide-react"
 export function MobileHeader() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState("")
-  const [cartOpen, setCartOpen] = useState(false)
-  const { totalCount } = useCart()
   const router = useRouter()
   const pathname = usePathname()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -86,22 +82,9 @@ export function MobileHeader() {
                 <Search className="h-5 w-5" />
               </button>
             )}
-            <button
-              onClick={() => setCartOpen(true)}
-              aria-label="Open cart"
-              className="relative grid h-10 w-10 place-items-center rounded-full border border-gray-200 bg-card text-foreground hover:bg-card"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {totalCount > 0 && (
-                <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
-                  {totalCount}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </header>
-      <CartBottomSheet open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   )
 }
