@@ -31,6 +31,8 @@ export function SliderBanner({ slides }: { slides: Slider[] }) {
           <SwiperSlide key={slide.id}>
             <Link
               href={slide.link || '#'}
+              target={slide.external ? "_blank" : undefined}
+              rel={slide.external ? "noopener noreferrer" : undefined}
               className='block w-full'
               aria-label={slide.title || 'Banner'}
             >

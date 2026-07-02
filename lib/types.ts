@@ -75,6 +75,7 @@ export type Slider = {
   bg: string;
   categoryId?: string;
   inHomePage?: boolean;
+  external?: boolean;
   createdAt?: string;
 };
 
