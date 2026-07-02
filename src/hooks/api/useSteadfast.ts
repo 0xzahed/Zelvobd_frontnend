@@ -4,7 +4,7 @@ import { BASE_URL } from '@/src/api/_shared/client';
 import { notify } from '@/lib/notify';
 
 export type FraudStatus = {
-  Total_parcels: number;
+  total_parcels: number;
   total_delivered: number;
   total_cancelled: number;
   total_fraud_reports: any[];

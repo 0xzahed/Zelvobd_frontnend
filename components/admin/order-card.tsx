@@ -108,25 +108,55 @@ export function OrderCard({ order, isSelected, onToggleSelect, onDelete, onFraud
           )}
         </div>
 
+        {/* Ordered Items */}
+        {order.items && order.items.length > 0 && (
+          <div className="mb-4 space-y-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ordered Items</h4>
+            <ul className="space-y-2">
+              {order.items.map((item, idx) => (
+                <li key={item.id || idx} className="flex gap-2 text-xs items-center bg-muted/20 p-2 rounded-md">
+                  {item.productImage && (
+                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-muted">
+                      <img src={item.productImage} alt={item.productName} className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground line-clamp-1">{item.productName}</p>
+                    <p className="text-muted-foreground mt-0.5">
+                      {item.color && <span>{item.color}</span>}
+                      {item.color && item.size && <span className="mx-1">•</span>}
+                      {item.size && <span>{item.size}</span>}
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-medium">{formatBDT(Number(item.price))}</p>
+                    <p className="text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Payment Breakdown */}
         <div className="mb-4 mt-auto rounded-lg border border-border/50 bg-muted/10 p-3 text-xs">
           <div className="flex justify-between py-1">
-            <span className="text-muted-foreground">Items ({order.items.length})</span>
-            <span className="font-medium">{formatBDT(order.subtotal)}</span>
+            <span className="text-muted-foreground">Items ({order.items?.length || 0})</span>
+            <span className="font-medium">{formatBDT(Number(order.subtotal))}</span>
           </div>
           <div className="flex justify-between py-1">
             <span className="text-muted-foreground">Shipping</span>
-            <span className="font-medium">{formatBDT(order.shippingCharge)}</span>
+            <span className="font-medium">{formatBDT(Number(order.shippingCharge))}</span>
           </div>
           {Number(order.discountAmount) > 0 && (
             <div className="flex justify-between py-1 text-primary">
               <span>Discount {order.promoCode ? `(${order.promoCode})` : ""}</span>
-              <span className="font-medium">-{formatBDT(order.discountAmount)}</span>
+              <span className="font-medium">-{formatBDT(Number(order.discountAmount))}</span>
             </div>
           )}
           <div className="mt-1 flex justify-between border-t border-border/50 pt-2 font-bold text-foreground">
             <span>Total</span>
-            <span>{formatBDT(order.total)}</span>
+            <span>{formatBDT(Number(order.total))}</span>
           </div>
         </div>
 

@@ -285,7 +285,7 @@ export function OrderList({
                 <div className="grid grid-cols-2 gap-3 text-left">
                   <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
                     <p className="text-xs text-muted-foreground">Total Parcels</p>
-                    <p className="text-lg font-bold text-foreground">{fraudData.Total_parcels}</p>
+                    <p className="text-lg font-bold text-foreground">{fraudData.total_parcels}</p>
                   </div>
                   <div className="rounded-lg border border-border/50 bg-muted/20 p-3">
                     <p className="text-xs text-muted-foreground">Delivered</p>
@@ -306,8 +306,8 @@ export function OrderList({
                   <div className="col-span-2 mt-2 rounded-lg border border-border/50 bg-card p-3">
                     <p className="text-xs text-muted-foreground text-center">
                       Success Rate: <span className="font-bold text-foreground">
-                        {fraudData.Total_parcels > 0 
-                          ? Math.round((fraudData.total_delivered / fraudData.Total_parcels) * 100) 
+                        {fraudData.total_parcels > 0 
+                          ? Math.round((fraudData.total_delivered / fraudData.total_parcels) * 100) 
                           : 0}%
                       </span>
                     </p>
