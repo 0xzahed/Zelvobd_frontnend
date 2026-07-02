@@ -339,16 +339,16 @@ export default function CartPage() {
   };
 
   const onCheckout = async () => {
+    if (selectedEnriched.length === 0) {
+      notify.error({ title: 'Error', message: 'Please select at least one product to checkout.' });
+      return;
+    }
+
     if (!form.name || !form.phone || !form.address || !location) {
       notify.error({
         title: 'Validation Error',
         message: 'Please fill in all required fields including Location',
       });
-      return;
-    }
-
-    if (items.length === 0) {
-      notify.error({ title: 'Error', message: 'Your cart is empty.' });
       return;
     }
 
@@ -363,7 +363,7 @@ export default function CartPage() {
         union: null,
         orderNotes: form.notes || null,
         promoCode: appliedPromo?.code || null,
-        items: items.map((item) => ({
+        items: selectedEnriched.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
           color: item.color || null,
@@ -375,7 +375,8 @@ export default function CartPage() {
 
       setOrderCode(orderData.code);
       setIsSuccess(true);
-      clearCart();
+      deleteSelected();
+      removePromo();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error: any) {
       notify.error({
