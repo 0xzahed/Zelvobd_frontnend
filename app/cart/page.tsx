@@ -75,7 +75,7 @@ function colorToHex(name: string): string {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo } =
+  const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo, isHydrated } =
     useCart();
   const { data: products = [], isLoading: isLoadingProducts } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
@@ -422,7 +422,7 @@ export default function CartPage() {
     );
   }
 
-  if (items.length > 0 && isLoadingDetails) {
+  if (!isHydrated || (items.length > 0 && isLoadingDetails)) {
     return (
       <AppShell>
         <CartSkeleton />

@@ -19,6 +19,7 @@ type CartContextType = {
   removePromo: () => void
   clearCart: () => void
   totalCount: number
+  isHydrated: boolean
 }
 
 const CartContext = createContext<CartContextType | null>(null)
@@ -104,7 +105,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items])
 
   return (
-    <CartContext.Provider value={{ items, appliedPromo, addItem, removeItem, updateQuantity, applyPromo, removePromo, clearCart, totalCount }}>
+    <CartContext.Provider value={{ items, appliedPromo, addItem, removeItem, updateQuantity, applyPromo, removePromo, clearCart, totalCount, isHydrated: hydrated }}>
       {children}
     </CartContext.Provider>
   )
