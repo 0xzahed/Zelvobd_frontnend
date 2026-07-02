@@ -5,6 +5,7 @@ import { Eye, Trash2, ShieldAlert, Package, CheckCircle2 } from "lucide-react"
 import type { Order, OrderStatus } from "@/src/hooks/api/useOrders"
 import { formatBDT } from "@/lib/format"
 import { AdminIconButton } from "@/components/admin/admin-ui"
+import { BASE_URL } from "@/src/api/_shared/client"
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
   PENDING: "text-blue-600 bg-blue-50 border-blue-100",
@@ -113,13 +114,20 @@ export function OrderCard({ order, isSelected, onToggleSelect, onDelete, onFraud
           <div className="mb-4 space-y-2">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ordered Items</h4>
             <ul className="space-y-2">
-              {order.items.map((item, idx) => (
-                <li key={item.id || idx} className="flex gap-2 text-xs items-center bg-muted/20 p-2 rounded-md">
-                  {item.productImage && (
-                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-muted">
-                      <img src={item.productImage} alt={item.productName} className="h-full w-full object-cover" />
-                    </div>
-                  )}
+              {order.items.map((item, idx) => {
+                const imageUrl = item.productImage?.startsWith('http')
+                  ? item.productImage
+                  : item.productImage
+                    ? `${BASE_URL.replace(/\/api\/v1$/, '')}${item.productImage}`
+                    : null;
+                
+                return (
+                  <li key={item.id || idx} className="flex gap-2 text-xs items-center bg-muted/20 p-2 rounded-md">
+                    {imageUrl && (
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-muted">
+                        <img src={imageUrl} alt={item.productName} className="h-full w-full object-cover" />
+                      </div>
+                    )}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground line-clamp-1">{item.productName}</p>
                     <p className="text-muted-foreground mt-0.5">
@@ -133,7 +141,8 @@ export function OrderCard({ order, isSelected, onToggleSelect, onDelete, onFraud
                     <p className="text-muted-foreground mt-0.5">Qty: {item.quantity}</p>
                   </div>
                 </li>
-              ))}
+              );
+            })}
             </ul>
           </div>
         )}
