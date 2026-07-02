@@ -80,6 +80,7 @@ export default function CartPage() {
   const { data: products = [], isLoading: isLoadingProducts } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [detailMap, setDetailMap] = useState<Record<string, Product>>({});
+  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
 
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
@@ -218,32 +219,43 @@ export default function CartPage() {
     let cancelled = false;
 
     const loadDetails = async () => {
-      const targets = enriched
-        .map((item) => item.product)
-        .filter((p) => !detailMap[p.id]);
+      const targets = items
+        .filter((item) => !detailMap[item.productId]);
 
-      for (const p of targets) {
-        if (detailMap[p.id]) continue;
+      if (targets.length === 0) {
+        setIsLoadingDetails(false);
+        return;
+      }
+
+      setIsLoadingDetails(true);
+      for (const t of targets) {
+        if (detailMap[t.productId]) continue;
         try {
-          const res = await getProductDetails(p.id);
+          const res = await getProductDetails(t.productId);
           const mapped = mapProduct(res?.data);
           if (!cancelled) {
-            setDetailMap((prev) => ({ ...prev, [p.id]: mapped }));
+            setDetailMap((prev) => ({ ...prev, [t.productId]: mapped }));
           }
         } catch {
           // ignore detail errors
         }
       }
+      
+      if (!cancelled) {
+        setIsLoadingDetails(false);
+      }
     };
 
-    if (enriched.length > 0) {
+    if (items.length > 0) {
       void loadDetails();
+    } else {
+      setIsLoadingDetails(false);
     }
 
     return () => {
       cancelled = true;
     };
-  }, [enriched, detailMap]);
+  }, [items]);
 
   const allKeys = useMemo(() => enriched.map((item) => keyForItem(item)), [enriched]);
   const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedKeys.has(k));
@@ -400,7 +412,7 @@ export default function CartPage() {
     );
   }
 
-  if (items.length > 0 && isLoadingProducts) {
+  if (items.length > 0 && isLoadingDetails) {
     return (
       <AppShell>
         <CartSkeleton />
