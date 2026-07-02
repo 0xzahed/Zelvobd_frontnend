@@ -159,14 +159,19 @@ export default function CartPage() {
       : Number(variantData.discountedPrice || product.price);
   };
 
-  const subtotal = enriched.reduce((s, i) => {
+  const keyForItem = (item: { productId: string; color?: string; storage?: string }) =>
+    `${item.productId}__${item.color || ''}__${item.storage || ''}`;
+
+  const selectedEnriched = enriched.filter(item => selectedKeys.has(keyForItem(item)));
+
+  const subtotal = selectedEnriched.reduce((s, i) => {
     const displayVariant = getDisplayVariant(i);
     const price = getVariantPrice(i.product, displayVariant.data);
     return s + price * i.quantity;
   }, 0);
 
-  const paidDeliveryItems = enriched.filter((i) => !i.product.isFreeDelivery);
-  const allItemsFree = enriched.length > 0 && paidDeliveryItems.length === 0;
+  const paidDeliveryItems = selectedEnriched.filter((i) => !i.product.isFreeDelivery);
+  const allItemsFree = selectedEnriched.length > 0 && paidDeliveryItems.length === 0;
 
   let shippingTax = 0;
   if (subtotal > 0 && !allItemsFree && location) {
@@ -181,9 +186,6 @@ export default function CartPage() {
   }
   const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0;
   const total = Math.max(0, subtotal + shippingTax - discountAmount);
-
-  const keyForItem = (item: { productId: string; color?: string; storage?: string }) =>
-    `${item.productId}__${item.color || ''}__${item.storage || ''}`;
 
   const getVariantLabels = (item: { color?: string; storage?: string; product: Product }) => {
     const displayVariant = getDisplayVariant(item);
