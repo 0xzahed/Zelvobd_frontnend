@@ -728,7 +728,7 @@ export default function CartPage() {
                   type='button'
                   onClick={onCheckout}
                   disabled={isSubmitting}
-                  className='flex w-full items-center justify-center gap-2 rounded-full border border-[#6C95E9] bg-[#EBF1FD] py-3.5 text-center text-sm font-semibold text-[#6C95E9] transition-all duration-300 hover:border-transparent hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)] hover:text-white active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100'
+                  className='flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-primary/90 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100'
                 >
                   {isSubmitting && <Loader2 className='h-4 w-4 animate-spin' />}
                   {isSubmitting ? 'Processing...' : <ShinyText text='Checkout' />}
