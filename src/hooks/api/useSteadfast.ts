@@ -34,6 +34,9 @@ export const useFraudCheck = (phone: string | null) => {
 export const syncOrdersToSteadfast = async (orderIds: string[]) => {
   const response = await adminFetch(`${BASE_URL}/steadfast/sync-orders`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ orderIds }),
   });
   
