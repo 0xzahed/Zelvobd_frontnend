@@ -66,3 +66,29 @@ export const useSyncOrders = () => {
     },
   });
 };
+
+export type DeliveryStatusResponse = {
+  status: number;
+  delivery_status: string;
+};
+
+export const getDeliveryStatus = async (invoice: string): Promise<DeliveryStatusResponse> => {
+  const response = await adminFetch(`${BASE_URL}/steadfast/status/${invoice}`);
+  const payload = await response.json();
+
+  if (!response.ok) {
+    throw new Error(payload?.message || 'Failed to check delivery status');
+  }
+
+  return payload.data;
+};
+
+export const useSteadfastDeliveryStatus = (invoice: string | null) => {
+  return useQuery({
+    queryKey: ['steadfastDeliveryStatus', invoice],
+    queryFn: () => getDeliveryStatus(invoice!),
+    enabled: !!invoice,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1,
+  });
+};

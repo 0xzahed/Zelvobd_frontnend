@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Eye, Trash2, ShieldAlert, Package, Truck, CheckCircle2 } from 'lucide-react';
 import type { Order, OrderStatus } from '@/src/hooks/api/useOrders';
+import { useSteadfastDeliveryStatus } from '@/src/hooks/api/useSteadfast';
 import { formatBDT } from '@/lib/format';
 import { AdminIconButton } from '@/components/admin/admin-ui';
 import { BASE_URL } from '@/src/api/_shared/client';
@@ -46,6 +47,10 @@ export function OrderCard({
   onSyncSteadfast,
   isSyncing,
 }: OrderCardProps) {
+  const { data: steadfastStatusData, isLoading: isStatusLoading } = useSteadfastDeliveryStatus(
+    order.consignmentId ? order.code : null
+  );
+
   return (
     <div
       className={`flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md border-border/60`}
@@ -119,6 +124,24 @@ export function OrderCard({
                   <span className='font-mono text-primary'>{order.trackingCode}</span>
                 </p>
               )}
+              
+              <div className="mt-2 pt-2 border-t border-primary/10">
+                <p className="flex items-center gap-2">
+                  <span className='font-semibold text-foreground/80'>Live Status:</span>
+                  {isStatusLoading ? (
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                      Fetching...
+                    </span>
+                  ) : steadfastStatusData ? (
+                    <span className="font-semibold text-primary capitalize">
+                      {steadfastStatusData.delivery_status?.replace(/_/g, ' ') || 'Unknown'}
+                    </span>
+                  ) : (
+                    <span className="text-red-500">Failed to fetch</span>
+                  )}
+                </p>
+              </div>
             </div>
           ) : (
             <p className='text-xs text-muted-foreground'>Not synced with Steadfast yet</p>
