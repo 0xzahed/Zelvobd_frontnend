@@ -176,16 +176,22 @@ export default function CartPage() {
 
   const paidDeliveryItems = selectedEnriched.filter((i) => !i.product.isFreeDelivery);
   const allItemsFree = selectedEnriched.length > 0 && paidDeliveryItems.length === 0;
+  const totalCartQuantity = selectedEnriched.reduce((sum, item) => sum + item.quantity, 0);
 
   let shippingTax = 0;
   if (subtotal > 0 && !allItemsFree && location) {
     const baseCharge = location === 'Inside Dhaka' ? 100 : 150;
-    const totalWeight = paidDeliveryItems.reduce(
-      (sum, item) => sum + (parseFloat(item.product.weight || '0') || 0) * item.quantity,
-      0,
-    );
-    const extraWeight = Math.max(0, totalWeight - 1);
-    const extraCharge = extraWeight * 20;
+    
+    let extraCharge = 0;
+    if (totalCartQuantity > 1) {
+      const totalWeight = paidDeliveryItems.reduce(
+        (sum, item) => sum + (parseFloat(item.product.weight || '0') || 0) * item.quantity,
+        0,
+      );
+      const extraWeight = Math.max(0, totalWeight - 1);
+      extraCharge = extraWeight * 20;
+    }
+    
     shippingTax = baseCharge + extraCharge;
   }
   const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0;
