@@ -66,7 +66,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     initialVariant?.color || uniqueColors[0] || ""
   )
   const [selectedSize, setSelectedSize] = useState<string>(
-    initialVariant?.size || uniqueSizes[0] || ""
+    (initialVariant?.size || "").split(",")[0]?.trim() || uniqueSizes[0] || ""
   )
   
   // Keep gallery image in sync (memoized so its reference is stable across renders)

@@ -97,7 +97,7 @@ export default function CartPage() {
 
   const enriched = items
     .map((item) => {
-      const p = products.find((prod: Product) => prod.id === item.productId);
+      const p = detailMap[item.productId] || products.find((prod: Product) => prod.id === item.productId);
       return p ? { ...item, product: p } : null;
     })
     .filter(Boolean) as Array<{
@@ -108,7 +108,63 @@ export default function CartPage() {
     product: Product;
   }>;
 
-  const subtotal = enriched.reduce((s, i) => s + i.product.price * i.quantity, 0);
+  const getDisplayVariant = (item: { color?: string; storage?: string; product: Product }) => {
+    const variants = item.product.variants || [];
+    if (variants.length === 0) return { color: item.color, size: item.storage, image: undefined, data: null };
+
+    const norm = (val?: string) => (val || '').trim().toLowerCase();
+    const itemColor = norm(item.color);
+    const itemSize = norm(item.storage);
+
+    const matchesColor = (v: any) => norm(v.color) === itemColor;
+    const matchesSize = (v: any) => v.size.split(',').map(norm).includes(itemSize);
+
+    if (item.color && item.storage) {
+      const exact = variants.find((v) => matchesColor(v) && matchesSize(v));
+      if (exact) return { color: item.color, size: item.storage, image: exact.image, data: exact };
+    }
+
+    const byColor = item.color ? variants.find(matchesColor) : null;
+    if (byColor) {
+      return {
+        color: item.color,
+        size: item.storage || byColor.size.split(',')[0].trim(),
+        image: byColor.image,
+        data: byColor
+      };
+    }
+
+    const bySize = item.storage ? variants.find(matchesSize) : null;
+    if (bySize) {
+      return {
+        color: item.color || bySize.color,
+        size: item.storage,
+        image: bySize.image,
+        data: bySize
+      };
+    }
+
+    return {
+      color: item.color || variants[0]?.color,
+      size: item.storage || variants[0]?.size.split(',')[0].trim(),
+      image: variants[0]?.image,
+      data: variants[0] || null
+    };
+  };
+
+  const getVariantPrice = (product: Product, variantData: any) => {
+    if (!variantData) return product.price;
+    return product.isFlashSale && variantData.flashSalePrice != null
+      ? Number(variantData.flashSalePrice)
+      : Number(variantData.discountedPrice || product.price);
+  };
+
+  const subtotal = enriched.reduce((s, i) => {
+    const displayVariant = getDisplayVariant(i);
+    const price = getVariantPrice(i.product, displayVariant.data);
+    return s + price * i.quantity;
+  }, 0);
+
   const paidDeliveryItems = enriched.filter((i) => !i.product.isFreeDelivery);
   const allItemsFree = enriched.length > 0 && paidDeliveryItems.length === 0;
 
@@ -128,34 +184,6 @@ export default function CartPage() {
 
   const keyForItem = (item: { productId: string; color?: string; storage?: string }) =>
     `${item.productId}__${item.color || ''}__${item.storage || ''}`;
-
-  const getDisplayVariant = (item: { color?: string; storage?: string; product: Product }) => {
-    const variants = item.product.variants || [];
-    if (variants.length === 0) return { color: item.color, size: item.storage };
-
-    if (item.color && item.storage) return { color: item.color, size: item.storage };
-
-    const byColor = item.color ? variants.find((v) => v.color === item.color) : null;
-    if (byColor) {
-      return {
-        color: item.color,
-        size: item.storage || byColor.size,
-      };
-    }
-
-    const bySize = item.storage ? variants.find((v) => v.size === item.storage) : null;
-    if (bySize) {
-      return {
-        color: item.color || bySize.color,
-        size: item.storage,
-      };
-    }
-
-    return {
-      color: item.color || variants[0]?.color,
-      size: item.storage || variants[0]?.size,
-    };
-  };
 
   const getVariantLabels = (item: { color?: string; storage?: string; product: Product }) => {
     const displayVariant = getDisplayVariant(item);
@@ -190,11 +218,7 @@ export default function CartPage() {
     const loadDetails = async () => {
       const targets = enriched
         .map((item) => item.product)
-        .filter(
-          (p) =>
-            (p.variants?.length || 0) === 0 ||
-            !(p.variants || []).some((v) => (v.color || '').trim() || (v.size || '').trim()),
-        );
+        .filter((p) => !detailMap[p.id]);
 
       for (const p of targets) {
         if (detailMap[p.id]) continue;
@@ -441,6 +465,10 @@ export default function CartPage() {
                 const itemKey = keyForItem(item);
                 const isSelected = selectedKeys.has(itemKey);
                 const variantLabels = getVariantLabels({ ...item, product: p });
+                const displayVariant = getDisplayVariant({ ...item, product: p });
+                const imageToUse = displayVariant.image || p.images?.[0] || `/placeholder.svg?height=200&width=200&query=${imgQuery}`;
+                const activePrice = getVariantPrice(p, displayVariant.data);
+                
                 return (
                   <li
                     key={`${p.id}-${item.color}-${item.storage}`}
@@ -460,10 +488,7 @@ export default function CartPage() {
                       </button>
                       <div className='relative h-24 w-24 shrink-0 overflow-hidden rounded-sm bg-muted'>
                         <Image
-                          src={
-                            p.images?.[0] ||
-                            `/placeholder.svg?height=200&width=200&query=${imgQuery}`
-                          }
+                          src={imageToUse}
                           alt={p.name}
                           fill
                           className='object-cover'
@@ -478,7 +503,7 @@ export default function CartPage() {
                         </Link>
                         <p className='text-sm font-medium text-primary'>{p.brand}</p>
                         <p className='mt-1 text-base font-bold text-foreground'>
-                          {formatBDT(p.price)}
+                          {formatBDT(activePrice)}
                         </p>
                         {variantLabels.shouldShow && (
                           <div className='mt-2 flex flex-wrap items-center gap-2 text-xs'>
