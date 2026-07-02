@@ -81,6 +81,7 @@ export default function CartPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [detailMap, setDetailMap] = useState<Record<string, Product>>({});
   const [isLoadingDetails, setIsLoadingDetails] = useState(true);
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [promoLoading, setPromoLoading] = useState(false);
@@ -260,6 +261,13 @@ export default function CartPage() {
 
   const allKeys = useMemo(() => enriched.map((item) => keyForItem(item)), [enriched]);
   const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedKeys.has(k));
+
+  useEffect(() => {
+    if (!isLoadingDetails && enriched.length > 0 && !hasAutoSelected) {
+      setSelectedKeys(new Set(allKeys));
+      setHasAutoSelected(true);
+    }
+  }, [isLoadingDetails, enriched.length, allKeys, hasAutoSelected]);
 
   const toggleOne = (key: string) => {
     setSelectedKeys((prev) => {
