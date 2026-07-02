@@ -6,6 +6,8 @@ import type { Product } from '@/lib/types';
 import { Flame, Star, Truck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/contexts/cart-context';
 
 export function ProductCard({
   product,
@@ -16,6 +18,26 @@ export function ProductCard({
   compact?: boolean;
   emphasis?: boolean;
 }) {
+  const router = useRouter();
+  const { addItem } = useCart();
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const selectedColor = product.variants?.[0]?.color || '';
+    const selectedSize = product.variants?.[0]?.size?.split(',')[0] || '';
+
+    addItem({
+      productId: product.id,
+      quantity: 1,
+      color: selectedColor,
+      storage: selectedSize,
+    });
+
+    router.push('/cart');
+  };
+
   const src =
     product.images?.[0] ||
     `/placeholder.svg?height=400&width=400&query=${encodeURIComponent(product.name)}`;
@@ -128,7 +150,9 @@ export function ProductCard({
 
         {/* Actions */}
         <div className='mt-auto px-2 pt-2 pb-2'>
-          <span
+          <button
+            type='button'
+            onClick={handleBuyNow}
             className={cx(
               'flex w-full items-center justify-center rounded-full text-xs font-semibold transition-all duration-300',
               'border border-[#6C95E9] text-[#6C95E9] bg-[#EBF1FD]',
@@ -137,7 +161,7 @@ export function ProductCard({
             )}
           >
             <ShinyText text='Buy Now' className='px-3' />
-          </span>
+          </button>
         </div>
       </div>
     </Link>
