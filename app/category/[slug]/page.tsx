@@ -15,6 +15,7 @@ import { getSubCategories } from "@/src/api/categoryApi"
 import { mapBanner, mapSubCategory } from "@/src/api/_shared/mappers"
 import { CategoryBannerSlider } from "@/components/category/category-banner-slider"
 import type { CategoryBanner } from "@/lib/types"
+import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 export default function CategoryPage(props: { params: any }) {
   const [slug, setSlug] = useState<string>("")
@@ -118,6 +119,7 @@ export default function CategoryPage(props: { params: any }) {
           />
         )}
       </div>
+      <FloatingRotatingIcon />
     </AppShell>
   )
 }
