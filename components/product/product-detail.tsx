@@ -15,6 +15,7 @@ import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 import { TrendingSection } from "../home/trending-section"
+import { ShinyText } from "@/components/ui/shiny-text"
 
 interface ProductDetailProps {
   product: Product
@@ -65,7 +66,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     initialVariant?.color || uniqueColors[0] || ""
   )
   const [selectedSize, setSelectedSize] = useState<string>(
-    initialVariant?.size || uniqueSizes[0] || ""
+    (initialVariant?.size || "").split(",")[0]?.trim() || uniqueSizes[0] || ""
   )
   
   // Keep gallery image in sync (memoized so its reference is stable across renders)
@@ -272,7 +273,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
               onClick={handleBuy}
               className="h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary hover:bg-primary/5"
             >
-              Buy Now
+              <ShinyText text="Buy Now" />
             </button>
             <button
               onClick={() => handleAdd()}
@@ -298,7 +299,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           onClick={handleBuy}
           className="relative z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
         >
-          Buy Now
+          <ShinyText text="Buy Now" />
         </button>
       </div>
 

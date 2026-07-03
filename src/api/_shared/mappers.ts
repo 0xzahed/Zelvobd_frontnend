@@ -121,15 +121,21 @@ export const mapProduct = (product: any): Product => {
   }
 }
 
-export const mapBanner = (banner: any): Slider => ({
-  id: banner.id,
-  title: banner.title || "",
-  subtitle: banner.subTitle || "",
-  cta: "Shop now",
-  link: banner.url || "/",
-  image: toAbsoluteUploadUrl(banner.imageUrl),
-  bg: "var(--secondary)",
-  categoryId: banner.categoryId || undefined,
-  inHomePage: Boolean(banner.inHomePage),
-  createdAt: banner.createdAt || undefined,
-})
+export const mapBanner = (banner: any): Slider => {
+  const hasUrl = Boolean(banner.url && banner.url.trim().length > 0);
+  const link = hasUrl ? banner.url : banner.category?.slug ? `/${banner.category.slug}` : "/";
+  
+  return {
+    id: banner.id,
+    title: banner.title || "",
+    subtitle: banner.subTitle || "",
+    cta: "Shop now",
+    link,
+    external: hasUrl,
+    image: toAbsoluteUploadUrl(banner.imageUrl),
+    bg: "var(--secondary)",
+    categoryId: banner.categoryId || undefined,
+    inHomePage: Boolean(banner.inHomePage),
+    createdAt: banner.createdAt || undefined,
+  };
+};

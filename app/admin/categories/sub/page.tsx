@@ -1,122 +1,125 @@
-"use client"
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import Image from "next/image"
-import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react"
-import type { SubCategory } from "@/lib/types"
-import { notify } from "@/lib/notify"
-import { useConfirm } from "@/components/ui/confirm-dialog"
-import { AdminSelect } from "@/components/admin/admin-select"
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import { ImagePlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import type { SubCategory } from '@/lib/types';
+import { notify } from '@/lib/notify';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { AdminSelect } from '@/components/admin/admin-select';
 import {
   useCategories,
   useSubCategories,
   useCreateSubCategory,
   useUpdateSubCategory,
   useDeleteSubCategory,
-} from "@/src/hooks/api/useCategories"
+} from '@/src/hooks/api/useCategories';
 
 export default function AdminSubCategoriesPage() {
-  const { data: categories = [] } = useCategories()
-  const createMutation = useCreateSubCategory()
-  const updateMutation = useUpdateSubCategory()
-  const deleteMutation = useDeleteSubCategory()
+  const { data: categories = [] } = useCategories();
+  const createMutation = useCreateSubCategory();
+  const updateMutation = useUpdateSubCategory();
+  const deleteMutation = useDeleteSubCategory();
 
-  const confirm = useConfirm()
+  const confirm = useConfirm();
 
-  const [query, setQuery] = useState("")
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("")
-  const [showModal, setShowModal] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingParentId, setEditingParentId] = useState<string | null>(null)
+  const [query, setQuery] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingParentId, setEditingParentId] = useState<string | null>(null);
 
-  const [name, setName] = useState("")
-  const [image, setImage] = useState<string>("")
-  const [parentCategoryId, setParentCategoryId] = useState<string>("")
-  const imgInputRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState('');
+  const [image, setImage] = useState<string>('');
+  const [parentCategoryId, setParentCategoryId] = useState<string>('');
+  const imgInputRef = useRef<HTMLInputElement>(null);
 
   // This will fetch subcategories for the selected category automatically
-  const { data: subCategories = [], isLoading: isLoadingSubs } = useSubCategories(selectedCategoryId, { enabled: Boolean(selectedCategoryId) })
+  const { data: subCategories = [], isLoading: isLoadingSubs } = useSubCategories(
+    selectedCategoryId,
+    { enabled: Boolean(selectedCategoryId) },
+  );
 
   useEffect(() => {
     if (categories.length === 0) {
-      setSelectedCategoryId("")
-      return
+      setSelectedCategoryId('');
+      return;
     }
 
-    const hasCurrentCategory = categories.some((c) => c.id === selectedCategoryId)
+    const hasCurrentCategory = categories.some((c) => c.id === selectedCategoryId);
     if (!hasCurrentCategory) {
-      setSelectedCategoryId(categories[0].id)
+      setSelectedCategoryId(categories[0].id);
     }
-  }, [categories, selectedCategoryId])
+  }, [categories, selectedCategoryId]);
 
   const handleDeleteSub = async (parentId: string, sub: SubCategory) => {
     const ok = await confirm({
-      title: "Delete sub-category?",
+      title: 'Delete sub-category?',
       message: `Are you sure you want to delete "${sub.name}"? This action cannot be undone.`,
-      confirmText: "Delete",
-      variant: "danger",
-    })
+      confirmText: 'Delete',
+      variant: 'danger',
+    });
     if (ok) {
-      deleteMutation.mutate({ categoryId: parentId, subId: sub.id })
+      deleteMutation.mutate({ categoryId: parentId, subId: sub.id });
     }
-  }
+  };
 
   const rows = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    let subs = subCategories
-    
+    const q = query.trim().toLowerCase();
+    let subs = subCategories;
+
     if (q) {
-      subs = subs.filter((s) => s.name.toLowerCase().includes(q))
+      subs = subs.filter((s) => s.name.toLowerCase().includes(q));
     }
-    return subs
-  }, [subCategories, query])
+    return subs;
+  }, [subCategories, query]);
 
   const resetForm = () => {
-    setName("")
-    setImage("")
-    setParentCategoryId("")
-    setEditingId(null)
-    setEditingParentId(null)
-  }
+    setName('');
+    setImage('');
+    setParentCategoryId('');
+    setEditingId(null);
+    setEditingParentId(null);
+  };
 
   const openAdd = () => {
-    resetForm()
-    setParentCategoryId(selectedCategoryId)
-    setShowModal(true)
-  }
+    resetForm();
+    setParentCategoryId(selectedCategoryId);
+    setShowModal(true);
+  };
 
   const openEdit = (sub: SubCategory & { parentId: string }) => {
-    setEditingId(sub.id)
-    setEditingParentId(sub.parentId)
-    setName(sub.name)
-    setImage(sub.image)
-    setParentCategoryId(sub.parentId)
-    setShowModal(true)
-  }
+    setEditingId(sub.id);
+    setEditingParentId(sub.parentId);
+    setName(sub.name);
+    setImage(sub.image);
+    setParentCategoryId(sub.parentId);
+    setShowModal(true);
+  };
 
   const closeModal = () => {
-    setShowModal(false)
-    resetForm()
-  }
+    setShowModal(false);
+    resetForm();
+  };
 
   const pickImage = (file: File | undefined) => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => setImage(String(reader.result))
-    reader.readAsDataURL(file)
-  }
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setImage(String(reader.result));
+    reader.readAsDataURL(file);
+  };
 
   const submit = () => {
-    const n = name.trim()
-    if (!n) return
+    const n = name.trim();
+    if (!n) return;
     if (!parentCategoryId) {
-      notify.error("Please select a parent category")
-      return
+      notify.error('Please select a parent category');
+      return;
     }
 
     if (!editingId && !image) {
-      notify.error("Please upload an image for the sub-category")
-      return
+      notify.error('Please upload an image for the sub-category');
+      return;
     }
 
     if (editingId && editingParentId) {
@@ -124,44 +127,44 @@ export default function AdminSubCategoriesPage() {
         categoryId: editingParentId,
         subId: editingId,
         data: { name: n, image: image || undefined },
-      })
+      });
     } else {
-      const slug = n.toLowerCase().replace(/\s+/g, "-")
+      const slug = n.toLowerCase().replace(/\s+/g, '-');
       const newSub: SubCategory = {
         id: `sub-${Date.now()}`,
         name: n,
         slug,
-        image: image || "/placeholder.svg",
-      }
-      createMutation.mutate({ categoryId: parentCategoryId, sub: newSub })
+        image: image || '/placeholder.svg',
+      };
+      createMutation.mutate({ categoryId: parentCategoryId, sub: newSub });
     }
-    closeModal()
-  }
+    closeModal();
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className='space-y-4'>
+      <div className='flex flex-wrap items-center justify-between gap-3'>
         <div>
-          <h2 className="text-lg font-bold text-foreground">Sub-Categories</h2>
-          <p className="text-xs text-muted-foreground">{rows.length} total</p>
+          <h2 className='text-lg font-bold text-foreground'>Sub-Categories</h2>
+          <p className='text-xs text-muted-foreground'>{rows.length} total</p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-sm bg-card px-3 shadow-sm">
-            <Search className="h-4 w-4 text-muted-foreground" />
+        <div className='flex w-full flex-col gap-2 sm:flex-row sm:items-center'>
+          <div className='flex h-10 min-w-0 flex-1 items-center gap-2 rounded-sm bg-card px-3 shadow-sm'>
+            <Search className='h-4 w-4 text-muted-foreground' />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search sub-categories..."
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              placeholder='Search sub-categories...'
+              className='flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground'
             />
           </div>
-          <div className="w-full sm:min-w-[220px] sm:flex-1">
+          <div className='w-full sm:min-w-55 sm:flex-1'>
             <AdminSelect
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(e.target.value)}
-              className="h-10 rounded-sm"
+              className='h-10 rounded-sm'
             >
-              <option value="">Select category...</option>
+              <option value=''>Select category...</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -171,102 +174,102 @@ export default function AdminSubCategoriesPage() {
           </div>
           <button
             onClick={openAdd}
-            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:flex-1"
+            className='inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:flex-1'
           >
-            <Plus className="hidden h-4 w-4 md:inline-flex" />
-            <span className="md:hidden">Add</span>
-            <span className="hidden md:inline">Add Sub Category</span>
+            <Plus className='hidden h-4 w-4 md:inline-flex' />
+            <span className='md:hidden'>Add</span>
+            <span className='hidden md:inline'>Add Sub Category</span>
           </button>
         </div>
       </div>
 
       {/* Cards */}
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {rows.length === 0 && (
-            <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
-              {isLoadingSubs
-                ? "Loading sub-categories..."
-                : selectedCategoryId
-                ? "No sub-categories in this category yet."
-                : "No categories found. Create a category first."}
+      <div className='mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+        {rows.length === 0 && (
+          <div className='col-span-full rounded-sm border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground'>
+            {isLoadingSubs
+              ? 'Loading sub-categories...'
+              : selectedCategoryId
+                ? 'No sub-categories in this category yet.'
+                : 'No categories found. Create a category first.'}
+          </div>
+        )}
+        {rows.map((sub) => (
+          <div
+            key={sub.id}
+            className='flex flex-col overflow-hidden rounded-sm border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 sm:flex-row'
+          >
+            <div className='relative h-40 w-full shrink-0 overflow-hidden border-b border-border/40 bg-muted/10 sm:h-auto sm:w-28 sm:border-b-0 sm:border-r'>
+              <Image
+                src={sub.image || '/placeholder.svg'}
+                alt={sub.name}
+                fill
+                sizes='112px'
+                className='object-contain p-2'
+              />
             </div>
-          )}
-          {rows.map((sub) => (
-            <div
-              key={sub.id}
-              className="flex flex-col overflow-hidden rounded-[8px] border border-border/40 bg-card shadow-sm transition hover:bg-secondary/30 sm:flex-row"
-            >
-              <div className="relative h-40 w-full shrink-0 overflow-hidden border-b border-border/40 bg-muted/10 sm:h-auto sm:w-28 sm:border-b-0 sm:border-r">
-                <Image
-                  src={sub.image || "/placeholder.svg"}
-                  alt={sub.name}
-                  fill
-                  sizes="112px"
-                  className="object-contain p-2"
-                />
+            <div className='flex min-w-0 flex-1 flex-col justify-between p-3 min-h-30'>
+              <div className='space-y-1'>
+                <p className='truncate text-sm font-semibold text-foreground'>{sub.name}</p>
+                <p className='truncate text-xs text-muted-foreground'>{sub.parentName}</p>
               </div>
-              <div className="flex min-w-0 flex-1 flex-col justify-between p-3 min-h-[120px]">
-                <div className="space-y-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{sub.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{sub.parentName}</p>
-                </div>
-                <div className="flex w-full flex-col gap-1 sm:flex-row">
-                  <button
-                    onClick={() => openEdit(sub)}
-                    aria-label={`Edit ${sub.name}`}
-                    className="flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-secondary text-primary transition hover:bg-primary hover:text-white md:gap-1.5"
-                  >
-                    <Pencil className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                    <span className="text-[10px] font-semibold leading-none">Edit</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSub(sub.parentId, sub)}
-                    aria-label={`Delete ${sub.name}`}
-                    className="flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 text-accent transition hover:bg-accent hover:text-white md:gap-1.5"
-                  >
-                    <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
-                    <span className="text-[10px] font-semibold leading-none">Delete</span>
-                  </button>
-                </div>
+              <div className='flex w-full flex-col gap-1 sm:flex-row'>
+                <button
+                  onClick={() => openEdit(sub)}
+                  aria-label={`Edit ${sub.name}`}
+                  className='flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-secondary text-primary transition hover:bg-primary hover:text-white md:gap-1.5'
+                >
+                  <Pencil className='h-3 w-3 md:h-3.5 md:w-3.5' />
+                  <span className='text-[10px] font-semibold leading-none'>Edit</span>
+                </button>
+                <button
+                  onClick={() => handleDeleteSub(sub.parentId, sub)}
+                  aria-label={`Delete ${sub.name}`}
+                  className='flex h-8 flex-1 items-center justify-center gap-1 rounded-sm bg-accent/10 text-accent transition hover:bg-accent hover:text-white md:gap-1.5'
+                >
+                  <Trash2 className='h-3 w-3 md:h-3.5 md:w-3.5' />
+                  <span className='text-[10px] font-semibold leading-none'>Delete</span>
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
       {/* Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'
           onClick={closeModal}
         >
           <div
-            className="relative w-full max-w-xl rounded-2xl bg-card p-6 shadow-2xl"
+            className='relative w-full max-w-xl rounded-2xl bg-card p-6 shadow-2xl'
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              aria-label="Close"
-              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary"
+              aria-label='Close'
+              className='absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-secondary'
             >
-              <X className="h-4 w-4" />
+              <X className='h-4 w-4' />
             </button>
 
-            <h3 className="text-center text-lg text-foreground">
-              {editingId ? "Edit Sub-category" : "Add New Sub-category"}
+            <h3 className='text-center text-lg text-foreground'>
+              {editingId ? 'Edit Sub-category' : 'Add New Sub-category'}
             </h3>
 
-            <div className="mx-auto mt-5 h-px w-full bg-border/60" />
+            <div className='mx-auto mt-5 h-px w-full bg-border/60' />
 
             {/* Parent category */}
             {!editingId && (
-              <div className="mt-5">
-                <label className="mb-1.5 block text-xs text-foreground">Parent Category</label>
+              <div className='mt-5'>
+                <label className='mb-1.5 block text-xs text-foreground'>Parent Category</label>
                 <AdminSelect
                   value={parentCategoryId}
                   onChange={(e) => setParentCategoryId(e.target.value)}
-                  className="h-12 px-4"
+                  className='h-12 px-4'
                 >
-                  <option value="">Select category...</option>
+                  <option value=''>Select category...</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -277,53 +280,53 @@ export default function AdminSubCategoriesPage() {
             )}
 
             {/* Title */}
-            <div className="mt-5">
+            <div className='mt-5'>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Title"
-                className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-primary/60"
+                placeholder='Title'
+                className='h-12 w-full rounded-lg border border-border bg-background px-4 text-sm outline-none focus:border-primary/60'
               />
             </div>
 
             {/* Image upload */}
-            <div className="mt-4">
-              <label className="mb-1.5 block text-xs text-foreground">Image Upload</label>
+            <div className='mt-4'>
+              <label className='mb-1.5 block text-xs text-foreground'>Image Upload</label>
               <input
                 ref={imgInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
+                type='file'
+                accept='image/*'
+                className='hidden'
                 onChange={(e) => pickImage(e.target.files?.[0])}
               />
               <button
-                type="button"
+                type='button'
                 onClick={() => imgInputRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-primary/40 bg-secondary/60 py-6 text-center transition hover:border-primary/70 hover:bg-secondary"
+                className='flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-dashed border-primary/40 bg-secondary/60 py-6 text-center transition hover:border-primary/70 hover:bg-secondary'
               >
                 {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={image || "/placeholder.svg"}
-                    alt="Preview"
-                    className="h-28 w-full object-contain"
+                    src={image || '/placeholder.svg'}
+                    alt='Preview'
+                    className='h-28 w-full object-contain'
                   />
                 ) : (
                   <>
-                    <ImagePlus className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-primary">Click to upload image</span>
-                    <span className="text-[11px] text-muted-foreground">Max size 5 MB</span>
+                    <ImagePlus className='h-5 w-5 text-primary' />
+                    <span className='text-sm text-primary'>Click to upload image</span>
+                    <span className='text-[11px] text-muted-foreground'>Max size 5 MB</span>
                   </>
                 )}
               </button>
             </div>
 
             {/* Submit */}
-            <div className="mt-6 flex justify-center">
+            <div className='mt-6 flex justify-center'>
               <button
                 onClick={submit}
                 disabled={!name.trim() || (!editingId && !parentCategoryId)}
-                className="h-11 min-w-40 rounded-full bg-primary px-8 text-sm text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className='h-11 min-w-40 rounded-full bg-primary px-8 text-sm text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 Submit
               </button>
@@ -332,5 +335,5 @@ export default function AdminSubCategoriesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

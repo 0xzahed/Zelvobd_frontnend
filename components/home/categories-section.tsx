@@ -53,7 +53,6 @@ export function CategoriesSection() {
       <div
         ref={containerRef}
         className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory"
-        style={{ touchAction: "pan-x" }}
       >
         {Array.from({ length: totalPages }).map((_, pageIdx) => {
           const start = pageIdx * ITEMS_PER_PAGE

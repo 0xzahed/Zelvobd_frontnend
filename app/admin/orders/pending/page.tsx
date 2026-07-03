@@ -7,6 +7,7 @@ export default function PendingOrdersPage() {
       description="Orders awaiting confirmation"
       defaultStatus="PENDING"
       lockStatus
+      showSteadfast
     />
   )
 }

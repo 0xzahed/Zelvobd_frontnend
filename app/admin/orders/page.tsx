@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
 
 export default function OrdersIndexPage() {
-  redirect("/admin/orders/new")
+  redirect("/admin/orders/pending")
 }

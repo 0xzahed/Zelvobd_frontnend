@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import type { SubCategory } from "@/lib/types"
 
 export function SubCategoryTile({
@@ -15,11 +16,12 @@ export function SubCategoryTile({
     >
       <div className="relative w-full flex-1 overflow-hidden rounded-md bg-muted">
         {sub.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={sub.image || "/placeholder.svg"}
             alt={sub.name}
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="(max-width: 768px) 33vw, 20vw"
+            className="object-cover"
           />
         ) : null}
       </div>

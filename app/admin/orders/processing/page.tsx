@@ -7,7 +7,6 @@ export default function ProcessingOrdersPage() {
       description="Orders being prepared for shipment"
       defaultStatus="PROCESSING"
       lockStatus
-      showSteadfast
     />
   )
 }

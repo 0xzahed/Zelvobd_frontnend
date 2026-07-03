@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product/product-detail"
 import { getStorefrontProductBySlug } from "@/src/api/products/getStorefrontProductBySlug"
+import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 export default async function ProductDetailPage(props: {
   params: Promise<{
@@ -30,6 +31,7 @@ export default async function ProductDetailPage(props: {
       <div className="mx-auto max-w-7xl">
         <ProductDetail product={product} initialVariantId={initialVariantId} />
       </div>
+      <FloatingRotatingIcon />
     </main>
   )
 }

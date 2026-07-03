@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Play, X } from 'lucide-react';
@@ -59,11 +60,12 @@ export function YoutubeVideoSection() {
                   aria-label={`Play ${video.title}`}
                 >
                   {video.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={toAbsoluteUrl(video.imageUrl)}
                       alt={video.title}
-                      className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+                      fill
+                      sizes="(max-width: 768px) 100vw, 100vw"
+                      className='object-cover transition-transform duration-500 group-hover:scale-105'
                       draggable={false}
                     />
                   ) : (

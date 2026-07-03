@@ -156,7 +156,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <video src={video} className="h-full w-full object-cover opacity-60" />
+                <video preload="metadata" src={video} className="h-full w-full object-cover opacity-60" />
               </button>
             )}
           </div>
@@ -245,7 +245,7 @@ export function ProductGallery({ images, productName, activeImageIndex, onImageC
                     <svg className="h-6 w-6 fill-white absolute z-10" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    <video src={video} className="h-full w-full object-cover opacity-60" />
+                    <video preload="metadata" src={video} className="h-full w-full object-cover opacity-60" />
                   </button>
                 )}
               </div>
