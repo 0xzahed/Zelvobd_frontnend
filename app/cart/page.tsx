@@ -31,6 +31,7 @@ import { mapProduct } from "@/src/api/_shared/mappers";
 import { placeOrderAPI } from "@/src/api/orders/placeOrder";
 import { ShinyText } from "@/components/ui/shiny-text";
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon";
+import { purchase, initiateCheckout } from "@/lib/pixel";
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase()
@@ -298,6 +299,8 @@ export default function CartPage() {
     try {
       setIsSubmitting(true)
 
+      initiateCheckout({ value: total, numItems: items.length })
+
       const payload = {
         customerName: form.name,
         customerPhone: form.phone,
@@ -315,6 +318,8 @@ export default function CartPage() {
       }
 
       const orderData = await placeOrderAPI(payload)
+
+      purchase({ value: total, orderId: orderData.code })
 
       setOrderCode(orderData.code)
       setIsSuccess(true)

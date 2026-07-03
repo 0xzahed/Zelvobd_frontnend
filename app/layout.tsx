@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/components/providers"
+import { FacebookPixel } from "@/components/pixel/FacebookPixel"
 import "./globals.css"
 
 const poppins = Poppins({
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-card text-foreground" suppressHydrationWarning>
         <Providers>{children}</Providers>
         {process.env.NODE_ENV === "production" && <Analytics />}
+        {process.env.NODE_ENV === "production" && <FacebookPixel />}
       </body>
     </html>
   )
