@@ -1,6 +1,7 @@
 "use client"
 
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useCategories } from "@/lib/use-store-data"
 import type { Slider, SubCategory } from "@/lib/types"
@@ -101,11 +102,16 @@ export default function CategoryPage(props: { params: any }) {
 
         {/* Sub-categories */}
         {subCategories.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-foreground md:text-xl">Browse {category.name}</h2>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-8 md:gap-2">
+          <section>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
               {subCategories.map((sc) => (
-                <SubCategoryCard key={sc.id} categorySlug={category.slug} subCategory={sc} />
+                <Link
+                  key={sc.id}
+                  href={`/${category.slug}/${sc.slug}`}
+                  className="whitespace-nowrap flex items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 border border-[#6C95E9] text-[#6C95E9] bg-[#EBF1FD] hover:border-transparent hover:text-white hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)] px-4 h-7"
+                >
+                  {sc.name}
+                </Link>
               ))}
             </div>
           </section>
