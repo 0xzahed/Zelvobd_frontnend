@@ -15,6 +15,7 @@ import {
   useUpdateCategoryBanner,
   useDeleteCategoryBanner,
 } from '@/src/hooks/api/useCategoryBanners';
+import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 
 type Draft = {
   id?: string;
@@ -160,7 +161,7 @@ export default function AdminCategoryBanners() {
                 <div className='relative h-32 w-full bg-secondary overflow-hidden'>
                   {b.imageUrl && (
                     <Image
-                      src={b.imageUrl || '/placeholder.svg'}
+                      src={toAbsoluteUploadUrl(b.imageUrl) || '/placeholder.svg'}
                       alt={b.title || 'Banner'}
                       fill
                       sizes='(max-width: 768px) 100vw, 33vw'
@@ -289,7 +290,7 @@ export default function AdminCategoryBanners() {
                       <div className='relative h-full w-full'>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={draft.imageUrl || '/placeholder.svg'}
+                          src={toAbsoluteUploadUrl(draft.imageUrl) || '/placeholder.svg'}
                           alt='Preview'
                           className='mx-auto max-h-36 rounded-md object-contain'
                         />

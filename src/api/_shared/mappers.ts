@@ -5,11 +5,15 @@ const BASE_URL =
   process.env.VITE_API_BASE_URL ||
   "http://localhost:5000/api/v1"
 
-const toAbsoluteUploadUrl = (path: string | null | undefined): string => {
+export const toAbsoluteUploadUrl = (path: string | null | undefined): string => {
   if (!path) return ""
-  if (path.startsWith("http")) return path
+  if (path.startsWith("http") || path.startsWith("blob") || path.startsWith("data")) return path
+  
+  // Auto-correct backend typo where '/uploads/' was saved instead of '/upload/'
+  const correctedPath = path.replace(/^\/uploads\//, "/upload/")
+  
   const root = BASE_URL.replace(/\/api\/v1$/, "")
-  return `${root}${path}`
+  return `${root}${correctedPath}`
 }
 
 const uniqueNonEmpty = (values: Array<string | null | undefined>) =>
