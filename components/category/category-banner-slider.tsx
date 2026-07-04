@@ -1,6 +1,7 @@
 'use client';
 
 import type { CategoryBanner } from '@/lib/types';
+import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -37,7 +38,7 @@ export function CategoryBannerSlider({ banners }: { banners: CategoryBanner[] })
               <div className='relative aspect-4/1 w-full overflow-hidden bg-[#f5f5f7]'>
                 {banner.imageUrl ? (
                   <Image
-                    src={banner.imageUrl}
+                    src={toAbsoluteUploadUrl(banner.imageUrl)}
                     alt={banner.title || 'Category Banner'}
                     fill
                     priority={index === 0}
