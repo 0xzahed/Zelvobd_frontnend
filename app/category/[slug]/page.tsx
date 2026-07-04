@@ -36,6 +36,7 @@ export default function CategoryPage(props: { params: any }) {
   const [newCategoryBanners, setNewCategoryBanners] = useState<CategoryBanner[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [pageDataLoaded, setPageDataLoaded] = useState(false);
+  const [activeSubCategoryId, setActiveSubCategoryId] = useState<string | null>(null);
 
   const category = slug ? categories.find((c) => c.slug === slug) : undefined;
 
@@ -97,6 +98,13 @@ export default function CategoryPage(props: { params: any }) {
 
   if (!category) return notFound();
 
+  const orderedSubCategories = activeSubCategoryId 
+    ? [
+        ...subCategories.filter(sc => sc.id === activeSubCategoryId),
+        ...subCategories.filter(sc => sc.id !== activeSubCategoryId)
+      ]
+    : subCategories;
+
   return (
     <AppShell>
       <BackHeader title={category.name} />
@@ -109,23 +117,23 @@ export default function CategoryPage(props: { params: any }) {
             {/* Text Buttons Row */}
             <div className='flex gap-2 overflow-x-auto no-scrollbar pb-1'>
               {subCategories.map((sc) => (
-                <Link
+                <button
                   key={`text-${sc.id}`}
-                  href={`/${category.slug}/${sc.slug}`}
-                  className='whitespace-nowrap flex items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 border border-[#6C95E9] text-[#6C95E9] bg-[#EBF1FD] hover:border-transparent hover:text-white hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)] px-4 h-7'
+                  onClick={() => setActiveSubCategoryId(sc.id)}
+                  className={`whitespace-nowrap flex items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 border border-[#6C95E9] px-4 h-7 ${activeSubCategoryId === sc.id ? 'bg-[#052F84] text-white border-transparent' : 'text-[#6C95E9] bg-[#EBF1FD] hover:border-transparent hover:text-white hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)]'}`}
                 >
                   {sc.name}
-                </Link>
+                </button>
               ))}
             </div>
 
             {/* Images Row */}
             <div className='flex gap-3 overflow-x-auto no-scrollbar pb-2'>
               {subCategories.map((sc) => (
-                <Link
+                <button
                   key={`img-${sc.id}`}
-                  href={`/${category.slug}/${sc.slug}`}
-                  className='relative shrink-0 h-16 overflow-hidden rounded-lg border border-border/50 bg-card transition-transform duration-300 hover:scale-105 hover:border-primary hover:shadow-sm block'
+                  onClick={() => setActiveSubCategoryId(sc.id)}
+                  className={`relative shrink-0 h-16 overflow-hidden rounded-lg border bg-card transition-transform duration-300 hover:scale-105 hover:shadow-sm block ${activeSubCategoryId === sc.id ? 'border-primary ring-2 ring-primary/50' : 'border-border/50 hover:border-primary'}`}
                 >
                   {sc.image ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -135,15 +143,18 @@ export default function CategoryPage(props: { params: any }) {
                       <span className='text-[10px] text-muted-foreground'>No Image</span>
                     </div>
                   )}
-                </Link>
+                </button>
               ))}
             </div>
           </section>
         )}
 
         {/* Products by Subcategory */}
-        {subCategories.length > 0 && (
-          <SubCategoryProductsSections categorySlug={category.slug} subCategories={subCategories} />
+        {orderedSubCategories.length > 0 && (
+          <SubCategoryProductsSections 
+            categorySlug={category.slug} 
+            subCategories={orderedSubCategories} 
+          />
         )}
       </div>
       <FloatingRotatingIcon />
