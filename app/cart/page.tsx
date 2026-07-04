@@ -396,12 +396,6 @@ export default function CartPage() {
       setIsSuccess(true);
       clearCart();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      setOrderCode(orderData.code);
-      setIsSuccess(true);
-      deleteSelected();
-      removePromo();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error: any) {
       notify.error({
         title: 'Checkout Failed',
