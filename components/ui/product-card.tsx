@@ -154,13 +154,13 @@ export function ProductCard({
             type='button'
             onClick={handleBuyNow}
             className={cx(
-              'flex w-full items-center justify-center rounded-full text-xs font-semibold transition-all duration-300',
+              'relative overflow-hidden shiny-button flex w-full items-center justify-center rounded-full text-xs font-semibold transition-all duration-300',
               'border border-[#6C95E9] text-[#6C95E9] bg-[#EBF1FD]',
               'hover:border-transparent hover:text-white hover:bg-[linear-gradient(45deg,#052F84,#7BA4F7)]',
               emphasis ? 'h-9' : 'h-8',
             )}
           >
-            <ShinyText text='Buy Now' className='px-3' />
+            Buy Now
           </button>
         </div>
       </div>
