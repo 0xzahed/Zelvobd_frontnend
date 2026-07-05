@@ -4,6 +4,7 @@ node_modules
 # nextjs
 .next/
 out/
+next-env.d.ts
 
 # build
 dist/

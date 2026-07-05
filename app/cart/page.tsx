@@ -1,54 +1,37 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { FloatingRotatingIcon } from '@/components/home/floating-rotating-icon';
+import { AppShell } from '@/components/layout/app-shell';
+import { ShinyText } from '@/components/ui/shiny-text';
+import { CartSkeleton } from '@/components/ui/skeletons/cart-skeleton';
+import { useCart } from '@/contexts/cart-context';
+import { formatBDT } from '@/lib/format';
+import { notify } from '@/lib/notify';
+import { initiateCheckout, purchase } from '@/lib/pixel';
+import type { Product } from '@/lib/types';
+import { mapProduct } from '@/src/api/_shared/mappers';
+import { placeOrderAPI } from '@/src/api/orders/placeOrder';
+import { getProductDetails } from '@/src/api/products/getProductDetails';
+import { applyPromoAPI } from '@/src/api/promo/applyPromo';
+import { useProducts } from '@/src/hooks/api/useProducts';
 import {
   ArrowLeft,
   CheckSquare,
   ChevronRight,
+  Loader2,
   Minus,
   Pencil,
   Plus,
-  Square,
   ShoppingBag,
+  Square,
   Ticket,
   Trash2,
   X,
-  Loader2,
-<<<<<<< HEAD
-} from "lucide-react";
-import type { Product } from "@/lib/types";
-import { AppShell } from "@/components/layout/app-shell";
-import { useCart } from "@/contexts/cart-context";
-import { formatBDT } from "@/lib/format";
-import { useProducts } from "@/src/hooks/api/useProducts";
-import { applyPromoAPI } from "@/src/api/promo/applyPromo";
-import { CartSkeleton } from "@/components/ui/skeletons/cart-skeleton";
-import { notify } from "@/lib/notify";
-import { getProductDetails } from "@/src/api/products/getProductDetails";
-import { mapProduct } from "@/src/api/_shared/mappers";
-import { placeOrderAPI } from "@/src/api/orders/placeOrder";
-import { ShinyText } from "@/components/ui/shiny-text";
-import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon";
-import { purchase, initiateCheckout } from "@/lib/pixel";
-=======
 } from 'lucide-react';
-import type { Product } from '@/lib/types';
-import { AppShell } from '@/components/layout/app-shell';
-import { useCart } from '@/contexts/cart-context';
-import { formatBDT } from '@/lib/format';
-import { useProducts } from '@/src/hooks/api/useProducts';
-import { applyPromoAPI } from '@/src/api/promo/applyPromo';
-import { CartSkeleton } from '@/components/ui/skeletons/cart-skeleton';
-import { notify } from '@/lib/notify';
-import { getProductDetails } from '@/src/api/products/getProductDetails';
-import { mapProduct } from '@/src/api/_shared/mappers';
-import { placeOrderAPI } from '@/src/api/orders/placeOrder';
-import { ShinyText } from '@/components/ui/shiny-text';
-import { FloatingRotatingIcon } from '@/components/home/floating-rotating-icon';
->>>>>>> 249a8b31b90279b72fad423a93ff46d0cf0927f7
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase();
@@ -93,8 +76,16 @@ function colorToHex(name: string): string {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, clearCart, appliedPromo, applyPromo, removePromo, isHydrated } =
-    useCart();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    appliedPromo,
+    applyPromo,
+    removePromo,
+    isHydrated,
+  } = useCart();
   const { data: products = [], isLoading: isLoadingProducts } = useProducts();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [detailMap, setDetailMap] = useState<Record<string, Product>>({});
@@ -112,8 +103,6 @@ export default function CartPage() {
   });
   const [location, setLocation] = useState<'Inside Dhaka' | 'Outside Dhaka' | ''>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [orderCode, setOrderCode] = useState('');
 
   const enriched = items
     .map((item) => {
@@ -194,14 +183,14 @@ export default function CartPage() {
 
   const paidDeliveryItems = selectedEnriched.filter((i) => !i.product.isFreeDelivery);
   const allItemsFree = selectedEnriched.length > 0 && paidDeliveryItems.length === 0;
-  const totalCartQuantity = selectedEnriched.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPaidDeliveryQuantity = paidDeliveryItems.reduce((sum, item) => sum + item.quantity, 0);
 
   let shippingTax = 0;
   if (subtotal > 0 && !allItemsFree && location) {
     const baseCharge = location === 'Inside Dhaka' ? 100 : 150;
-    
+
     let extraCharge = 0;
-    if (totalCartQuantity > 1) {
+    if (totalPaidDeliveryQuantity > 1) {
       const totalWeight = paidDeliveryItems.reduce(
         (sum, item) => sum + (parseFloat(item.product.weight || '0') || 0) * item.quantity,
         0,
@@ -209,7 +198,7 @@ export default function CartPage() {
       const extraWeight = Math.max(0, totalWeight - 1);
       extraCharge = extraWeight * 20;
     }
-    
+
     shippingTax = baseCharge + extraCharge;
   }
   const discountAmount = appliedPromo ? appliedPromo.discountAmount : 0;
@@ -379,7 +368,7 @@ export default function CartPage() {
     try {
       setIsSubmitting(true);
 
-      initiateCheckout({ value: total, numItems: items.length })
+      initiateCheckout({ value: total, numItems: items.length });
 
       const payload = {
         customerName: form.name,
@@ -397,24 +386,10 @@ export default function CartPage() {
         })),
       };
 
-<<<<<<< HEAD
-      const orderData = await placeOrderAPI(payload)
-
-      purchase({ value: total, orderId: orderData.code })
-
-      setOrderCode(orderData.code)
-      setIsSuccess(true)
-      clearCart()
-      window.scrollTo({ top: 0, behavior: "smooth" })
-=======
       const orderData = await placeOrderAPI(payload);
->>>>>>> 249a8b31b90279b72fad423a93ff46d0cf0927f7
 
-      setOrderCode(orderData.code);
-      setIsSuccess(true);
-      deleteSelected();
-      removePromo();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      clearCart();
+      router.push(`/place-order?orderId=${orderData.code}&value=${total}`);
     } catch (error: any) {
       notify.error({
         title: 'Checkout Failed',
@@ -425,39 +400,7 @@ export default function CartPage() {
     }
   };
 
-  if (isSuccess) {
-    return (
-      <AppShell>
-        <div className='mx-auto flex min-h-[calc(100dvh-140px)] max-w-md flex-col items-center justify-center gap-5 px-4 text-center'>
-          <div className='relative grid h-24 w-24 place-items-center rounded-full bg-emerald-500'>
-            <svg
-              className='h-12 w-12 text-white'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-              strokeWidth={3}
-            >
-              <path strokeLinecap='round' strokeLinejoin='round' d='M5 13l4 4L19 7' />
-            </svg>
-          </div>
-          <div className='space-y-1'>
-            <h1 className='text-xl font-bold text-foreground md:text-2xl'>অর্ডার সফল হয়েছে!</h1>
-            <p className='text-sm text-muted-foreground'>
-              {' '}
-              অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/')}
-            className='block w-full rounded-full bg-primary py-3.5 text-center text-sm font-semibold text-white'
-          >
-            হোমে ফিরে যান
-          </button>
-        </div>
-        <FloatingRotatingIcon />
-      </AppShell>
-    );
-  }
+
 
   if (!isHydrated || (items.length > 0 && isLoadingDetails)) {
     return (
@@ -508,7 +451,9 @@ export default function CartPage() {
             {/* Left Column: Shipping Form */}
             <div className='space-y-4'>
               <div className='space-y-4 rounded-2xl border border-border/60 bg-card p-4 md:p-6'>
-                <h3 className='text-base font-semibold text-foreground md:text-lg'>Shipping Information</h3>
+                <h3 className='text-base font-semibold text-foreground md:text-lg'>
+                  Shipping Information
+                </h3>
                 <div className='grid gap-4'>
                   <div className='grid grid-cols-2 gap-3'>
                     <input
@@ -541,7 +486,9 @@ export default function CartPage() {
                         onChange={(e) => setLocation(e.target.value as 'Inside Dhaka')}
                         className='h-4 w-4 shrink-0 text-primary focus:ring-primary'
                       />
-                      <span className='text-xs font-medium md:text-sm line-clamp-1'>Inside Dhaka</span>
+                      <span className='text-xs font-medium md:text-sm line-clamp-1'>
+                        Inside Dhaka
+                      </span>
                     </label>
                     <label className='flex items-center gap-2 rounded-xl border border-border/60 p-3 md:p-4 cursor-pointer hover:bg-muted/50 transition-colors'>
                       <input
@@ -552,7 +499,9 @@ export default function CartPage() {
                         onChange={(e) => setLocation(e.target.value as 'Outside Dhaka')}
                         className='h-4 w-4 shrink-0 text-primary focus:ring-primary'
                       />
-                      <span className='text-xs font-medium md:text-sm line-clamp-1'>Outside Dhaka</span>
+                      <span className='text-xs font-medium md:text-sm line-clamp-1'>
+                        Outside Dhaka
+                      </span>
                     </label>
                   </div>
                   <textarea
@@ -582,7 +531,9 @@ export default function CartPage() {
                     )}
                     Select All
                   </button>
-                  <span className='text-xs text-muted-foreground'>{selectedKeys.size} selected</span>
+                  <span className='text-xs text-muted-foreground'>
+                    {selectedKeys.size} selected
+                  </span>
                 </div>
                 <ul className='space-y-3 max-h-[45vh] overflow-y-auto pr-1 custom-scrollbar'>
                   {enriched.map((item) => {

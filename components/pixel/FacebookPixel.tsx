@@ -10,14 +10,19 @@ function PixelPageviewTracker() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    pageview()
+    if (!pathname.startsWith('/admin')) {
+      pageview()
+    }
   }, [pathname, searchParams])
 
   return null
 }
 
 export function FacebookPixel() {
+  const pathname = usePathname()
+
   if (!FB_PIXEL_ID) return null
+  if (pathname.startsWith('/admin')) return null
 
   return (
     <>
@@ -35,7 +40,6 @@ export function FacebookPixel() {
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${FB_PIXEL_ID}');
-            fbq('track', 'PageView');
           `,
         }}
       />

@@ -271,9 +271,9 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           <div className="hidden gap-3 mt-8 md:flex">
             <button
               onClick={handleBuy}
-              className="h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary hover:bg-primary/5"
+              className="relative overflow-hidden shiny-button h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary hover:bg-primary/5"
             >
-              <ShinyText text="Buy Now" />
+              Buy Now
             </button>
             <button
               onClick={() => handleAdd()}
@@ -297,9 +297,9 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
         <button
           type="button"
           onClick={handleBuy}
-          className="relative z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
+          className="relative overflow-hidden shiny-button z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
         >
-          <ShinyText text="Buy Now" />
+          Buy Now
         </button>
       </div>
 
