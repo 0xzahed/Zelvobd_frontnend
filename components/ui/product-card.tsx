@@ -77,7 +77,7 @@ export function ProductCard({
       <div
         className={cx(
           'relative w-full overflow-hidden rounded-t-lg bg-transparent',
-          compact ? 'aspect-square' : 'aspect-square md:aspect-auto md:flex-1 md:min-h-0',
+          'aspect-square',
         )}
       >
         <Image
