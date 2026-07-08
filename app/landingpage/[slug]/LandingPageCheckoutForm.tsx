@@ -141,7 +141,7 @@ export default function LandingPageCheckoutForm({
             required
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
-            className='w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--lp-cta)] text-lg h-24 resize-none'
+            className='w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-(--lp-cta) text-lg h-24 resize-none'
             placeholder='গ্রাম/মহল্লা, থানা, জেলা'
           />
         </div>
