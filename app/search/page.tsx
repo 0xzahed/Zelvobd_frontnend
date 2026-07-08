@@ -5,6 +5,7 @@ import { useProducts } from "@/lib/use-store-data"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { ProductCard } from "@/components/ui/product-card"
+import { ProductGridSkeleton } from "@/components/ui/skeletons/product-grid-skeleton"
 
 export default function SearchPage({
   searchParams,
@@ -29,8 +30,8 @@ export default function SearchPage({
     return (
       <AppShell>
         <BackHeader title={q ? `Results for "${q}"` : "Search"} />
-        <div className="flex min-h-[30vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="py-4 md:py-6">
+          <ProductGridSkeleton />
         </div>
       </AppShell>
     )

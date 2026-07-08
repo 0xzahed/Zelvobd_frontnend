@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { useEffect, useState, useRef } from "react"
 import { ChevronRight, ChevronLeft } from "lucide-react"
-import { getTrending } from "@/src/api/trending/getTrending"
-import { mapProduct } from "@/src/api/_shared/mappers"
+import { getTrending } from "@/src/api/trendingApi"
+import { mapProduct } from "@/src/api/mainApi"
 import type { Product } from "@/lib/types"
 import { ProductCard } from "@/components/ui/product-card"
 

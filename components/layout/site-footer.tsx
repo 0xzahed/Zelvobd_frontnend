@@ -4,13 +4,15 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react"
+import { getFooterPublic } from "@/src/api/footerApi"
 type FooterNavLink = { label: string; href: string }
 type FooterNavGroup = { title: string; links: FooterNavLink[] }
-type FooterSocial = { label: string; href: string; icon?: "facebook" | "instagram" | "twitter" | "youtube" | "" }
+type FooterSocial = { label: string; href: string; icon?: string }
 
 type FooterSettings = {
   brandName: string
   brandTagline: string
+  logoUrl?: string
   supportEmail: string
   supportPhone: string
   supportAddress: string
@@ -23,6 +25,7 @@ const STORAGE_KEY = "zelvobd_footer"
 const DEFAULT_FOOTER: FooterSettings = {
   brandName: "ZELVO BD",
   brandTagline: "All Types of Home & Kitchen Appliances Available",
+  logoUrl: "/logo.png",
   supportEmail: "support@zelvobd.com",
   supportPhone: "+8801994040246",
   supportAddress: "136/137, Mudi Market, 2nd Floor, Kachabazar, Dhaka New Market, Dhaka - 1205",
@@ -60,7 +63,7 @@ const DEFAULT_FOOTER: FooterSettings = {
   ],
 }
 
-const socialIcons = {
+const socialIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   facebook: Facebook,
   instagram: Instagram,
   twitter: Twitter,
@@ -80,14 +83,18 @@ export function SiteFooter() {
   const [footer, setFooter] = useState<FooterSettings>(DEFAULT_FOOTER)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (!raw) return
-      const parsed = JSON.parse(raw) as Partial<FooterSettings>
-      setFooter(mergeFooter(DEFAULT_FOOTER, parsed))
-    } catch {
-      // noop
-    }
+    getFooterPublic()
+      .then((data) => setFooter(mergeFooter(DEFAULT_FOOTER, data as Partial<FooterSettings>)))
+      .catch(() => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY)
+          if (!raw) return
+          const parsed = JSON.parse(raw) as Partial<FooterSettings>
+          setFooter(mergeFooter(DEFAULT_FOOTER, parsed))
+        } catch {
+          // noop
+        }
+      })
   }, [])
 
   return (
@@ -99,8 +106,8 @@ export function SiteFooter() {
             <div className="flex items-center p-1 bg-white rounded-full w-fit">
               <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo.png"
-                alt="ZELVO BD"
+                src={footer.logoUrl || "/logo.png"}
+                alt={footer.brandName}
                 width={120}
                 height={32}
                 className="h-10 w-auto object-contain"
@@ -153,7 +160,8 @@ export function SiteFooter() {
             <h3 className="mb-3 text-sm font-semibold text-slate-100">Follow us</h3>
             <div className="flex gap-2">
               {footer.socials.map(({ label, href, icon }) => {
-                const Icon = icon ? socialIcons[icon] : null
+                const NamedIcon = icon && socialIcons[icon] ? socialIcons[icon] : null
+                const isUrlIcon = icon && /^https?:\/\//i.test(icon)
                 const fallback = label?.trim()?.[0] ?? "S"
                 return (
                   <a
@@ -162,9 +170,15 @@ export function SiteFooter() {
                     aria-label={label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="grid h-9 w-9 place-items-center rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-primary hover:text-primary"
+                    className="grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-slate-800 bg-slate-900 text-slate-200 transition hover:border-primary hover:text-primary"
                   >
-                    {Icon ? <Icon className="h-4 w-4" /> : <span className="text-xs font-semibold">{fallback}</span>}
+                    {NamedIcon ? (
+                      <NamedIcon className="h-4 w-4" />
+                    ) : isUrlIcon ? (
+                      <Image src={icon!} alt={label} width={36} height={36} className="h-full w-full object-contain" unoptimized />
+                    ) : (
+                      <span className="text-xs font-semibold">{fallback}</span>
+                    )}
                   </a>
                 )
               })}
@@ -174,7 +188,7 @@ export function SiteFooter() {
 
         <div className="mt-8 border-t border-slate-800">
           <p className="mt-4 text-center text-xs tracking-wide text-slate-500">
-            © {new Date().getFullYear()} — {footer.brandName}. All rights reserved.
+            © {new Date().getFullYear()} — <a href="https://motionbooster.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">MotionBooster</a>. All rights reserved.
           </p>
         </div>
       </div>

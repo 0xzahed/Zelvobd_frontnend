@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { getFreeDelivery, getFreeDeliveryAdmin, updateFreeDeliveryCampaign, updateFreeDeliveryProducts } from "@/src/api/freeDeliveryApi"
+import { mapProduct } from "@/src/api/mainApi"
 import { notify } from "@/lib/notify"
 
 export type FreeDeliveryAdminResponse = {
@@ -40,12 +40,8 @@ export function useFreeDeliveryAdmin() {
   return useQuery({
     queryKey: ["free-delivery-admin"],
     queryFn: async (): Promise<FreeDeliveryAdminResponse> => {
-      const res = await adminFetch(`${BASE_URL}/free-delivery/admin`, {
-        headers: authHeaders(),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to fetch free delivery config")
-      return data.data
+      const res = await getFreeDeliveryAdmin()
+      return res.data
     },
   })
 }
@@ -54,14 +50,7 @@ export function useUpdateFreeDeliveryCampaign() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: { title?: string; isActive?: boolean }) => {
-      const res = await adminFetch(`${BASE_URL}/free-delivery/campaign`, {
-        method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to update campaign")
-      return data.data
+      return updateFreeDeliveryCampaign(payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["free-delivery-admin"] })
@@ -77,14 +66,7 @@ export function useUpdateFreeDeliveryProducts() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: { addProductIds?: string[]; removeProductIds?: string[] }) => {
-      const res = await adminFetch(`${BASE_URL}/free-delivery/products`, {
-        method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to update products")
-      return data.data
+      return updateFreeDeliveryProducts(payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["free-delivery-admin"] })
@@ -95,9 +77,6 @@ export function useUpdateFreeDeliveryProducts() {
     },
   })
 }
-
-import { getFreeDelivery } from "@/src/api/freeDelivery/getFreeDelivery"
-import { mapProduct } from "@/src/api/_shared/mappers"
 
 export const FREE_DELIVERY_KEYS = {
   storefront: ["free-delivery-storefront"] as const,

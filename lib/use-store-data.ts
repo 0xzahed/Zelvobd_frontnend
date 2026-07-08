@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { getCategories } from "@/src/api/categoryApi"
-import { getProducts } from "@/src/api/products/getProducts"
-import { getHomePageBanners } from "@/src/api/banner/getHomePageBanners"
-import { mapBanner, mapCategory, mapProduct } from "@/src/api/_shared/mappers"
+import { getProducts } from "@/src/api/productApi"
+import { getHomePageBanners } from "@/src/api/bannerApi"
+import { mapBanner, mapCategory, mapProduct } from "@/src/api/mainApi"
 import type { Category, Product, Slider } from "@/lib/types"
 
 let categoriesCache: Category[] | null = null
@@ -18,7 +18,7 @@ let productsInFlight: Promise<Product[]> | null = null
 let slidersInFlight: Promise<Slider[]> | null = null
 let youtubeVideosInFlight: Promise<any[]> | null = null
 
-import { BASE_URL } from "@/src/api/_shared/client"
+import { BASE_URL } from "@/src/api/mainApi"
 
 export function useCategories() {
   const pathname = usePathname()
@@ -26,7 +26,7 @@ export function useCategories() {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
+    if (pathname?.startsWith("/dashboard")) {
       setCategories([])
       setLoaded(true)
       return
@@ -85,7 +85,7 @@ export function useProducts(options?: { enabled?: boolean }) {
       return
     }
 
-    if (pathname?.startsWith("/admin")) {
+    if (pathname?.startsWith("/dashboard")) {
       setProducts([])
       setLoaded(true)
       return
@@ -136,7 +136,7 @@ export function useSliders() {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
+    if (pathname?.startsWith("/dashboard")) {
       setSliders([])
       setLoaded(true)
       return
@@ -188,7 +188,7 @@ export function useStorefrontYoutubeVideos() {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
+    if (pathname?.startsWith("/dashboard")) {
       setVideos([])
       setLoaded(true)
       return

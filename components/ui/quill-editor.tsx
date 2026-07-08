@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Quill from "quill"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL } from "@/src/api/_shared/client"
+import { adminFetch, BASE_URL } from "@/src/api/mainApi"
 import { notify } from "@/lib/notify"
 
 import LucideIconBlot from "./quill/quill-icon-blot"

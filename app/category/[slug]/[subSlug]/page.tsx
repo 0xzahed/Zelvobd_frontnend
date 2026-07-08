@@ -1,16 +1,53 @@
 "use client"
 
 import { notFound } from "next/navigation"
+import { useEffect, useState } from "react"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { ProductCard } from "@/components/ui/product-card"
+import { ProductGridSkeleton } from "@/components/ui/skeletons/product-grid-skeleton"
 import { useCategories, useProducts } from "@/lib/use-store-data"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
-export default function SubCategoryPage({ params }: { params: { slug: string; subSlug: string } }) {
-  const { categories } = useCategories()
-  const { products } = useProducts()
-  const { slug, subSlug } = params
+export default function SubCategoryPage({ params }: { params: any }) {
+  const [slug, setSlug] = useState("")
+  const [subSlug, setSubSlug] = useState("")
+
+  useEffect(() => {
+    if (params && typeof params.then === "function") {
+      params.then((res: any) => {
+        setSlug(res.slug)
+        setSubSlug(res.subSlug)
+      })
+    } else if (params) {
+      setSlug(params.slug)
+      setSubSlug(params.subSlug)
+    }
+  }, [params])
+
+  const { categories, loaded: catsLoaded } = useCategories()
+  const { products, loaded: prodsLoaded } = useProducts()
+
+  if (!slug || !subSlug) {
+    return (
+      <AppShell>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      </AppShell>
+    )
+  }
+
+  if (!catsLoaded || !prodsLoaded) {
+    return (
+      <AppShell>
+        <BackHeader title="" />
+        <div className="py-4 md:py-6">
+          <ProductGridSkeleton />
+        </div>
+      </AppShell>
+    )
+  }
 
   const category = categories.find((c) => c.slug === slug)
   if (!category) return notFound()

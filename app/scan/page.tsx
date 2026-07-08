@@ -7,7 +7,7 @@ import { Html5Qrcode } from "html5-qrcode"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { notify } from "@/lib/notify"
-import { BASE_URL } from "@/src/api/_shared/client"
+import { BASE_URL } from "@/src/api/mainApi"
 import { cx } from "@/lib/format"
 
 type ScanMode = "camera" | "upload" | "manual"

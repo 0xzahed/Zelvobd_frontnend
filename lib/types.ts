@@ -63,6 +63,7 @@ export type Category = {
   image: string;
   subCategories: SubCategory[];
   slider?: string[];
+  createdAt?: string;
 };
 
 export type Slider = {
@@ -102,6 +103,14 @@ export type FlashSale = {
   productIds: string[];
   bg?: string;
 };
+export type Admin = {
+  id: string
+  email: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export type CategoryBanner = {
   id: string;
   title: string;

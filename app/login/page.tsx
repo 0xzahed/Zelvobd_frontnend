@@ -20,7 +20,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (authLoading) return
     if (isAdmin) {
-      router.replace("/admin")
+      router.replace("/dashboard")
     }
   }, [authLoading, isAdmin, router])
 
@@ -38,7 +38,7 @@ export default function LoginPage() {
         title: "Access Granted",
         message: "Logged in as administrator.",
       })
-      router.push("/admin")
+      router.push("/dashboard")
     } catch (authError) {
       const message = handleApiError(authError, "Login Failed")
       setError(message)

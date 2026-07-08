@@ -22,7 +22,7 @@ export function BottomNavbar() {
   }
 
   if (
-    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/dashboard") ||
     pathname?.startsWith("/login") ||
     pathname?.startsWith("/product/")
   ) {

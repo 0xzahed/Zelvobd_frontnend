@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { getPromos, createPromo, updatePromo, deletePromo } from "@/src/api/promoApi"
 
 export const PROMO_KEYS = {
   all: ["promos"] as const,
@@ -38,68 +37,6 @@ export type CreatePromoPayload = {
 
 export type UpdatePromoPayload = Partial<CreatePromoPayload> & { id: string }
 
-const getPromos = async () => {
-  const response = await adminFetch(`${BASE_URL}/promos`, {
-    method: "GET",
-    headers: { ...authHeaders() },
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
-}
-
-const createPromo = async (data: CreatePromoPayload) => {
-  const response = await adminFetch(`${BASE_URL}/promos`, {
-    method: "POST",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
-}
-
-const updatePromo = async (id: string, data: Partial<CreatePromoPayload>) => {
-  const response = await adminFetch(`${BASE_URL}/promos/${id}`, {
-    method: "PATCH",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
-}
-
-const deletePromo = async (id: string) => {
-  const response = await adminFetch(`${BASE_URL}/promos/${id}`, {
-    method: "DELETE",
-    headers: { ...authHeaders() },
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
-}
-
 export function usePromos() {
   return useQuery({
     queryKey: PROMO_KEYS.all,
@@ -113,7 +50,7 @@ export function usePromos() {
 export function useCreatePromo() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: createPromo,
+    mutationFn: (payload: CreatePromoPayload) => createPromo(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PROMO_KEYS.all })
       notify.success({ title: "Success", message: "Promo code created." })

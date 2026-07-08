@@ -12,7 +12,7 @@ import {
   updateSubCategory,
   deleteSubCategory,
 } from "@/src/api/categoryApi"
-import { mapCategory, mapSubCategory } from "@/src/api/_shared/mappers"
+import { mapCategory, mapSubCategory } from "@/src/api/mainApi"
 import type { Category, SubCategory } from "@/lib/types"
 
 export const CATEGORY_KEYS = {

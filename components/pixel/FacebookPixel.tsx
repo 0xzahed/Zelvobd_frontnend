@@ -10,7 +10,7 @@ function PixelPageviewTracker() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (!pathname.startsWith('/admin')) {
+    if (!pathname.startsWith('/dashboard')) {
       pageview()
     }
   }, [pathname, searchParams])
@@ -22,7 +22,7 @@ export function FacebookPixel() {
   const pathname = usePathname()
 
   if (!FB_PIXEL_ID) return null
-  if (pathname.startsWith('/admin')) return null
+  if (pathname.startsWith('/dashboard')) return null
 
   return (
     <>
