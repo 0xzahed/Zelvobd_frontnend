@@ -222,11 +222,11 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         <section className='py-12 px-4 max-w-3xl mx-auto'>
           <div className='text-center mb-8'>
             {table.caption && (
-              <span className='inline-block bg-[var(--lp-highlight)] text-[var(--lp-cta)] px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide mb-4'>
+              <span className='inline-block bg-[var(--lp-highlight)] text-(--lp-cta) px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide mb-4'>
                 {table.caption}
               </span>
             )}
-            <h2 className='text-2xl md:text-4xl font-bold text-[var(--lp-navy)]'>{table.title}</h2>
+            <h2 className='text-2xl md:text-4xl font-bold text-(--lp-navy)'>{table.title}</h2>
             <p className='text-slate-500 mt-2'>{table.subtitle}</p>
           </div>
 
@@ -235,7 +235,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
               {table.tableData.map((row: any, idx: number) => (
                 <li key={idx} className='flex justify-between items-center px-6 py-4'>
                   <div className='flex items-center gap-3'>
-                    <span className='w-10 h-10 rounded-full bg-[var(--lp-highlight)] text-[var(--lp-cta)] flex items-center justify-center'>
+                    <span className='w-10 h-10 rounded-full bg-(--lp-highlight) text-[var(--lp-cta)] flex items-center justify-center'>
                       <Check size={20} />
                     </span>
                     <span className='font-semibold text-slate-800 text-lg'>{row.key}</span>
