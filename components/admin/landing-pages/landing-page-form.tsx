@@ -23,7 +23,7 @@ const COLOR_PALETTES = [
 
 export default function LandingPageForm({ initialData, onSubmit, isSubmitting }: { initialData?: any, onSubmit: (data: any) => void, isSubmitting?: boolean }) {
   const router = useRouter();
-  const { data: productsResult } = useProducts(1, 100);
+  const { data: productsResult } = useProducts({ limit: 100 });
   const products = productsResult?.data || [];
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({

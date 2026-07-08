@@ -26,10 +26,6 @@ export default function NewLandingPage() {
     <AdminPage>
       <AdminPageHeader
         title='Create New Landing Page'
-        breadcrumbs={[
-          { label: 'Landing Pages', href: '/admin/landing-pages' },
-          { label: 'New', href: '/admin/landing-pages/new' },
-        ]}
       />
       
       <div className="mt-6">

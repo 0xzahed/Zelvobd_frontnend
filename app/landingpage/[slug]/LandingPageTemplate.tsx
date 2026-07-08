@@ -45,7 +45,7 @@ const IconMap: Record<string, any> = {
   shield: Shield,
 };
 
-const bnDigits = (s: string | number) =>
+export const bnDigits = (s: string | number) =>
   String(s).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[Number(d)]);
 
 // Palette configurations mapped to CSS Variables
@@ -136,6 +136,9 @@ export default function LandingPageTemplate({ data }: { data: any }) {
               </span>
             </div>
             <button
+              onClick={() =>
+                document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })
+              }
               className='w-full mt-4 py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1'
               style={{ backgroundColor: 'var(--lp-cta)' }}
             >
@@ -254,6 +257,9 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           </div>
           <div className='mt-8 flex justify-center'>
             <button
+              onClick={() =>
+                document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })
+              }
               className='px-12 py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-transform hover:-translate-y-1'
               style={{ backgroundColor: 'var(--lp-cta)' }}
             >
@@ -272,9 +278,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                 {bullets.caption}
               </span>
             )}
-            <h2 className='text-2xl md:text-3xl font-bold text-[var(--lp-navy)]'>
-              {bullets.title}
-            </h2>
+            <h2 className='text-2xl md:text-3xl font-bold text-(--lp-navy)'>{bullets.title}</h2>
           </div>
           <div className='bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100'>
             <ul className='grid md:grid-cols-2 gap-4'>
@@ -323,18 +327,20 @@ export default function LandingPageTemplate({ data }: { data: any }) {
       )}
 
       {/* Checkout Form Container Phase 4 */}
-      <section className="py-16 px-4" style={{ backgroundColor: 'var(--lp-navy)' }}>
-         <div className="max-w-3xl mx-auto text-center text-white">
-            {checkout.caption && (
-              <span className="inline-block bg-[var(--lp-highlight)] text-[var(--lp-cta)] px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide mb-4">
-                {checkout.caption}
-              </span>
-            )}
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">{checkout.title || 'Order Now'}</h2>
-            <p className="text-lg opacity-80 mb-10">{checkout.subtitle || 'Fill up the form to complete your order.'}</p>
-            
-            <LandingPageCheckoutForm landingPageId={data.id} checkoutData={checkout} />
-         </div>
+      <section id='order' className='py-16 px-4' style={{ backgroundColor: 'var(--lp-navy)' }}>
+        <div className='max-w-3xl mx-auto text-center text-white'>
+          {checkout.caption && (
+            <span className='inline-block bg-[var(--lp-highlight)] text-[var(--lp-cta)] px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide mb-4'>
+              {checkout.caption}
+            </span>
+          )}
+          <h2 className='text-3xl md:text-5xl font-bold mb-4'>{checkout.title || 'Order Now'}</h2>
+          <p className='text-lg opacity-80 mb-10'>
+            {checkout.subtitle || 'Fill up the form to complete your order.'}
+          </p>
+
+          <LandingPageCheckoutForm landingPageId={data.id} checkoutData={checkout} />
+        </div>
       </section>
 
       {/* WhatsApp Floating Button */}

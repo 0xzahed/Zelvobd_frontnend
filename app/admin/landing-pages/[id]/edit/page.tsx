@@ -49,10 +49,6 @@ export default function EditLandingPage() {
     <AdminPage>
       <AdminPageHeader
         title={`Edit Landing Page: /${initialData.slug}`}
-        breadcrumbs={[
-          { label: 'Landing Pages', href: '/admin/landing-pages' },
-          { label: 'Edit', href: `/admin/landing-pages/${id}/edit` },
-        ]}
       />
       
       <div className="mt-6">

@@ -73,7 +73,7 @@ export const useCreateLandingPage = () => {
       queryClient.invalidateQueries({ queryKey: ['landing-pages'] });
       notify.success({ title: 'Success', message: 'Landing page created successfully' });
     },
-    onError: handleApiError,
+    onError: (error) => handleApiError(error),
   });
 };
 
@@ -96,7 +96,7 @@ export const useUpdateLandingPage = () => {
       queryClient.invalidateQueries({ queryKey: ['landing-page'] });
       notify.success({ title: 'Success', message: 'Landing page updated successfully' });
     },
-    onError: handleApiError,
+    onError: (error) => handleApiError(error),
   });
 };
 
@@ -117,6 +117,6 @@ export const useDeleteLandingPage = () => {
       queryClient.invalidateQueries({ queryKey: ['landing-pages'] });
       notify.success({ title: 'Success', message: 'Landing page deleted successfully' });
     },
-    onError: handleApiError,
+    onError: (error) => handleApiError(error),
   });
 };
