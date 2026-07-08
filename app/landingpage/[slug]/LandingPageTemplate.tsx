@@ -19,6 +19,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
+import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 
 const hindSiliguri = Hind_Siliguri({
   subsets: ['bengali'],
@@ -95,6 +96,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
   const video = data.videoSection || {};
   const bullets = data.bulletPointsSection || {};
   const faq = data.faqSection || {};
+  const checkout = data.checkoutSection || {};
 
   return (
     <div
@@ -320,17 +322,19 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         </section>
       )}
 
-      {/* Checkout Form Placeholder for Phase 4 */}
-      <section className='py-16 px-4' style={{ backgroundColor: 'var(--lp-navy)' }}>
-        <div className='max-w-2xl mx-auto text-center text-white'>
-          <h2 className='text-3xl font-bold mb-8'>Order Form (Phase 4 Logic Goes Here)</h2>
-          <div className='bg-white rounded-3xl p-8 text-slate-800 shadow-xl'>
-            <p>
-              The Bengali phone number sanitization and API submission logic will be integrated into
-              this container.
-            </p>
-          </div>
-        </div>
+      {/* Checkout Form Container Phase 4 */}
+      <section className="py-16 px-4" style={{ backgroundColor: 'var(--lp-navy)' }}>
+         <div className="max-w-3xl mx-auto text-center text-white">
+            {checkout.caption && (
+              <span className="inline-block bg-[var(--lp-highlight)] text-[var(--lp-cta)] px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide mb-4">
+                {checkout.caption}
+              </span>
+            )}
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">{checkout.title || 'Order Now'}</h2>
+            <p className="text-lg opacity-80 mb-10">{checkout.subtitle || 'Fill up the form to complete your order.'}</p>
+            
+            <LandingPageCheckoutForm landingPageId={data.id} checkoutData={checkout} />
+         </div>
       </section>
 
       {/* WhatsApp Floating Button */}
