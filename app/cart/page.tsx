@@ -378,6 +378,10 @@ export default function CartPage() {
         union: null,
         orderNotes: form.notes || null,
         promoCode: appliedPromo?.code || null,
+        subtotal,
+        shippingCharge: shippingTax,
+        discountAmount,
+        total,
         items: selectedEnriched.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,

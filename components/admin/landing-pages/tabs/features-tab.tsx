@@ -1,0 +1,106 @@
+import { useFieldArray } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Trash2, Plus } from 'lucide-react';
+
+export default function FeaturesTab({ register, control }: { register: any, control: any }) {
+  const { fields: featureCards, append: addCard, remove: removeCard } = useFieldArray({ control, name: 'featureCards' });
+  const { fields: videoCards, append: addVideoCard, remove: removeVideoCard } = useFieldArray({ control, name: 'videoSection.cards' });
+  const { fields: points, append: addPoint, remove: removePoint } = useFieldArray({ control, name: 'bulletPointsSection.points' });
+
+  return (
+    <div className="space-y-10">
+      
+      {/* 4 Feature Cards */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between border-b pb-2">
+          <h3 className="text-lg font-semibold">Mini Feature Cards (e.g. Free Delivery, 7 Days Return)</h3>
+          <button type="button" onClick={() => addCard({ icon: 'check', title: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
+            <Plus className="h-4 w-4" /> Add Card
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {featureCards.map((field, index) => (
+            <div key={field.id} className="p-4 border rounded-md relative group">
+              <button type="button" onClick={() => removeCard(index)} className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition">
+                <Trash2 className="h-4 w-4" />
+              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Icon Name</Label>
+                  <Input {...register(`featureCards.${index}.icon`)} placeholder="e.g. truck, shield, rotate-ccw" />
+                </div>
+                <div>
+                  <Label>Title</Label>
+                  <Input {...register(`featureCards.${index}.title`)} placeholder="Title" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Video Section */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold border-b pb-2">Video & Why It's Best Section</h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div><Label>Caption</Label><Input {...register('videoSection.caption')} placeholder="Caption" /></div>
+          <div><Label>Youtube Video Link</Label><Input {...register('videoSection.videoLink')} placeholder="https://youtube.com/..." /></div>
+          <div><Label>Custom Thumbnail URL</Label><Input {...register('videoSection.customThumbnail')} placeholder="/uploads/..." /></div>
+          <div><Label>Custom Play Button URL</Label><Input {...register('videoSection.playButtonImage')} placeholder="/uploads/..." /></div>
+        </div>
+
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <Label>Video Features Cards</Label>
+            <button type="button" onClick={() => addVideoCard({ icon: '', title: '', subtitle: '', image: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
+              <Plus className="h-4 w-4" /> Add Card
+            </button>
+          </div>
+          <div className="space-y-3">
+            {videoCards.map((field, index) => (
+              <div key={field.id} className="p-3 border rounded-md flex gap-3 items-center">
+                <div className="flex-1 grid grid-cols-4 gap-2">
+                  <Input {...register(`videoSection.cards.${index}.icon`)} placeholder="Icon (e.g. check)" />
+                  <Input {...register(`videoSection.cards.${index}.title`)} placeholder="Title" />
+                  <Input {...register(`videoSection.cards.${index}.subtitle`)} placeholder="Subtitle" />
+                  <Input {...register(`videoSection.cards.${index}.image`)} placeholder="Image URL (Optional)" />
+                </div>
+                <button type="button" onClick={() => removeVideoCard(index)} className="text-red-500 hover:bg-red-50 p-2 rounded">
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bullet Points */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between border-b pb-2">
+          <h3 className="text-lg font-semibold">Bullet Points Section</h3>
+          <button type="button" onClick={() => addPoint({ value: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
+            <Plus className="h-4 w-4" /> Add Point
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div><Label>Caption</Label><Input {...register('bulletPointsSection.caption')} /></div>
+          <div><Label>Title</Label><Input {...register('bulletPointsSection.title')} /></div>
+          <div><Label>Subtitle</Label><Input {...register('bulletPointsSection.subtitle')} /></div>
+        </div>
+        <div className="space-y-2 mt-2">
+          {points.map((field: any, index) => (
+            <div key={field.id} className="flex gap-2">
+              <Input {...register(`bulletPointsSection.points.${index}.value`)} placeholder={`Point ${index + 1}`} />
+              <button type="button" onClick={() => removePoint(index)} className="text-red-500 px-2 hover:bg-red-50 rounded">
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+}

@@ -113,7 +113,7 @@ export default function DashboardFlashSaleDetailsPage() {
   return (
     <DashPage>
       <div className="flex items-center gap-4">
-        <Link href="/dashboard/flash-sale" className="grid h-10 w-10 place-items-center rounded-lg border border-border/60 bg-card text-muted-foreground transition hover:bg-secondary hover:text-foreground">
+        <Link href="/admin/flash-sale" className="grid h-10 w-10 place-items-center rounded-lg border border-border/60 bg-card text-muted-foreground transition hover:bg-secondary hover:text-foreground">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>

@@ -71,7 +71,7 @@ export function OrderStatusChart({ data }: { data: StatusData }) {
       <DashSectionTitle
         title="Order Status Distribution"
         action={
-          <Link href="/dashboard/orders/pending" className="text-xs font-medium text-primary hover:underline">
+          <Link href="/admin/orders/pending" className="text-xs font-medium text-primary hover:underline">
             View all →
           </Link>
         }

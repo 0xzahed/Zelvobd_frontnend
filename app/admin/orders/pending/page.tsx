@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Search, Eye, Truck, CheckCircle2, Ban, MoreHorizontal } from "lucide-react"
-import { useOrders, type Order } from "@/src/hooks/api/useOrders"
+import { useOrders, useUpdateOrderStatus, useDeleteOrder, type Order, type OrderStatus } from "@/src/hooks/api/useOrders"
 import { formatBDT, formatRelativeTime, cx } from "@/lib/format"
+import { useConfirm } from "@/components/ui/confirm-dialog"
+import { notify } from "@/lib/notify"
 import { DashPage, DashHeader, DashPanel, DashStatusBadge, DashLoading } from "@/dashboard/components/dash-ui"
 
 const STATUS_LABELS: Record<string, string> = {
@@ -19,7 +21,10 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export default function DashboardOrdersPendingPage() {
-  const { data: ordersData, isLoading } = useOrders({ limit: 1000 })
+  const { data: ordersData, isLoading } = useOrders({})
+  const updateStatus = useUpdateOrderStatus()
+  const deleteMutation = useDeleteOrder()
+  const confirm = useConfirm()
   const [q, setQ] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
@@ -116,29 +121,55 @@ export default function DashboardOrdersPendingPage() {
                     <p>{order.customerName}</p>
                     <p className="text-xs text-muted-foreground">{(order as any).phone}</p>
                   </td>
-                  <td className="px-5 py-3.5 text-muted-foreground">Cash</td>
-                  <td className="px-5 py-3.5 font-medium text-foreground">{formatBDT(order.total)}</td>
+<td className="px-5 py-3.5 text-muted-foreground">Cash on Delivery</td>
+<td className="px-5 py-3.5 font-medium text-foreground">{formatBDT((order as any).totalAmount ?? order.total)}</td>
                   <td className="px-5 py-3.5">
                     <DashStatusBadge status={order.status} label={STATUS_LABELS[order.status] || order.status} />
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1">
                       <Link
-                        href={`/dashboard/orders/${order.id}`}
+                        href={`/admin/orders/${order.id}`}
                         className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
-                      <button className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-blue-50 hover:text-blue-500">
+                      <button
+                        onClick={() => updateStatus.mutate({ id: order.id, status: "PROCESSING" as OrderStatus })}
+                        disabled={updateStatus.isPending}
+                        className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-blue-50 hover:text-blue-500 disabled:opacity-50"
+                        title="Process"
+                      >
                         <Truck className="h-4 w-4" />
                       </button>
-                      <button className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-emerald-50 hover:text-emerald-500">
+                      <button
+                        onClick={() => updateStatus.mutate({ id: order.id, status: "DELIVERED" as OrderStatus })}
+                        disabled={updateStatus.isPending}
+                        className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-emerald-50 hover:text-emerald-500 disabled:opacity-50"
+                        title="Deliver"
+                      >
                         <CheckCircle2 className="h-4 w-4" />
                       </button>
-                      <button className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500">
+                      <button
+                        onClick={async () => {
+                          const ok = await confirm({ title: "Cancel order?", message: `Cancel order #${order.code}?`, confirmText: "Cancel", variant: "danger" })
+                          if (ok) updateStatus.mutate({ id: order.id, status: "CANCELLED" as OrderStatus })
+                        }}
+                        disabled={updateStatus.isPending}
+                        className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                        title="Cancel"
+                      >
                         <Ban className="h-4 w-4" />
                       </button>
-                      <button className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary">
+                      <button
+                        onClick={async () => {
+                          const ok = await confirm({ title: "Delete order?", message: `Delete order #${order.code}?`, confirmText: "Delete", variant: "danger" })
+                          if (ok) deleteMutation.mutate(order.id)
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                        title="Delete"
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                       </button>
                     </div>

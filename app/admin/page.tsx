@@ -14,9 +14,9 @@ import { useOrders, type Order } from "@/src/hooks/api/useOrders"
 import { formatBDT, formatRelativeTime } from "@/lib/format"
 import { DashPage, DashGradientCard, DashMetricCard, DashPanel, DashSectionTitle, DashStatusBadge, DashLoading } from "@/dashboard/components/dash-ui"
 
-const WeeklySalesChart = dynamic(() => import("@/app/dashboard/charts").then((m) => ({ default: m.WeeklySalesChart })), { ssr: false })
-const BestSellingPie = dynamic(() => import("@/app/dashboard/charts").then((m) => ({ default: m.BestSellingPie })), { ssr: false })
-const OrderStatusChart = dynamic(() => import("@/app/dashboard/charts").then((m) => ({ default: m.OrderStatusChart })), { ssr: false })
+const WeeklySalesChart = dynamic(() => import("@/app/admin/charts").then((m) => ({ default: m.WeeklySalesChart })), { ssr: false })
+const BestSellingPie = dynamic(() => import("@/app/admin/charts").then((m) => ({ default: m.BestSellingPie })), { ssr: false })
+const OrderStatusChart = dynamic(() => import("@/app/admin/charts").then((m) => ({ default: m.OrderStatusChart })), { ssr: false })
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: "#F59E0B",
@@ -43,20 +43,20 @@ const STATUS_LABELS: Record<string, string> = {
 const PIE_COLORS = ["#10B981", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6"]
 
 const QUICK_LINKS = [
-  { href: "/dashboard/products", label: "Products", icon: Package, color: "bg-blue-500" },
-  { href: "/dashboard/orders/pending", label: "Orders", icon: ShoppingBag, color: "bg-violet-500" },
-  { href: "/dashboard/categories", label: "Categories", icon: FolderTree, color: "bg-emerald-500" },
-  { href: "/dashboard/flash-sale", label: "Flash Sale", icon: Gauge, color: "bg-rose-500" },
-  { href: "/dashboard/promos", label: "Promos", icon: CircleDollarSign, color: "bg-amber-500" },
-  { href: "/dashboard/sliders", label: "Sliders", icon: Sparkles, color: "bg-cyan-500" },
-  { href: "/dashboard/customers", label: "Customers", icon: Users, color: "bg-indigo-500" },
-  { href: "/dashboard/trending", label: "Trending", icon: TrendingUp, color: "bg-teal-500" },
+  { href: "/admin/products", label: "Products", icon: Package, color: "bg-blue-500" },
+  { href: "/admin/orders/pending", label: "Orders", icon: ShoppingBag, color: "bg-violet-500" },
+  { href: "/admin/categories", label: "Categories", icon: FolderTree, color: "bg-emerald-500" },
+  { href: "/admin/flash-sale", label: "Flash Sale", icon: Gauge, color: "bg-rose-500" },
+  { href: "/admin/promos", label: "Promos", icon: CircleDollarSign, color: "bg-amber-500" },
+  { href: "/admin/sliders", label: "Sliders", icon: Sparkles, color: "bg-cyan-500" },
+  { href: "/admin/customers", label: "Customers", icon: Users, color: "bg-indigo-500" },
+  { href: "/admin/trending", label: "Trending", icon: TrendingUp, color: "bg-teal-500" },
 ]
 
 export default function DashboardOverview() {
   const { admin } = useAuth()
   const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 })
-  const { data: ordersData, isLoading: ordersLoading } = useOrders({ limit: 1000 })
+  const { data: ordersData, isLoading: ordersLoading } = useOrders({})
 
   const products = (productsData as any)?.products || productsData || []
   const ordersMeta = (ordersData as any)?.meta
@@ -65,19 +65,40 @@ export default function DashboardOverview() {
   const stats = useMemo(() => {
     const totalProducts = Array.isArray(products) ? products.length : 0
     const totalOrders = ordersMeta?.total || orders.length
-    const totalRevenue = (orders as Order[]).reduce((sum, o) => sum + (o.total || 0), 0)
+    const delivered = (orders as Order[]).filter((o) => o.status === "DELIVERED")
     const pendingOrders = (orders as Order[]).filter((o) => o.status === "PENDING").length
-    const deliveredOrders = (orders as Order[]).filter((o) => o.status === "DELIVERED").length
+    const deliveredOrders = delivered.length
     const processingOrders = (orders as Order[]).filter((o) => o.status === "PROCESSING").length
     const cancelledOrders = (orders as Order[]).filter(
       (o) => o.status === "CANCELLED" || o.status === "CUSTOMER_CANCELLED"
     ).length
+    const totalRevenue = delivered.reduce((sum, o) => sum + Number(o.total || 0), 0)
 
-    // Simulated time period splits (using real totals where possible)
-    const todayRevenue = totalRevenue * 0.08
-    const yesterdayRevenue = totalRevenue * 0.12
-    const thisMonthRevenue = totalRevenue * 0.45
-    const lastMonthRevenue = totalRevenue * 0.35
+    const today = new Date()
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const yesterdayStart = new Date(todayStart.getTime() - 86400000)
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
+
+    const todayRevenue = delivered
+      .filter((o) => new Date(o.createdAt) >= todayStart)
+      .reduce((sum, o) => sum + Number(o.total || 0), 0)
+    const yesterdayRevenue = delivered
+      .filter((o) => {
+        const d = new Date(o.createdAt)
+        return d >= yesterdayStart && d < todayStart
+      })
+      .reduce((sum, o) => sum + Number(o.total || 0), 0)
+    const thisMonthRevenue = delivered
+      .filter((o) => new Date(o.createdAt) >= monthStart)
+      .reduce((sum, o) => sum + Number(o.total || 0), 0)
+    const lastMonthRevenue = delivered
+      .filter((o) => {
+        const d = new Date(o.createdAt)
+        return d >= lastMonthStart && d <= lastMonthEnd
+      })
+      .reduce((sum, o) => sum + Number(o.total || 0), 0)
 
     return {
       totalProducts,
@@ -112,20 +133,34 @@ export default function DashboardOverview() {
   }, [orders])
 
   const weeklyChartData = useMemo(() => {
-    const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
-    const data = days.map((day) => ({
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    const now = new Date()
+    const dayTotals: Record<string, number> = {}
+    const dayCounts: Record<string, number> = {}
+    days.forEach((d) => { dayTotals[d] = 0; dayCounts[d] = 0 })
+
+    ;(orders as Order[]).forEach((o) => {
+      const d = new Date(o.createdAt)
+      const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000)
+      if (diffDays < 7) {
+        const dayName = days[d.getDay()]
+        dayTotals[dayName] += Number(o.total || 0)
+        dayCounts[dayName]++
+      }
+    })
+
+    return days.map((day) => ({
       day,
-      sales: Math.floor(stats.totalRevenue / 7 + Math.random() * 500),
-      orders: Math.floor(stats.totalOrders / 7 + Math.random() * 5),
+      sales: dayTotals[day],
+      orders: dayCounts[day],
     }))
-    return data
-  }, [stats.totalRevenue, stats.totalOrders])
+  }, [orders])
 
   const bestSellingData = useMemo(() => {
     if (!Array.isArray(products) || products.length === 0) return []
     return products.slice(0, 5).map((p: any, i: number) => ({
       name: p.name.length > 12 ? p.name.slice(0, 12) + "..." : p.name,
-      value: p.price || 1,
+      value: p.soldCount || p.price || 1,
       color: PIE_COLORS[i % PIE_COLORS.length],
     }))
   }, [products])
@@ -146,12 +181,12 @@ export default function DashboardOverview() {
   if (isLoading) {
     return (
       <DashPage>
-        <div>
-          <h2 className="text-xl font-bold text-foreground md:text-2xl">
-            Welcome back, {admin?.email?.split("@")[0] || "Admin"}
-          </h2>
-          <p className="mt-0.5 text-sm text-muted-foreground">Loading your dashboard...</p>
-        </div>
+      <div>
+        <h2 className="text-xl font-bold text-foreground md:text-2xl">
+          Welcome back, {admin?.email?.split("@")[0] || "Admin"}
+        </h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">Loading your dashboard...</p>
+      </div>
         <DashLoading label="Fetching latest data..." />
       </DashPage>
     )
@@ -161,11 +196,11 @@ export default function DashboardOverview() {
     <DashPage>
       {/* Stat cards (glass) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <DashGradientCard label="Today Orders" value={formatBDT(stats.todayRevenue)} subValue="Cash ৳0 · Card ৳0 · Credit ৳0" icon={Package} />
-        <DashGradientCard label="Yesterday Orders" value={formatBDT(stats.yesterdayRevenue)} subValue="Cash ৳0 · Card ৳0 · Credit ৳0" icon={ShoppingBag} />
-        <DashGradientCard label="This Month" value={formatBDT(stats.thisMonthRevenue)} subValue="Current month sales" icon={CreditCard} />
-        <DashGradientCard label="Last Month" value={formatBDT(stats.lastMonthRevenue)} subValue="Previous month sales" icon={Wallet} />
-        <DashGradientCard label="All-Time Sales" value={formatBDT(stats.totalRevenue)} subValue="Total lifetime revenue" icon={Banknote} />
+        <DashGradientCard label="Today Orders" value={formatBDT(stats.todayRevenue)} icon={Package} />
+        <DashGradientCard label="Yesterday Orders" value={formatBDT(stats.yesterdayRevenue)} icon={ShoppingBag} />
+        <DashGradientCard label="This Month" value={formatBDT(stats.thisMonthRevenue)} icon={CreditCard} />
+        <DashGradientCard label="Last Month" value={formatBDT(stats.lastMonthRevenue)} icon={Wallet} />
+        <DashGradientCard label="All-Time Sales" value={formatBDT(stats.totalRevenue)} icon={Banknote} />
       </div>
 
       {/* Metric cards */}
@@ -256,7 +291,7 @@ export default function DashboardOverview() {
       <DashPanel noPadding>
         <div className="flex items-center justify-between border-b border-border/40 p-5">
           <h3 className="text-sm font-bold text-foreground">Recent Order</h3>
-          <Link href="/dashboard/orders/pending" className="text-xs font-medium text-primary hover:underline">
+          <Link href="/admin/orders/pending" className="text-xs font-medium text-primary hover:underline">
             View all →
           </Link>
         </div>
@@ -285,14 +320,14 @@ export default function DashboardOverview() {
                     <td className="px-5 py-3.5 font-semibold text-foreground">#{order.code}</td>
                     <td className="px-5 py-3.5 text-muted-foreground">{formatRelativeTime(order.createdAt)}</td>
                     <td className="px-5 py-3.5 text-foreground">{order.customerName}</td>
-                    <td className="px-5 py-3.5 text-muted-foreground">Cash</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">Cash on Delivery</td>
                     <td className="px-5 py-3.5 font-medium text-foreground">{formatBDT(order.total)}</td>
                     <td className="px-5 py-3.5">
                       <DashStatusBadge status={order.status} label={STATUS_LABELS[order.status] || order.status} />
                     </td>
                     <td className="px-5 py-3.5">
                       <Link
-                        href={`/dashboard/orders/${order.id}`}
+                        href={`/admin/orders/${order.id}`}
                         className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                       >
                         <Eye className="h-3.5 w-3.5" />

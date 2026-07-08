@@ -4,36 +4,23 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
-import {
-  Activity,
-  Home,
-  MessageCircle,
-  Package,
-  Percent,
-  Search,
-  ShoppingCart,
-  Star,
-  X,
-  Zap,
-} from "lucide-react"
+import { Search, ShoppingCart, X } from "lucide-react"
 import { CartBottomSheet } from "@/components/ui/cart-bottom-sheet"
 import { useCart } from "@/contexts/cart-context"
 
 type NavLink = {
   label: string
   href: string
-  Icon: React.ComponentType<{ className?: string }>
-  accent?: string
 }
 
 const NAV_LINKS: NavLink[] = [
-  { label: "Home", href: "/", Icon: Home },
-  { label: "Flash Sale", href: "/offers", Icon: Zap, accent: "text-accent" },
-  { label: "Trending", href: "/trending", Icon: Activity, accent: "text-primary" },
-  { label: "Free Delivery", href: "/free-delivery", Icon: Package, accent: "text-success" },
-  { label: "New", href: "/new-products", Icon: Star, accent: "text-primary" },
-  { label: "Offers", href: "/offers", Icon: Percent, accent: "text-warning" },
-  { label: "Help", href: "/help", Icon: MessageCircle },
+  { label: "Home", href: "/" },
+  { label: "Flash Sale", href: "/offers" },
+  { label: "Trending", href: "/trending" },
+  { label: "Free Delivery", href: "/free-delivery" },
+  { label: "New", href: "/new-products" },
+  { label: "Offers", href: "/offers" },
+  { label: "Help", href: "/help" },
 ]
 
 export function DesktopHeader() {
@@ -45,18 +32,15 @@ export function DesktopHeader() {
   const [query, setQuery] = useState("")
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Hide on admin + product detail / auth pages (same behaviour as the shell).
   const hidden =
     pathname?.startsWith("/dashboard") ||
     pathname?.startsWith("/product/") ||
     pathname?.startsWith("/login")
 
-  // Close search panel whenever the route changes.
   useEffect(() => {
     setSearchOpen(false)
   }, [pathname])
 
-  // Focus the input when the search panel opens; close on Escape.
   useEffect(() => {
     if (!searchOpen) return
     searchInputRef.current?.focus()
@@ -84,7 +68,6 @@ export function DesktopHeader() {
 
   return (
     <>
-      {/* Spacer to prevent content from jumping under the fixed header */}
       <div className="hidden h-20 w-full md:block" aria-hidden="true" />
       
       <header className="fixed inset-x-0 top-0 z-50 hidden border-b border-border/40 bg-background/80 backdrop-blur-xl md:block">
@@ -137,20 +120,19 @@ export function DesktopHeader() {
           ) : (
             <nav className="flex min-w-0 flex-1 items-center justify-center px-4">
               <div className="flex items-center gap-1 rounded-full bg-secondary/50 p-1.5 shadow-inner backdrop-blur-md border border-border/50 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {NAV_LINKS.map(({ label, href, Icon, accent }) => {
+                {NAV_LINKS.map(({ label, href }) => {
                   const active = isActive(href)
                   return (
                     <Link
                       key={label}
                       href={href}
-                      className={`group flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${
                         active
                           ? "bg-background text-primary shadow-sm ring-1 ring-border/50"
                           : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
                       }`}
                     >
-                      <Icon className={`h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110 ${!active && accent ? accent : ""}`} />
-                      <span>{label}</span>
+                      {label}
                     </Link>
                   )
                 })}

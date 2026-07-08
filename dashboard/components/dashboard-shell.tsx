@@ -95,16 +95,16 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
       {/* Top bar */}
       <header className="sticky top-0 z-20 ml-0 flex h-16 items-center justify-between border-b border-border/40 bg-surface-elevated px-4 md:ml-[250px] md:px-8">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setOpen(true)}
-            className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary md:hidden"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-bold text-foreground">{pageTitle}</h1>
-        </div>
+         <div className="flex items-center gap-3">
+    <button
+      onClick={() => setOpen(true)}
+      className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary md:hidden"
+      aria-label="Open menu"
+    >
+      <Menu className="h-5 w-5" />
+    </button>
+    <h1 className="text-lg font-bold text-foreground">{pageTitle}</h1>
+  </div>
 
       </header>
 

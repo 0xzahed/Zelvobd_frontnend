@@ -17,7 +17,7 @@ export default function NotFound() {
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
-          href="/dashboard"
+          href="/admin"
           className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
         >
           <Home className="h-4 w-4" />

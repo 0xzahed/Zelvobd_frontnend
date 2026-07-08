@@ -38,7 +38,7 @@ export default function LoginPage() {
         title: "Access Granted",
         message: "Logged in as administrator.",
       })
-      router.push("/dashboard")
+      router.push("/admin")
     } catch (authError) {
       const message = handleApiError(authError, "Login Failed")
       setError(message)

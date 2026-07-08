@@ -266,7 +266,7 @@ function FraudCheckModal({ phone, onClose }: { phone: string | null; onClose: ()
 const ROWS_PER_PAGE = 12
 
 export function OrderList({ status, title, subtitle, showSteadfast }: OrderListProps) {
-  const { data: ordersData, isLoading } = useOrders({ limit: 1000 })
+  const { data: ordersData, isLoading } = useOrders({})
   const updateStatus = useUpdateOrderStatus()
   const deleteMutation = useDeleteOrder()
   const syncMutation = useSyncOrders()

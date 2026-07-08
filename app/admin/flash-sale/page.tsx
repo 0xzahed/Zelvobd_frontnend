@@ -186,7 +186,7 @@ export default function DashboardFlashSalePage() {
                       <Edit className="mr-2 h-4 w-4" /> Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={`/dashboard/flash-sale/${campaign.id}`} className="cursor-pointer">
+                      <Link href={`/admin/flash-sale/${campaign.id}`} className="cursor-pointer">
                         <Tag className="mr-2 h-4 w-4" /> Manage Products
                       </Link>
                     </DropdownMenuItem>

@@ -22,15 +22,26 @@ export function MobileHeader() {
     setSearchOpen(false)
   }, [pathname])
 
-  // Focus input when opened; close on Escape
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Focus input when opened; close on Escape or click outside
   useEffect(() => {
     if (!searchOpen) return
     inputRef.current?.focus()
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSearchOpen(false)
     }
+    const onClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setSearchOpen(false)
+      }
+    }
     document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    document.addEventListener("mousedown", onClickOutside)
+    return () => {
+      document.removeEventListener("keydown", onKey)
+      document.removeEventListener("mousedown", onClickOutside)
+    }
   }, [searchOpen])
 
   const onSearchSubmit = (e: React.FormEvent) => {
@@ -45,65 +56,56 @@ export function MobileHeader() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-40 border-b border-border/40 bg-white md:hidden">
-        {searchOpen ? (
-          <div className="flex h-14 items-center gap-2 px-4">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(false)}
-              aria-label="Close search"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <form
-              onSubmit={onSearchSubmit}
-              className="flex h-10 flex-1 items-center gap-2 rounded-full border border-border bg-card px-3"
-            >
-              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search..."
-                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                aria-label="Search"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  aria-label="Clear search"
-                  className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </form>
-          </div>
-        ) : (
-          <div className="flex h-14 items-center justify-between gap-2 px-4">
-            <Link href="/" className="flex shrink-0 items-center gap-1.5 text-lg font-bold text-foreground">
-              <Image 
-                src="/logo.png" 
-                alt="Zelvobd" 
-                width={100} 
-                height={28} 
-                className="h-10 w-auto object-contain" 
-                priority 
-              />
-            </Link>
+        <div ref={containerRef} className="flex h-14 items-center gap-2 px-4">
+          <Link href="/" className="flex shrink-0 items-center gap-1.5 text-lg font-bold text-foreground">
+            <Image 
+              src="/logo.png" 
+              alt="Zelvobd" 
+              width={100} 
+              height={28} 
+              className="h-10 w-auto object-contain" 
+              priority 
+            />
+          </Link>
+
+          {searchOpen ? (
+            <>
+              <form
+                onSubmit={onSearchSubmit}
+                className="flex h-10 flex-1 items-center gap-2 rounded-full border border-border bg-card px-3"
+              >
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                  aria-label="Search"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    aria-label="Clear search"
+                    className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </form>
+            </>
+          ) : (
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-background text-muted-foreground hover:text-foreground"
+              className="ml-auto flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-background text-muted-foreground hover:text-foreground"
             >
               <Search className="h-5 w-5" />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </header>
     </>
   )

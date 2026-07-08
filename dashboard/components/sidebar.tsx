@@ -20,6 +20,7 @@ import {
   ChevronRight,
   X,
   Image,
+  Layout,
 } from "lucide-react"
 import { cx } from "@/lib/format"
 import { useState, useMemo } from "react"
@@ -42,7 +43,7 @@ type Section = {
 const MENU: Section[] = [
   {
     title: "Menu",
-    items: [{ label: "Overview", icon: LayoutDashboard, href: "/dashboard", exact: true }],
+    items: [{ label: "Overview", icon: LayoutDashboard, href: "/admin", exact: true }],
   },
   {
     title: "Catalog",
@@ -51,14 +52,14 @@ const MENU: Section[] = [
         label: "Categories",
         icon: FolderTree,
         children: [
-          { href: "/dashboard/categories", label: "Category" },
-          { href: "/dashboard/categories/sub", label: "Sub Category" },
-          { href: "/dashboard/category-banners", label: "Category Banners" },
+          { href: "/admin/categories", label: "Category" },
+          { href: "/admin/categories/sub", label: "Sub Category" },
+          { href: "/admin/category-banners", label: "Category Banners" },
         ],
       },
-      { label: "Products", icon: Package, href: "/dashboard/products" },
-      { label: "Trending Products", icon: TrendingUp, href: "/dashboard/trending" },
-      { label: "Free Delivery", icon: Truck, href: "/dashboard/free-delivery" },
+      { label: "Products", icon: Package, href: "/admin/products" },
+      { label: "Trending Products", icon: TrendingUp, href: "/admin/trending" },
+      { label: "Free Delivery", icon: Truck, href: "/admin/free-delivery" },
     ],
   },
   {
@@ -67,11 +68,12 @@ const MENU: Section[] = [
       {
         label: "Sliders",
         icon: Sparkles,
-        children: [{ href: "/dashboard/sliders", label: "Sliders List" }],
+        children: [{ href: "/admin/sliders", label: "Sliders List" }],
       },
-      { label: "YouTube Videos", icon: Youtube, href: "/dashboard/youtube" },
-      { label: "Promos", icon: CircleDollarSign, href: "/dashboard/promos" },
-      { label: "Flash Sale", icon: Gauge, href: "/dashboard/flash-sale", badge: "HOT" },
+      { label: "Landing Pages", icon: Layout, href: "/admin/landing-pages" },
+      { label: "YouTube Videos", icon: Youtube, href: "/admin/youtube" },
+      { label: "Promos", icon: CircleDollarSign, href: "/admin/promos" },
+      { label: "Flash Sale", icon: Gauge, href: "/admin/flash-sale", badge: "HOT" },
     ],
   },
   {
@@ -81,26 +83,26 @@ const MENU: Section[] = [
         label: "Orders",
         icon: ShoppingBag,
         children: [
-          { href: "/dashboard/orders/pending", label: "Pending" },
-          { href: "/dashboard/orders/processing", label: "Processing" },
-          { href: "/dashboard/orders/hold", label: "Hold" },
-          { href: "/dashboard/orders/pickup", label: "Pickup" },
-          { href: "/dashboard/orders/delivered", label: "Delivered" },
-          { href: "/dashboard/orders/cancelled", label: "Cancelled" },
+          { href: "/admin/orders/pending", label: "Pending" },
+          { href: "/admin/orders/processing", label: "Processing" },
+          { href: "/admin/orders/hold", label: "Hold" },
+          { href: "/admin/orders/pickup", label: "Pickup" },
+          { href: "/admin/orders/delivered", label: "Delivered" },
+          { href: "/admin/orders/cancelled", label: "Cancelled" },
         ],
       },
-      { label: "Customers", icon: Users, href: "/dashboard/customers" },
+      { label: "Customers", icon: Users, href: "/admin/customers" },
     ],
   },
   {
     title: "Support",
-    items: [{ label: "Live Chat", icon: MessageSquare, href: "/dashboard/chat" }],
+    items: [{ label: "Live Chat", icon: MessageSquare, href: "/admin/chat" }],
   },
   {
     title: "System",
     items: [
-      { label: "Admins", icon: ShieldCheck, href: "/dashboard/admins" },
-      { label: "Footer", icon: Settings2, href: "/dashboard/footer" },
+      { label: "Admins", icon: ShieldCheck, href: "/admin/admins" },
+      { label: "Footer", icon: Settings2, href: "/admin/footer" },
     ],
   },
 ]
@@ -163,7 +165,7 @@ export function DashboardSidebar({ open, onClose }: { open: boolean; onClose: ()
       >
         {/* Brand */}
         <div className="flex h-16 items-center justify-between px-5">
-          <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
+          <Link href="/admin" className="flex items-center gap-2.5" onClick={onClose}>
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-bold text-white">
               Z
             </div>
