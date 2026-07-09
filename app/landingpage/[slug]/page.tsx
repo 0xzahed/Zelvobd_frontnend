@@ -6,7 +6,7 @@ import LandingPageTemplate from './LandingPageTemplate';
 async function getLandingPage(slug: string) {
   try {
     const res = await fetch(`${BASE_URL}/landing-pages/slug/${slug}`, {
-      next: { revalidate: 60 } // Cache for 60 seconds
+      cache: 'no-store'
     });
     const payload = await res.json();
     if (!res.ok || payload?.status === false || !payload.data) {
@@ -18,8 +18,9 @@ async function getLandingPage(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const page = await getLandingPage(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const page = await getLandingPage(resolvedParams.slug);
   if (!page) return { title: 'Not Found' };
   
   return {
@@ -28,8 +29,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function LandingPageRoute({ params }: { params: { slug: string } }) {
-  const pageData = await getLandingPage(params.slug);
+export default async function LandingPageRoute({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const pageData = await getLandingPage(resolvedParams.slug);
 
   if (!pageData) {
     notFound();

@@ -103,7 +103,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-border">
         {activeTab === 'general' && renderGeneral()}
-        {activeTab === 'hero' && <HeroTab register={register} />}
+        {activeTab === 'hero' && <HeroTab register={register} control={control} />}
         {activeTab === 'features' && <FeaturesTab register={register} control={control} />}
         {activeTab === 'checkout' && <CheckoutTab register={register} control={control} />}
       </div>

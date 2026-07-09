@@ -1,8 +1,9 @@
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus } from 'lucide-react';
 import { AdminPrimaryButton } from '@/components/admin/admin-ui';
+import { ImageUpload } from '../../image-upload';
 
 export default function FeaturesTab({ register, control }: { register: any, control: any }) {
   const { fields: featureCards, append: addCard, remove: removeCard } = useFieldArray({ control, name: 'featureCards' });
@@ -48,8 +49,24 @@ export default function FeaturesTab({ register, control }: { register: any, cont
         <div className="grid grid-cols-2 gap-4">
           <div><Label>Caption</Label><Input {...register('videoSection.caption')} placeholder="Caption" /></div>
           <div><Label>Youtube Video Link</Label><Input {...register('videoSection.videoLink')} placeholder="https://youtube.com/..." /></div>
-          <div><Label>Custom Thumbnail URL</Label><Input {...register('videoSection.customThumbnail')} placeholder="/uploads/..." /></div>
-          <div><Label>Custom Play Button URL</Label><Input {...register('videoSection.playButtonImage')} placeholder="/uploads/..." /></div>
+          <div>
+            <Controller
+              name="videoSection.customThumbnail"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload label="Custom Thumbnail" value={field.value} onChange={field.onChange} />
+              )}
+            />
+          </div>
+          <div>
+            <Controller
+              name="videoSection.playButtonImage"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload label="Custom Play Button" value={field.value} onChange={field.onChange} />
+              )}
+            />
+          </div>
         </div>
 
         <div className="mt-4">
@@ -66,7 +83,13 @@ export default function FeaturesTab({ register, control }: { register: any, cont
                   <Input {...register(`videoSection.cards.${index}.icon`)} placeholder="Icon (e.g. check)" />
                   <Input {...register(`videoSection.cards.${index}.title`)} placeholder="Title" />
                   <Input {...register(`videoSection.cards.${index}.subtitle`)} placeholder="Subtitle" />
-                  <Input {...register(`videoSection.cards.${index}.image`)} placeholder="Image URL (Optional)" />
+                  <Controller
+                    name={`videoSection.cards.${index}.image`}
+                    control={control}
+                    render={({ field }) => (
+                      <ImageUpload value={field.value} onChange={field.onChange} />
+                    )}
+                  />
                 </div>
                 <button type="button" onClick={() => removeVideoCard(index)} className="text-red-500 hover:bg-red-50 p-2 rounded">
                   <Trash2 className="h-4 w-4" />

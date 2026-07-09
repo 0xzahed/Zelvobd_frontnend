@@ -1,7 +1,9 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Controller } from 'react-hook-form';
+import { ImageUpload } from '../../image-upload';
 
-export default function HeroTab({ register }: { register: any }) {
+export default function HeroTab({ register, control }: { register: any, control: any }) {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
@@ -24,8 +26,17 @@ export default function HeroTab({ register }: { register: any }) {
         </div>
 
         <div>
-          <Label>Image URL</Label>
-          <Input {...register('heroSection.image')} placeholder="/uploads/..." />
+          <Controller
+            name="heroSection.image"
+            control={control}
+            render={({ field }) => (
+              <ImageUpload
+                label="Hero Image"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
