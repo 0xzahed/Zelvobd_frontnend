@@ -91,11 +91,11 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className='min-h-dvh overflow-x-hidden bg-surface'>
+    <div className='min-h-dvh bg-surface'>
       <DashboardSidebar open={open} onClose={() => setOpen(false)} />
 
       {/* Top bar */}
-      <header className='sticky top-0 z-20 ml-0 flex h-16 items-center justify-between border-b border-border/40 bg-surface-elevated px-4 md:ml-62.5 md:px-8'>
+      <header className='fixed top-0 inset-x-0 z-20 ml-0 flex h-16 items-center justify-between border-b border-border/40 bg-surface-elevated px-4 md:ml-62.5 md:px-8'>
         <div className='flex items-center gap-3'>
           <button
             onClick={() => setOpen(true)}
@@ -109,8 +109,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       </header>
 
       {/* Main */}
-      <main className='ml-0 min-h-[calc(100dvh-4rem)] p-4 md:ml-62.5 md:p-6'>
-        <div className='mx-auto max-w-400'>{children}</div>
+      <main className='ml-0 min-h-[calc(100dvh-4rem)] p-4 pt-20 md:ml-62.5 md:p-6 md:pt-20'>
+        <div className='mx-auto w-full max-w-[1600px]'>{children}</div>
       </main>
     </div>
   );

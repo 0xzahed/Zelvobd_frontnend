@@ -10,7 +10,6 @@ import {
   Clock,
   ArrowUpRight,
   CheckCircle2,
-  Eye,
   Sparkles,
   Gauge,
   CircleDollarSign,
@@ -208,7 +207,7 @@ export default function DashboardOverview() {
   const bestSellingData = useMemo(() => {
     if (!Array.isArray(products) || products.length === 0) return [];
     return products.slice(0, 5).map((p: any, i: number) => ({
-      name: p.name.length > 12 ? p.name.slice(0, 12) + '...' : p.name,
+      name: p.name.length > 10 ? p.name.slice(0, 10) + '...' : p.name,
       value: p.soldCount || p.price || 1,
       color: PIE_COLORS[i % PIE_COLORS.length],
     }));
@@ -362,68 +361,82 @@ export default function DashboardOverview() {
         {recentOrders.length === 0 ? (
           <div className='p-10 text-center text-sm text-muted-foreground'>No orders yet</div>
         ) : (
-          <div className='overflow-x-auto'>
-            <table className='w-full text-left text-sm'>
-              <thead>
-                <tr className='border-b border-border/40 bg-surface/30 text-muted-foreground'>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Invoice No
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Order Time
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Customer Name
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Method
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Amount
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Status
-                  </th>
-                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className='border-b border-border/30 transition hover:bg-secondary/20'
-                  >
-                    <td className='px-5 py-3.5 font-semibold text-foreground'>#{order.code}</td>
-                    <td className='px-5 py-3.5 text-muted-foreground'>
-                      {formatRelativeTime(order.createdAt)}
-                    </td>
-                    <td className='px-5 py-3.5 text-foreground'>{order.customerName}</td>
-                    <td className='px-5 py-3.5 text-muted-foreground'>Cash on Delivery</td>
-                    <td className='px-5 py-3.5 font-medium text-foreground'>
-                      {formatBDT(order.total)}
-                    </td>
-                    <td className='px-5 py-3.5'>
-                      <DashStatusBadge
-                        status={order.status}
-                        label={STATUS_LABELS[order.status] || order.status}
-                      />
-                    </td>
-                    <td className='px-5 py-3.5'>
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className='inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline'
-                      >
-                        <Eye className='h-3.5 w-3.5' />
-                        View
-                      </Link>
-                    </td>
+          <>
+            {/* Desktop table */}
+            <div className='hidden overflow-x-auto md:block'>
+              <table className='w-full text-left text-sm'>
+                <thead>
+                  <tr className='border-b border-border/40 bg-surface/30 text-muted-foreground'>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Invoice No
+                    </th>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Order Time
+                    </th>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Customer Name
+                    </th>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Method
+                    </th>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Amount
+                    </th>
+                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {recentOrders.map((order) => (
+                    <tr
+                      key={order.id}
+                      className='border-b border-border/30 transition hover:bg-secondary/20'
+                    >
+                      <td className='px-5 py-3.5 font-semibold text-foreground'>#{order.code}</td>
+                      <td className='px-5 py-3.5 text-muted-foreground'>
+                        {formatRelativeTime(order.createdAt)}
+                      </td>
+                      <td className='px-5 py-3.5 text-foreground'>{order.customerName}</td>
+                      <td className='px-5 py-3.5 text-muted-foreground'>Cash on Delivery</td>
+                      <td className='px-5 py-3.5 font-medium text-foreground'>
+                        {formatBDT(order.total)}
+                      </td>
+                      <td className='px-5 py-3.5'>
+                        <DashStatusBadge
+                          status={order.status}
+                          label={STATUS_LABELS[order.status] || order.status}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className='divide-y divide-border/30 md:hidden'>
+              {recentOrders.map((order) => (
+                <div key={order.id} className='p-4'>
+                  <div className='flex items-center justify-between'>
+                    <span className='font-semibold text-foreground'>#{order.code}</span>
+                    <DashStatusBadge
+                      status={order.status}
+                      label={STATUS_LABELS[order.status] || order.status}
+                    />
+                  </div>
+                  <div className='mt-2 flex items-center justify-between text-sm'>
+                    <span className='text-foreground'>{order.customerName}</span>
+                    <span className='font-medium text-foreground'>{formatBDT(order.total)}</span>
+                  </div>
+                  <div className='mt-1 flex items-center justify-between text-xs text-muted-foreground'>
+                    <span>{formatRelativeTime(order.createdAt)}</span>
+                    <span>Cash on Delivery</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </DashPanel>
     </DashPage>
