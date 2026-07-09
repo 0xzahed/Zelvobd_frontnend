@@ -1,7 +1,7 @@
 .landing-page-wrapper {
   background-color: var(--lp-background);
   color: var(--lp-foreground);
-  font-family: var(--font-hind-siliguri), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -13,7 +13,7 @@
 .landing-page-wrapper h2, 
 .landing-page-wrapper h3, 
 .landing-page-wrapper h4 {
-  font-family: var(--font-hind-siliguri), sans-serif;
+  font-family: var(--font-google-sans), sans-serif;
   font-weight: 700;
   letter-spacing: -0.01em;
 }

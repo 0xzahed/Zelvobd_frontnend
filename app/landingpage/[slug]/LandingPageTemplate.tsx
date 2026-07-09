@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Hind_Siliguri } from 'next/font/google';
+import localFont from 'next/font/local';
 import {
   Wallet,
   RotateCcw,
@@ -29,11 +29,10 @@ import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 import './landing-page.css';
 
-const hindSiliguri = Hind_Siliguri({
-  subsets: ['bengali'],
-  weight: ['400', '500', '600', '700'],
+const googleSans = localFont({
+  src: '../../../public/Google_Sans/GoogleSans-VariableFont_GRAD,opsz,wght.ttf',
+  variable: '--font-google-sans',
   display: 'swap',
-  variable: '--font-hind-siliguri',
 });
 
 // Icon Mapping
@@ -259,7 +258,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
 
   return (
     <div
-      className={`landing-page-wrapper min-h-screen pb-24 md:pb-0 ${hindSiliguri.variable}`}
+      className={`landing-page-wrapper min-h-screen pb-24 md:pb-0 ${googleSans.variable}`}
       style={themeVariables}
     >
       {/* Hero Section */}
