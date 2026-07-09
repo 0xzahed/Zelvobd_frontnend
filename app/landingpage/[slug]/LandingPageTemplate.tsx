@@ -227,8 +227,31 @@ function SectionHeader({
   );
 }
 
-/* ---------- main template ---------- */
+/* ---------- primitives ---------- */
+function getYouTubeEmbedUrl(url: string) {
+  if (!url) return '';
+  let videoId = '';
+  try {
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    } else if (url.includes('youtube.com/watch')) {
+      const urlObj = new URL(url);
+      videoId = urlObj.searchParams.get('v') || '';
+    } else if (url.includes('youtube.com/embed/')) {
+      return url;
+    } else if (url.includes('youtube.com/shorts/')) {
+      videoId = url.split('youtube.com/shorts/')[1]?.split('?')[0];
+    }
+  } catch (e) {}
+  
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return url;
+}
+
 export default function LandingPageTemplate({ data }: { data: any }) {
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const themeVariables = THEMES[data.colorPalette || 'blue'] || THEMES['blue'];
 
   const hero = data.heroSection || {};
@@ -439,51 +462,81 @@ export default function LandingPageTemplate({ data }: { data: any }) {
 
       {/* Video Section */}
       {(video.videoLink || video.cards?.length > 0) && (
-        <section className='py-3'>
-          <div className='mx-auto max-w-3xl px-4 text-center flex flex-col items-center'>
-            {video.videoLink && (
-              <div
-                className='relative w-full max-w-3xl overflow-hidden rounded-2xl bg-black shadow-md mb-6'
-                style={{ aspectRatio: '16 / 9', boxShadow: 'var(--lp-shadow-card)' }}
-              >
-                <iframe
-                  className='absolute inset-0 h-full w-full'
-                  src={video.videoLink}
-                  title='Video'
-                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-                  allowFullScreen
-                />
-              </div>
-            )}
-
-            {(video.caption || video.cards?.length > 0) && (
-              <div className='mt-5 flex flex-col items-center w-full'>
-                {video.caption && (
-                  <Pill>
-                    <Sparkles size={14} /> {video.caption}
-                  </Pill>
-                )}
-                <div className='w-full mt-4 grid gap-3 sm:grid-cols-2 text-left'>
-                  {video.cards?.map((c: any, i: number) => {
-                    const IconC = IconMap[c.icon] || Check;
-                    return (
-                      <div key={i} className='flex gap-3 items-start card-soft p-4'>
-                        <IconC className='mt-1' style={{ color: 'var(--lp-success)' }} />
-                        <div>
-                          <div
-                            className='font-semibold text-[15px]'
-                            style={{ color: 'var(--lp-navy)' }}
-                          >
-                            {c.title}
-                          </div>
-                          {c.subtitle && <div className='text-sm opacity-80'>{c.subtitle}</div>}
-                        </div>
-                      </div>
-                    );
-                  })}
+        <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
+          <div className='mx-auto max-w-6xl px-4'>
+            
+            {/* Caption */}
+            {video.caption && (
+              <div className='text-center mb-5 sm:mb-8'>
+                <div className='mb-2 flex justify-center'>
+                  <Pill>{video.caption}</Pill>
                 </div>
               </div>
             )}
+
+            {/* Video */}
+            {video.videoLink && (
+              <div className='mx-auto mb-6 sm:mb-8 w-full max-w-3xl'>
+                <div
+                  className='relative w-full overflow-hidden rounded-2xl bg-black'
+                  style={{ aspectRatio: '16 / 9', boxShadow: 'var(--lp-shadow-card)' }}
+                >
+                  {video.customThumbnail && !isVideoPlaying ? (
+                    <div 
+                      className="absolute inset-0 w-full h-full cursor-pointer group flex items-center justify-center"
+                      onClick={() => setIsVideoPlaying(true)}
+                    >
+                      <img src={toAbsoluteUploadUrl(video.customThumbnail)} alt="Video Thumbnail" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
+                      <div className="relative z-10 w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                        <LucideIcons.Play className="text-white w-8 h-8 ml-1" fill="currentColor" />
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      className='absolute inset-0 h-full w-full'
+                      src={(() => {
+                        const embedUrl = getYouTubeEmbedUrl(video.videoLink);
+                        return video.customThumbnail 
+                          ? (embedUrl.includes('?') ? `${embedUrl}&autoplay=1` : `${embedUrl}?autoplay=1`) 
+                          : embedUrl;
+                      })()}
+                      title='Video'
+                      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                      allowFullScreen
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Cards */}
+            {video.cards && video.cards.length > 0 && video.cards[0]?.title && (
+              <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+                {video.cards.map((c: any, i: number) => {
+                  const IconC = (LucideIcons as any)[c.icon] || Check;
+                  return (
+                    <div key={i} className='card-soft p-5 flex flex-col items-start gap-3'>
+                      <div
+                        className='w-12 h-12 rounded-full grid place-items-center'
+                        style={{ backgroundColor: 'var(--lp-highlight)', color: 'var(--lp-cta)' }}
+                      >
+                        <IconC size={24} />
+                      </div>
+                      <h3 className='text-lg font-bold' style={{ color: 'var(--lp-navy)' }}>
+                        {c.title}
+                      </h3>
+                      {c.subtitle && (
+                        <p className='text-sm leading-relaxed opacity-80'>
+                          {c.subtitle}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
           </div>
         </section>
       )}

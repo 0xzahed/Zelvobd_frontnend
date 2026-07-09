@@ -32,7 +32,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
       tableSection: { caption: '', title: '', subtitle: '', tableData: [{ key: '', value: '' }], totalItemsKey: '', totalItemsValue: '', offerPriceKey: '', offerPriceValue: '', buttonText: 'Order Now' },
       featureCards: [{ icon: 'truck', title: 'Free Delivery' }],
       timerSection: { targetDateTime: '' },
-      videoSection: { caption: '', videoLink: '', customThumbnail: '', playButtonImage: '', cards: [{ icon: 'check', title: '', subtitle: '', image: '' }] },
+      videoSection: { caption: '', videoLink: '', customThumbnail: '', cards: [{ icon: 'check', title: '', subtitle: '' }] },
       bulletPointsSection: { caption: '', title: '', subtitle: '', points: [''] },
       tipsSection: { title: '', subtitle: '' },
       checkoutSection: { caption: '', title: '', subtitle: '', productName: '', subName: '', price: '', deliveryText: 'Cash on Delivery' },

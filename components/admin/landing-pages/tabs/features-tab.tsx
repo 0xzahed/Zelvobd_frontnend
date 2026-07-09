@@ -81,28 +81,20 @@ export default function FeaturesTab({ register, control }: { register: any, cont
               )}
             />
           </div>
-          <div>
-            <Controller
-              name="videoSection.playButtonImage"
-              control={control}
-              render={({ field }) => (
-                <ImageUpload label="Custom Play Button" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </div>
+
         </div>
 
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <Label>Video Features Cards</Label>
-            <button type="button" onClick={() => addVideoCard({ icon: '', title: '', subtitle: '', image: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
+            <button type="button" onClick={() => addVideoCard({ icon: '', title: '', subtitle: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
               <Plus className="h-4 w-4" /> Add Card
             </button>
           </div>
           <div className="space-y-3">
             {videoCards.map((field, index) => (
               <div key={field.id} className="p-3 border rounded-md flex gap-3 items-center">
-                <div className="flex-1 grid grid-cols-4 gap-2">
+                <div className="flex-1 grid grid-cols-3 gap-2">
                   <Controller
                     name={`videoSection.cards.${index}.icon`}
                     control={control}
@@ -125,13 +117,6 @@ export default function FeaturesTab({ register, control }: { register: any, cont
                   />
                   <Input {...register(`videoSection.cards.${index}.title`)} placeholder="Title" />
                   <Input {...register(`videoSection.cards.${index}.subtitle`)} placeholder="Subtitle" />
-                  <Controller
-                    name={`videoSection.cards.${index}.image`}
-                    control={control}
-                    render={({ field }) => (
-                      <ImageUpload value={field.value} onChange={field.onChange} />
-                    )}
-                  />
                 </div>
                 <button type="button" onClick={() => removeVideoCard(index)} className="text-red-500 hover:bg-red-50 p-2 rounded">
                   <Trash2 className="h-4 w-4" />
