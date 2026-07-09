@@ -25,6 +25,7 @@ import {
   Shield,
   Check,
 } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 import './landing-page.css';
@@ -394,32 +395,30 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         </section>
       )}
 
-      {/* Trust Bar (Static icons) */}
-      <section className='py-3 border-y' style={{ borderColor: 'var(--lp-border)' }}>
-        <div className='mx-auto max-w-5xl px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center'>
-          {[
-            { Icon: Wallet, label: 'ক্যাশ অন ডেলিভারি' },
-            { Icon: RotateCcw, label: '৭ দিনের রিটার্ন' },
-            { Icon: BadgeCheck, label: '১০০% অরিজিনাল প্রোডাক্ট' },
-            { Icon: Truck, label: 'সারাদেশে ফ্রি ডেলিভারি' },
-          ].map(({ Icon, label }) => (
-            <div key={label} className='flex flex-col items-center gap-2'>
-              <div
-                className='w-12 h-12 rounded-full grid place-items-center'
-                style={{ backgroundColor: 'var(--lp-highlight)', color: 'var(--lp-cta)' }}
-              >
-                <Icon size={24} />
-              </div>
-              <div
-                className='text-sm sm:text-base font-semibold'
-                style={{ color: 'var(--lp-navy)' }}
-              >
-                {label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Feature Cards (Dynamic Trust Bar) */}
+      {featureCards && featureCards.length > 0 && featureCards[0]?.title && (
+        <section className='py-3 border-y' style={{ borderColor: 'var(--lp-border)' }}>
+          <div className='mx-auto max-w-5xl px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center'>
+            {featureCards.map((card: any, idx: number) => {
+              // Dynamically get the icon component from Lucide React
+              const IconC = (LucideIcons as any)[card.icon] || Check;
+              return (
+                <div key={idx} className='flex flex-col items-center gap-2'>
+                  <div
+                    className='w-12 h-12 rounded-full grid place-items-center'
+                    style={{ backgroundColor: 'var(--lp-highlight)', color: 'var(--lp-cta)' }}
+                  >
+                    <IconC size={24} />
+                  </div>
+                  <div className='text-sm sm:text-base font-semibold' style={{ color: 'var(--lp-navy)' }}>
+                    {card.title}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Countdown Timer */}
       <section className='py-3'>
@@ -436,37 +435,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         </div>
       </section>
 
-      {/* Features Cards */}
-      {featureCards && featureCards.length > 0 && featureCards[0]?.title && (
-        <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
-          <div className='mx-auto max-w-6xl px-4'>
-            <div className='text-center mb-5 sm:mb-8'>
-              <div className='mb-2 flex justify-center'>
-                <Pill>কেন এটি সেরা</Pill>
-              </div>
-            </div>
 
-            <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-              {featureCards.map((card: any, idx: number) => {
-                const IconC = IconMap[card.icon] || Check;
-                return (
-                  <div key={idx} className='card-soft flex flex-col items-start gap-3'>
-                    <div
-                      className='w-12 h-12 rounded-full grid place-items-center'
-                      style={{ backgroundColor: 'var(--lp-highlight)', color: 'var(--lp-cta)' }}
-                    >
-                      <IconC size={24} />
-                    </div>
-                    <h3 className='text-lg font-bold' style={{ color: 'var(--lp-navy)' }}>
-                      {card.title}
-                    </h3>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Video Section */}
       {(video.videoLink || video.cards?.length > 0) && (

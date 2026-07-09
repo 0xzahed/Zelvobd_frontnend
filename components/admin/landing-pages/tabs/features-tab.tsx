@@ -4,11 +4,16 @@ import { Label } from '@/components/ui/label';
 import { Trash2, Plus } from 'lucide-react';
 import { AdminPrimaryButton } from '@/components/admin/admin-ui';
 import { ImageUpload } from '../../image-upload';
+import { LucideIconPickerModal } from '../../lucide-icon-picker';
+import * as LucideIcons from 'lucide-react';
+import { useState } from 'react';
 
 export default function FeaturesTab({ register, control }: { register: any, control: any }) {
   const { fields: featureCards, append: addCard, remove: removeCard } = useFieldArray({ control, name: 'featureCards' });
   const { fields: videoCards, append: addVideoCard, remove: removeVideoCard } = useFieldArray({ control, name: 'videoSection.cards' });
   const { fields: points, append: addPoint, remove: removePoint } = useFieldArray({ control, name: 'bulletPointsSection.points' });
+
+  const [iconPickerOpenFor, setIconPickerOpenFor] = useState<{ name: string, onChange: (val: string) => void } | null>(null);
 
   return (
     <div className="space-y-10">
@@ -30,7 +35,25 @@ export default function FeaturesTab({ register, control }: { register: any, cont
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Icon Name</Label>
-                  <Input {...register(`featureCards.${index}.icon`)} placeholder="e.g. truck, shield, rotate-ccw" />
+                  <Controller
+                    name={`featureCards.${index}.icon`}
+                    control={control}
+                    render={({ field }) => {
+                      const IconC = (LucideIcons as any)[field.value];
+                      return (
+                        <div className="flex items-center gap-2 mt-1">
+                          <button
+                            type="button"
+                            onClick={() => setIconPickerOpenFor({ name: field.name, onChange: field.onChange })}
+                            className="p-2 border rounded-md hover:bg-gray-50 flex items-center justify-center min-w-10 min-h-10"
+                          >
+                            {IconC ? <IconC className="w-5 h-5" /> : <div className="text-xs">Pick</div>}
+                          </button>
+                          <Input {...field} placeholder="e.g. ShieldCheck" className="flex-1" />
+                        </div>
+                      )
+                    }}
+                  />
                 </div>
                 <div>
                   <Label>Title</Label>
@@ -80,7 +103,26 @@ export default function FeaturesTab({ register, control }: { register: any, cont
             {videoCards.map((field, index) => (
               <div key={field.id} className="p-3 border rounded-md flex gap-3 items-center">
                 <div className="flex-1 grid grid-cols-4 gap-2">
-                  <Input {...register(`videoSection.cards.${index}.icon`)} placeholder="Icon (e.g. check)" />
+                  <Controller
+                    name={`videoSection.cards.${index}.icon`}
+                    control={control}
+                    render={({ field }) => {
+                      const IconC = (LucideIcons as any)[field.value];
+                      return (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setIconPickerOpenFor({ name: field.name, onChange: field.onChange })}
+                            className="p-2 border rounded-md hover:bg-gray-50 flex items-center justify-center min-w-10 min-h-10"
+                            title="Pick Icon"
+                          >
+                            {IconC ? <IconC className="w-5 h-5" /> : <div className="text-xs">Pick</div>}
+                          </button>
+                          <Input {...field} placeholder="Icon name" className="flex-1" />
+                        </div>
+                      )
+                    }}
+                  />
                   <Input {...register(`videoSection.cards.${index}.title`)} placeholder="Title" />
                   <Input {...register(`videoSection.cards.${index}.subtitle`)} placeholder="Subtitle" />
                   <Controller
@@ -125,6 +167,16 @@ export default function FeaturesTab({ register, control }: { register: any, cont
         </div>
       </div>
 
+      {iconPickerOpenFor && (
+        <LucideIconPickerModal
+          isOpen={true}
+          onClose={() => setIconPickerOpenFor(null)}
+          onSelectIcon={(iconName) => {
+            iconPickerOpenFor.onChange(iconName);
+            setIconPickerOpenFor(null);
+          }}
+        />
+      )}
     </div>
   );
 }
