@@ -371,6 +371,18 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                     </li>
                   );
                 })}
+                {table.totalItemsKey && table.totalItemsValue && (
+                  <li className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 sm:px-5' style={{ backgroundColor: 'var(--lp-highlight)' }}>
+                    <span className='font-bold text-sm sm:text-base' style={{ color: 'var(--lp-navy)' }}>{table.totalItemsKey}</span>
+                    <span className='font-bold text-sm sm:text-base tabular-nums' style={{ color: 'var(--lp-navy)' }}>{table.totalItemsValue}</span>
+                  </li>
+                )}
+                {table.offerPriceKey && table.offerPriceValue && (
+                  <li className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-5' style={{ backgroundColor: 'var(--lp-navy)', color: 'var(--lp-navy-foreground)' }}>
+                    <span className='font-bold text-sm sm:text-base'>{table.offerPriceKey}</span>
+                    <span className='text-2xl font-extrabold tabular-nums'>{table.offerPriceValue}</span>
+                  </li>
+                )}
               </ul>
             </div>
             {table.buttonText && (

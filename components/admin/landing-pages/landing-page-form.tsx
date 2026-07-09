@@ -29,7 +29,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
       colorPalette: 'blue',
       productId: '',
       heroSection: { caption: '', title: '', subtitle: '', image: '', regularPrice: '', offerPrice: '', buttonText: 'Order Now' },
-      tableSection: { caption: '', title: '', subtitle: '', tableData: [{ key: '', value: '' }], bottomRows: '', buttonText: 'Order Now' },
+      tableSection: { caption: '', title: '', subtitle: '', tableData: [{ key: '', value: '' }], totalItemsKey: '', totalItemsValue: '', offerPriceKey: '', offerPriceValue: '', buttonText: 'Order Now' },
       featureCards: [{ icon: 'truck', title: 'Free Delivery' }],
       timerSection: { targetDateTime: '' },
       videoSection: { caption: '', videoLink: '', customThumbnail: '', playButtonImage: '', cards: [{ icon: 'check', title: '', subtitle: '', image: '' }] },
