@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useProducts } from '@/src/hooks/api/useProducts';
 import HeroTab from './tabs/hero-tab';
 import FeaturesTab from './tabs/features-tab';
 import CheckoutTab from './tabs/checkout-tab';
@@ -23,8 +22,6 @@ const COLOR_PALETTES = [
 
 export default function LandingPageForm({ initialData, onSubmit, isSubmitting }: { initialData?: any, onSubmit: (data: any) => void, isSubmitting?: boolean }) {
   const router = useRouter();
-  const { data: productsResult } = useProducts({ limit: 100 });
-  const products = productsResult?.data || [];
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: initialData || {
@@ -72,27 +69,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
         <p className="text-xs text-muted-foreground mt-1">Leave empty to type your own, or type normally to auto-format.</p>
       </div>
 
-      <div>
-        <Label>Link to Product (Optional)</Label>
-        <Controller
-          name="productId"
-          control={control}
-          render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a product to link orders to..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No Product (Custom)</SelectItem>
-                {products.map((p: any) => (
-                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        />
-        <p className="text-xs text-muted-foreground mt-1">If selected, landing page orders will be linked to this inventory item.</p>
-      </div>
+
 
       <div>
         <Label>Color Palette</Label>
