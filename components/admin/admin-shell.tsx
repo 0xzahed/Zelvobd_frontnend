@@ -16,7 +16,6 @@ import {
   Menu,
   MessageSquare,
   Search,
-  Settings2,
   ShieldAlert,
   Package,
   Settings,
@@ -94,8 +93,7 @@ const MENU: NavItem[] = [
   { section: 'Sales', label: 'Customers', icon: Users, href: '/admin/customers' },
   // { section: 'Support', label: 'Live Chat', icon: MessageSquare, href: '/admin/chat' },
   { section: 'System', label: 'Admins', icon: ShieldCheck, href: '/admin/admins' },
-  { section: 'System', label: 'Settings', icon: Settings, href: '/admin/settings' },
-  { section: 'System', label: 'Footer', icon: Settings2, href: '/admin/footer' },
+  { section: 'System', label: 'Settings', icon: Settings, href: '/admin/footer' },
 ];
 
 function isChildActive(pathname: string, href: string) {
@@ -142,8 +140,7 @@ const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
   { match: '/admin/customers', title: 'Customers' },
   // { match: '/admin/chat', title: 'Live Chat' },
   { match: '/admin/admins', title: 'Admins' },
-  { match: '/admin/settings', title: 'Settings' },
-  { match: '/admin/footer', title: 'Footer' },
+  { match: '/admin/footer', title: 'Settings' },
   { match: '/admin/notifications', title: 'Notifications' },
   { match: '/admin', title: 'Overview' },
 ];

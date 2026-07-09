@@ -22,7 +22,7 @@ const buildQueryUrl = (path: string, query?: Record<string, unknown>) => {
     if (value !== undefined && value !== null && value !== "") {
       if (key === "limit") {
         const numeric = Number(value)
-        const safeLimit = Number.isFinite(numeric) ? Math.min(Math.max(Math.floor(numeric), 1), 100) : 100
+        const safeLimit = Number.isFinite(numeric) ? Math.min(Math.max(Math.floor(numeric), 1), 10000) : 100
         url.searchParams.set(key, String(safeLimit))
         return
       }

@@ -91,7 +91,7 @@ const QUICK_LINKS = [
 export default function DashboardOverview() {
   const { admin } = useAuth();
   const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 }, { includeUnavailable: true });
-  const { data: ordersData, isLoading: ordersLoading } = useOrders({});
+  const { data: ordersData, isLoading: ordersLoading } = useOrders({ limit: 10000 });
 
   const products = (productsData as any)?.products || productsData || [];
   const ordersMeta = (ordersData as any)?.meta;

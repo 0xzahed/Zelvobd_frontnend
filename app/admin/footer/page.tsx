@@ -2,11 +2,15 @@
 
 import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
-import { Plus, Trash2, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, ImagePlus, Loader2 } from "lucide-react"
+import { Plus, Trash2, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, ImagePlus, Loader2, Lock, Save } from "lucide-react"
 import { useFooter, useUpdateFooter } from "@/src/hooks/api/useFooter"
 import { uploadFooterImage } from "@/src/api/footerApi"
 import { DashPage, DashHeader, DashPanel, DashLoading } from "@/dashboard/components/dash-ui"
 import { toAbsoluteUploadUrl } from "@/src/api/mainApi"
+import { useAuth } from "@/contexts/auth-context"
+import { updateAdmin } from "@/src/api/adminApi"
+import { notify } from "@/lib/notify"
+import { handleApiError } from "@/lib/api-utils"
 
 type NavLink = { label: string; href: string }
 type NavGroup = { title: string; links: NavLink[] }
@@ -53,6 +57,33 @@ export default function DashboardFooterPage() {
   const [socialUploadIdx, setSocialUploadIdx] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const socialFileInputRef = useRef<HTMLInputElement>(null)
+  const { admin } = useAuth()
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [savingPassword, setSavingPassword] = useState(false)
+
+  const handlePasswordChange = async () => {
+    if (!admin?.id) return
+    if (newPassword.length < 8) {
+      notify.error({ title: "Password too short", message: "Password must be at least 8 characters." })
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      notify.error({ title: "Passwords don't match", message: "New password and confirm password must match." })
+      return
+    }
+    setSavingPassword(true)
+    try {
+      await updateAdmin(admin.id, { password: newPassword })
+      notify.success({ title: "Password updated", message: "Your password has been changed." })
+      setNewPassword("")
+      setConfirmPassword("")
+    } catch (error) {
+      handleApiError(error)
+    } finally {
+      setSavingPassword(false)
+    }
+  }
 
   useEffect(() => {
     if (footerData) {
@@ -96,8 +127,9 @@ export default function DashboardFooterPage() {
     try {
       const url = await uploadFooterImage(file)
       update({ logoUrl: url })
-    } catch {
-      // error handled by uploadFooterImage
+      notify.success({ title: "Image uploaded", message: "Logo has been uploaded. Click Save Changes to persist." })
+    } catch (error) {
+      handleApiError(error, "Failed to upload image")
     }
     setUploading(false)
   }
@@ -107,8 +139,9 @@ export default function DashboardFooterPage() {
     try {
       const url = await uploadFooterImage(file)
       updateSocial(idx, { icon: url })
-    } catch {
-      // error handled by uploadFooterImage
+      notify.success({ title: "Icon uploaded", message: "Social icon has been uploaded." })
+    } catch (error) {
+      handleApiError(error, "Failed to upload icon")
     }
     setSocialUploadIdx(null)
   }
@@ -118,7 +151,7 @@ export default function DashboardFooterPage() {
   if (isLoading) {
     return (
       <DashPage>
-        <DashHeader title="Footer" subtitle="Manage footer content" />
+        <DashHeader title="Settings" subtitle="Manage footer content and account" />
         <DashLoading label="Loading footer..." />
       </DashPage>
     )
@@ -127,8 +160,8 @@ export default function DashboardFooterPage() {
   return (
     <DashPage>
       <DashHeader
-        title="Footer"
-        subtitle="Manage footer content"
+        title="Settings"
+        subtitle="Manage footer content and account"
         actions={
           <button
             onClick={handleSave}
@@ -152,41 +185,6 @@ export default function DashboardFooterPage() {
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-foreground">Brand Tagline</label>
               <input value={form.brandTagline} onChange={(e) => update({ brandTagline: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">Logo</label>
-              <div className="flex items-center gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0]
-                    if (f) handleLogoUpload(f)
-                  }}
-                />
-                <input
-                  value={form.logoUrl}
-                  onChange={(e) => update({ logoUrl: e.target.value })}
-                  placeholder="/logo.png or upload"
-                  className="h-10 flex-1 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 text-sm font-semibold text-primary transition hover:bg-primary/10 disabled:opacity-50"
-                >
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-                  Upload
-                </button>
-                {form.logoUrl && (
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border/40 bg-muted">
-                    <Image src={toAbsoluteUploadUrl(form.logoUrl) || form.logoUrl} alt="logo" fill className="object-contain p-1" unoptimized />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -259,37 +257,53 @@ export default function DashboardFooterPage() {
                   </div>
                   <input value={social.label} onChange={(e) => updateSocial(i, { label: e.target.value })} placeholder="Label" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
                   <input value={social.href} onChange={(e) => updateSocial(i, { href: e.target.value })} placeholder="https://..." className="h-8 flex-[2] rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                  <input
-                    ref={socialFileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0]
-                      if (f && socialUploadIdx !== null) {
-                        handleSocialIconUpload(f, socialUploadIdx)
-                        e.target.value = ""
-                      }
-                    }}
-                  />
-                  <div className="flex items-center gap-1">
-                    <input value={social.icon || ""} onChange={(e) => updateSocial(i, { icon: e.target.value })} placeholder="name or URL" className="h-8 w-28 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSocialUploadIdx(i)
-                        socialFileInputRef.current?.click()
-                      }}
-                      disabled={socialUploadIdx === i}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/5 text-primary transition hover:bg-primary/10 disabled:opacity-50"
-                    >
-                      {socialUploadIdx === i ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
+                  <input value={social.icon || ""} onChange={(e) => updateSocial(i, { icon: e.target.value })} placeholder="icon name" className="h-8 w-28 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
                   <button onClick={() => removeSocial(i)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>
               )
             })}
+          </div>
+        </DashPanel>
+
+        {/* Change Password */}
+        <DashPanel>
+          <h3 className="mb-4 text-sm font-bold text-foreground">Change Password</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Lock className="h-3.5 w-3.5 text-primary" />
+                New Password
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Lock className="h-3.5 w-3.5 text-primary" />
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Password must be at least 8 characters.</p>
+            <button
+              onClick={handlePasswordChange}
+              disabled={savingPassword}
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+            >
+              {savingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {savingPassword ? "Updating..." : "Update Password"}
+            </button>
           </div>
         </DashPanel>
       </div>

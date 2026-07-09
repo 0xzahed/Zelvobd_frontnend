@@ -10,7 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Package,
-  Settings2,
+  Settings,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -21,6 +21,7 @@ import {
   Youtube,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -106,7 +107,7 @@ const MENU: Section[] = [
     title: 'System',
     items: [
       { label: 'Admins', icon: ShieldCheck, href: '/admin/admins' },
-      // { label: 'Footer', icon: Settings2, href: '/admin/footer' },
+      { label: 'Settings', icon: Settings, href: '/admin/footer' },
     ],
   },
 ];
@@ -197,9 +198,14 @@ export function DashboardSidebar({ open, onClose }: { open: boolean; onClose: ()
         {/* Brand */}
         <div className='flex h-16 items-center justify-between px-5'>
           <Link href='/admin' className='flex items-center gap-2.5' onClick={onClose}>
-            <div className='grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm font-bold text-white'>
-              Z
-            </div>
+            <Image
+              src='/logo.png'
+              alt='Zelvobd'
+              width={32}
+              height={32}
+              priority
+              className='h-8 w-8 rounded-lg object-cover'
+            />
             <span className='text-lg font-bold text-foreground'>Zelvobd</span>
           </Link>
           <button onClick={onClose} className='md:hidden' aria-label='Close menu'>

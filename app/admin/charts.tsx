@@ -23,7 +23,7 @@ export function WeeklySalesChart({ data }: { data: WeeklyData }) {
     <DashPanel>
       <DashSectionTitle title="Weekly Sales" />
       <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={256}>
           <BarChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
             <XAxis dataKey="day" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
@@ -50,7 +50,7 @@ export function BestSellingPie({ data }: { data: PieData }) {
     <DashPanel>
       <DashSectionTitle title="Best Selling Products" />
       <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={256}>
           <PieChart>
             <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} fill="#8884d8" label={({ name }) => name}>
               {data.map((entry, index) => (
@@ -80,7 +80,7 @@ export function OrderStatusChart({ data }: { data: StatusData }) {
         <div className="flex h-48 items-center justify-center text-sm text-muted-foreground">No orders yet</div>
       ) : (
         <div className="h-48 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={192}>
             <BarChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
