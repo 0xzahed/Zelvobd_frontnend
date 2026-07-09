@@ -734,7 +734,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
       {/* Sticky Mobile CTA */}
       <div
         className='fixed bottom-0 inset-x-0 z-40 md:hidden bg-white/95 backdrop-blur border-t px-3 py-5 grid grid-cols-[minmax(0,1fr)_auto] gap-2 items-center'
-        style={{ borderColor: 'var(--lp-border)', boxShadow: '0 -6px 20px -10px rgba(0,0,0,0.1)' }}
+        style={{ borderColor: 'var(--lp-border)', boxShadow: '0 -6px 20px -10px oklch(0.2 0.03 260 / 0.25)' }}
       >
         <div className='min-w-0'>
           <div className='text-xs opacity-70'>অফার মূল্য</div>
@@ -751,7 +751,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           </div>
         </div>
         <div className='flex justify-center'>
-          <a href='#order' className='btn-cta py-2! px-3! text-sm'>
+          <a href='#order' className='btn-cta !py-2 !px-3 text-sm'>
             অর্ডার করুন <ArrowRight size={16} />
           </a>
         </div>
