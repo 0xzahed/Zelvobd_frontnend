@@ -2,15 +2,10 @@ import { useFieldArray, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus } from 'lucide-react';
-<<<<<<< HEAD
 import { ImageUpload } from '../../image-upload';
 import { LucideIconPickerModal } from '../../lucide-icon-picker';
 import * as LucideIcons from 'lucide-react';
 import { useState } from 'react';
-=======
-import { AdminPrimaryButton } from '@/components/admin/admin-ui';
-import { ImageUpload } from '../../image-upload';
->>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
 
 export default function FeaturesTab({ register, control }: { register: any, control: any }) {
   const { fields: featureCards, append: addCard, remove: removeCard } = useFieldArray({ control, name: 'featureCards' });
@@ -85,19 +80,6 @@ export default function FeaturesTab({ register, control }: { register: any, cont
               )}
             />
           </div>
-<<<<<<< HEAD
-
-=======
-          <div>
-            <Controller
-              name="videoSection.playButtonImage"
-              control={control}
-              render={({ field }) => (
-                <ImageUpload label="Custom Play Button" value={field.value} onChange={field.onChange} />
-              )}
-            />
-          </div>
->>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
         </div>
 
         <div className="mt-4">
@@ -133,16 +115,6 @@ export default function FeaturesTab({ register, control }: { register: any, cont
                   />
                   <Input {...register(`videoSection.cards.${index}.title`)} placeholder="Title" />
                   <Input {...register(`videoSection.cards.${index}.subtitle`)} placeholder="Subtitle" />
-<<<<<<< HEAD
-=======
-                  <Controller
-                    name={`videoSection.cards.${index}.image`}
-                    control={control}
-                    render={({ field }) => (
-                      <ImageUpload value={field.value} onChange={field.onChange} />
-                    )}
-                  />
->>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
                 </div>
                 <button type="button" onClick={() => removeVideoCard(index)} className="text-red-500 hover:bg-red-50 p-2 rounded">
                   <Trash2 className="h-4 w-4" />

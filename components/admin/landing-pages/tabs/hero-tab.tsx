@@ -1,18 +1,11 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-<<<<<<< HEAD
 import { Controller, useFieldArray } from 'react-hook-form';
 import { ImageUpload } from '../../image-upload';
 import { Trash2, Plus } from 'lucide-react';
 
 export default function HeroTab({ register, control }: { register: any, control: any }) {
   const { fields: sliderImages, append: addSliderImage, remove: removeSliderImage } = useFieldArray({ control, name: 'sliderSection.images' as never });
-=======
-import { Controller } from 'react-hook-form';
-import { ImageUpload } from '../../image-upload';
-
-export default function HeroTab({ register, control }: { register: any, control: any }) {
->>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
   return (
     <div className="space-y-8">
       <div className="space-y-4">
