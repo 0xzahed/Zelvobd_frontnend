@@ -61,6 +61,7 @@ export const useCreateLandingPage = () => {
     mutationFn: async (data: Partial<LandingPagePayload>) => {
       const res = await adminFetch(`${BASE_URL}/landing-pages`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       const payload = await res.json();
@@ -83,6 +84,7 @@ export const useUpdateLandingPage = () => {
     mutationFn: async ({ id, data }: { id: string; data: Partial<LandingPagePayload> }) => {
       const res = await adminFetch(`${BASE_URL}/landing-pages/${id}`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       const payload = await res.json();
