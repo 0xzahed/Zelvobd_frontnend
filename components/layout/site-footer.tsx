@@ -71,9 +71,11 @@ const socialIcons: Record<string, React.ComponentType<{ className?: string }>> =
 }
 
 function mergeFooter(base: FooterSettings, patch: Partial<FooterSettings>) {
+  const logoUrl = patch.logoUrl && patch.logoUrl.trim() !== "" ? patch.logoUrl : base.logoUrl
   return {
     ...base,
     ...patch,
+    logoUrl,
     navGroups: Array.isArray(patch.navGroups) ? patch.navGroups : base.navGroups,
     socials: Array.isArray(patch.socials) ? patch.socials : base.socials,
   }
@@ -106,7 +108,7 @@ export function SiteFooter() {
             <div className="flex items-center p-1 bg-white rounded-full w-fit">
               <Link href="/" className="flex items-center gap-2">
               <Image
-                src={footer.logoUrl || "/logo.png"}
+                src="/logo.png"
                 alt={footer.brandName}
                 width={120}
                 height={32}
