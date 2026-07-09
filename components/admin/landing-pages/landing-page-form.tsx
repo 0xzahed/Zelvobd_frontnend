@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { DashPrimaryButton } from '@/dashboard/components/dash-ui';
+import { AdminPrimaryButton } from '@/components/admin/admin-ui';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -113,13 +113,9 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
         <button type="button" onClick={() => router.back()} className="w-full sm:w-auto px-4 py-2 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-center">
           Cancel
         </button>
-<<<<<<< HEAD
-        <DashPrimaryButton type="submit" disabled={isSubmitting}>
-=======
         <AdminPrimaryButton type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
->>>>>>> ab5cb7bbb22194bd51e463dd48e304a02300547d
           {isSubmitting ? 'Saving...' : 'Save Landing Page'}
-        </DashPrimaryButton>
+        </AdminPrimaryButton>
       </div>
     </form>
   );

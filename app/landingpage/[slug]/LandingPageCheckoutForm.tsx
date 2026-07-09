@@ -1,15 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { BadgeCheck } from 'lucide-react';
-import { BASE_URL } from '@/src/api/mainApi';
-import { bnDigits } from './LandingPageTemplate'; // Assuming exported or re-implemented
-=======
 import { BadgeCheck, ArrowRight } from 'lucide-react';
-import { BASE_URL } from '@/src/api/_shared/client';
+import { BASE_URL } from '@/src/api/mainApi';
 import { bnDigits } from './LandingPageTemplate';
->>>>>>> ab5cb7bbb22194bd51e463dd48e304a02300547d
 
 const convertToEnglishDigits = (str: string) => {
   const map: Record<string, string> = {

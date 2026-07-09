@@ -178,12 +178,22 @@ export default function InvoicePage() {
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "baseline", marginBottom: 14 }}>
-              <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
-                Name
-              </span>
-              <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.customerName}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
+              <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
+                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                  Name
+                </span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
+                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.customerName}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
+                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                  Consignment No
+                </span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
+                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.consignmentId || ""}</span>
+                </div>
               </div>
             </div>
 
@@ -315,6 +325,20 @@ export default function InvoicePage() {
                     ))}
               </tbody>
               <tfoot>
+                <tr>
+                  <td colSpan={3} style={{ ...CELL_STYLE, textAlign: "right", padding: "8px 15px" }}>Subtotal</td>
+                  <td style={{ ...CELL_STYLE, textAlign: "center", padding: "8px 0" }}>{formatBDT(order.subtotal)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={3} style={{ ...CELL_STYLE, textAlign: "right", padding: "8px 15px" }}>Shipping</td>
+                  <td style={{ ...CELL_STYLE, textAlign: "center", padding: "8px 0" }}>{formatBDT(order.shippingCharge)}</td>
+                </tr>
+                {Number(order.discountAmount) > 0 && (
+                  <tr>
+                    <td colSpan={3} style={{ ...CELL_STYLE, textAlign: "right", padding: "8px 15px" }}>Discount {order.promoCode ? `(${order.promoCode})` : ""}</td>
+                    <td style={{ ...CELL_STYLE, textAlign: "center", padding: "8px 0", color: "#2b4a8c" }}>-{formatBDT(order.discountAmount)}</td>
+                  </tr>
+                )}
                 <tr>
                   <td
                     colSpan={3}

@@ -25,12 +25,8 @@ import {
   Shield,
   Check,
 } from 'lucide-react';
-<<<<<<< HEAD
-import { toAbsoluteUploadUrl } from '@/src/api/mainApi';
-=======
 import * as LucideIcons from 'lucide-react';
-import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
->>>>>>> ab5cb7bbb22194bd51e463dd48e304a02300547d
+import { toAbsoluteUploadUrl } from '@/src/api/mainApi';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { SliderBanner } from '@/components/ui/slider-banner';

@@ -2,14 +2,10 @@ import { useFieldArray, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus } from 'lucide-react';
-<<<<<<< HEAD
-=======
-import { AdminPrimaryButton } from '@/components/admin/admin-ui';
 import { ImageUpload } from '../../image-upload';
 import { LucideIconPickerModal } from '../../lucide-icon-picker';
 import * as LucideIcons from 'lucide-react';
 import { useState } from 'react';
->>>>>>> ab5cb7bbb22194bd51e463dd48e304a02300547d
 
 export default function FeaturesTab({ register, control }: { register: any, control: any }) {
   const { fields: featureCards, append: addCard, remove: removeCard } = useFieldArray({ control, name: 'featureCards' });
