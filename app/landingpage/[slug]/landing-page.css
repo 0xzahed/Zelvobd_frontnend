@@ -1,11 +1,7 @@
 .landing-page-wrapper {
   background-color: var(--lp-background);
   color: var(--lp-foreground);
-<<<<<<< HEAD
   font-family: var(--font-google-sans), sans-serif;
-=======
-  font-family: var(--font-hind-siliguri), sans-serif;
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
   -webkit-font-smoothing: antialiased;
 }
 
@@ -17,11 +13,7 @@
 .landing-page-wrapper h2, 
 .landing-page-wrapper h3, 
 .landing-page-wrapper h4 {
-<<<<<<< HEAD
   font-family: var(--font-google-sans), sans-serif;
-=======
-  font-family: var(--font-hind-siliguri), sans-serif;
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -63,9 +55,5 @@
   background: var(--lp-card);
   border-radius: 1rem;
   box-shadow: var(--lp-shadow-card);
-<<<<<<< HEAD
   /* padding: 1.25rem; */
-=======
-  padding: 1.25rem;
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
 }

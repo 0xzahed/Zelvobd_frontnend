@@ -2,15 +2,10 @@
 
 import React, { useState } from 'react';
 import { BadgeCheck, ArrowRight } from 'lucide-react';
-<<<<<<< HEAD
 import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/src/api/mainApi';
 import { bnDigits } from './LandingPageTemplate';
 import { lead } from '@/lib/pixel';
-=======
-import { BASE_URL } from '@/src/api/_shared/client';
-import { bnDigits } from './LandingPageTemplate';
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
 
 const convertToEnglishDigits = (str: string) => {
   const map: Record<string, string> = {
@@ -29,14 +24,9 @@ const convertToEnglishDigits = (str: string) => {
 };
 
 export default function LandingPageCheckoutForm({ landingPage }: { landingPage: any }) {
-<<<<<<< HEAD
   const router = useRouter();
   const checkoutData = landingPage.checkoutSection || {};
   const UNIT_PRICE = Number(landingPage.heroSection?.offerPrice || checkoutData.price || 0);
-=======
-  const checkoutData = landingPage.checkoutSection || {};
-  const UNIT_PRICE = Number(checkoutData.price || 0);
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
 
   const [form, setForm] = useState({
     name: '',
@@ -67,8 +57,6 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       return;
     }
 
-    const fullAddress = `[Qty: ${form.qty}, Area: ${form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}] ${form.address}`;
-
     setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/orders/checkout-landing-page`, {
@@ -77,17 +65,11 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
         body: JSON.stringify({
           customerName: form.name,
           customerPhone: englishPhone,
-<<<<<<< HEAD
           address: form.address,
           landingPageId: landingPage.id,
           district: form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka',
           quantity: form.qty,
           price: UNIT_PRICE,
-=======
-          address: fullAddress,
-          landingPageId: landingPage.id,
-          district: form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka',
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
         }),
       });
 
@@ -112,24 +94,6 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
     }
   };
 
-<<<<<<< HEAD
-=======
-  if (submitted) {
-    return (
-      <div className='text-center py-6'>
-        <div className='mb-2 flex justify-center'>
-          <BadgeCheck size={40} style={{ color: 'var(--lp-success)' }} />
-        </div>
-        <div className='text-lg font-bold' style={{ color: 'var(--lp-navy)' }}>
-          অর্ডার গ্রহণ হয়েছে!
-        </div>
-        <p className='mt-1 text-sm opacity-80'>
-          শীঘ্রই আমাদের প্রতিনিধি {form.phone} নম্বরে কল করে অর্ডার কনফার্ম করবেন।
-        </p>
-      </div>
-    );
-  }
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
 
   return (
     <form onSubmit={handleSubmit} className='grid gap-4 text-left'>
@@ -263,11 +227,7 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       )}
 
       <div className='flex justify-center mt-2'>
-<<<<<<< HEAD
         <button type='submit' disabled={loading} className='btn-cta shiny-button w-full'>
-=======
-        <button type='submit' disabled={loading} className='btn-cta w-full'>
->>>>>>> 5e95577 (feat: Enhance Landing Page with New Features and Styles)
           {loading ? (
             'Processing...'
           ) : (
