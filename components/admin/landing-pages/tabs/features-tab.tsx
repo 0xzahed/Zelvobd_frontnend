@@ -135,10 +135,21 @@ export default function FeaturesTab({ register, control }: { register: any, cont
             <Plus className="h-4 w-4" /> Add Point
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div><Label>Caption</Label><Input {...register('bulletPointsSection.caption')} /></div>
-          <div><Label>Title</Label><Input {...register('bulletPointsSection.title')} /></div>
-          <div><Label>Subtitle</Label><Input {...register('bulletPointsSection.subtitle')} /></div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <div><Label>Caption</Label><Input {...register('bulletPointsSection.caption')} /></div>
+            <div><Label>Title</Label><Input {...register('bulletPointsSection.title')} /></div>
+            <div><Label>Subtitle</Label><Input {...register('bulletPointsSection.subtitle')} /></div>
+          </div>
+          <div>
+            <Controller
+              name="bulletPointsSection.image"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload label="Main Image" value={field.value} onChange={field.onChange} />
+              )}
+            />
+          </div>
         </div>
         <div className="space-y-2 mt-2">
           {points.map((field: any, index) => (

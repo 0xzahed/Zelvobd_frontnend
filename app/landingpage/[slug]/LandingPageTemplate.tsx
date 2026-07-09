@@ -544,27 +544,50 @@ export default function LandingPageTemplate({ data }: { data: any }) {
       {/* Bullet Points */}
       {bullets.points && bullets.points.length > 0 && bullets.points[0]?.value && (
         <section className='py-3'>
-          <div className='mx-auto max-w-3xl px-4 flex flex-col items-center text-center'>
-            {bullets.caption && <Pill>{bullets.caption}</Pill>}
-            {bullets.title && (
-              <h2
-                className='mt-2 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight'
-                style={{ color: 'var(--lp-navy)' }}
-              >
-                {bullets.title}
-              </h2>
-            )}
-            {bullets.subtitle && (
-              <p className='mt-2 text-sm sm:text-base opacity-80 max-w-2xl'>{bullets.subtitle}</p>
+          <div className='mx-auto max-w-3xl px-4 text-center flex flex-col items-center'>
+            
+            {/* The Image */}
+            {bullets.image && (
+              <div className='rounded-2xl overflow-hidden bg-white w-full max-w-xl' style={{ boxShadow: 'var(--lp-shadow-card)' }}>
+                <img 
+                  src={toAbsoluteUploadUrl(bullets.image)} 
+                  alt={bullets.title || 'Feature Image'} 
+                  width={1024} 
+                  height={1024} 
+                  loading="lazy" 
+                  className="w-full h-auto object-cover" 
+                />
+              </div>
             )}
 
-            <ul className='mt-3 space-y-1.5 text-sm sm:text-base inline-block text-left'>
-              {bullets.points.map((pt: any, idx: number) => (
-                <li key={idx} className='flex gap-2 font-medium'>
-                  <span style={{ color: 'var(--lp-success)' }}>✔</span> {pt.value}
-                </li>
-              ))}
-            </ul>
+            {/* The Text Block */}
+            <div className={`${bullets.image ? 'mt-5' : ''} flex flex-col items-center`}>
+              {bullets.caption && <Pill>{bullets.caption}</Pill>}
+              
+              {bullets.title && (
+                <h2
+                  className='mt-2 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight'
+                  style={{ color: 'var(--lp-navy)' }}
+                >
+                  {bullets.title}
+                </h2>
+              )}
+              
+              {bullets.subtitle && (
+                <p className='mt-2 text-sm sm:text-base opacity-80 max-w-2xl'>
+                  {bullets.subtitle}
+                </p>
+              )}
+
+              <ul className='mt-3 space-y-1.5 text-sm sm:text-base inline-block text-left'>
+                {bullets.points.map((pt: any, idx: number) => (
+                  <li key={idx} className='flex gap-2 font-medium'>
+                    <span style={{ color: 'var(--lp-success)' }}>✔</span> {pt.value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </section>
       )}
