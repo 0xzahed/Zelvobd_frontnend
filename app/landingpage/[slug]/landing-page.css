@@ -55,5 +55,5 @@
   background: var(--lp-card);
   border-radius: 1rem;
   box-shadow: var(--lp-shadow-card);
-  padding: 1.25rem;
+  /* padding: 1.25rem; */
 }

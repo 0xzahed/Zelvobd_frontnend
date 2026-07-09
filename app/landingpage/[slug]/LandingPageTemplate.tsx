@@ -327,6 +327,11 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                 </span>
               </div>
             )}
+            {hero.regularPrice && hero.offerPrice && Number(hero.regularPrice) > Number(hero.offerPrice) && (
+              <p className='text-sm font-semibold' style={{ color: 'var(--lp-success)' }}>
+                সাশ্রয় {bnDigits(Number(hero.regularPrice) - Number(hero.offerPrice))}৳ + ফ্রি ডেলিভারি
+              </p>
+            )}
             <div className='mt-1'>
               <CtaButton>{hero.buttonText || 'অর্ডার করুন'}</CtaButton>
             </div>
@@ -347,21 +352,15 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                   return (
                     <li
                       key={i}
-                      className='grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 sm:px-5 sm:py-3'
+                      className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 sm:px-5'
                     >
-                      <span
-                        className='shrink-0 w-9 h-9 rounded-full grid place-items-center'
-                        style={{ backgroundColor: 'var(--lp-highlight)', color: 'var(--lp-cta)' }}
-                      >
-                        <IconC size={18} />
-                      </span>
-                      <div className='min-w-0'>
-                        <div
-                          className='font-semibold text-sm sm:text-base truncate'
+                      <div className='min-w-0 flex items-center gap-2'>
+                        <span
+                          className='text-sm sm:text-base truncate'
                           style={{ color: 'var(--lp-navy)' }}
                         >
                           {row.key}
-                        </div>
+                        </span>
                       </div>
                       <span
                         className='shrink-0 text-sm font-bold'
