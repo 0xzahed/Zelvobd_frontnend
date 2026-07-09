@@ -5,6 +5,7 @@ import { UploadCloud, X, Loader2 } from 'lucide-react';
 import { adminFetch } from '@/src/api/_shared/adminFetch';
 import { BASE_URL } from '@/src/api/_shared/client';
 import { notify } from '@/lib/notify';
+import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 
 export function ImageUpload({ 
   value, 
@@ -46,7 +47,7 @@ export function ImageUpload({
       {label && <label className="text-sm font-semibold">{label}</label>}
       {value ? (
         <div className="relative overflow-hidden rounded-md border w-full max-w-sm bg-black/5">
-           <img src={value.startsWith('http') ? value : `http://localhost:5000${value}`} alt="Uploaded" className="w-full h-auto object-contain max-h-48" />
+           <img src={toAbsoluteUploadUrl(value)} alt="Uploaded" className="w-full h-auto object-contain max-h-48" />
            <button
              type="button"
              onClick={() => onChange('')}
