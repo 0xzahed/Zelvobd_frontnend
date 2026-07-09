@@ -11,6 +11,7 @@ import {
   FolderTree,
   Gauge,
   LayoutDashboard,
+  LayoutTemplate,
   LogOut,
   Menu,
   MessageSquare,
@@ -68,6 +69,7 @@ const MENU: NavItem[] = [
   { section: 'Marketing', label: 'YouTube Videos', icon: Youtube, href: '/admin/youtube' },
   { section: 'Marketing', label: 'Promos', icon: CircleDollarSign, href: '/admin/promos' },
   { section: 'Marketing', label: 'Flash Sale', icon: Gauge, href: '/admin/flash-sale' },
+  { section: 'Marketing', label: 'Landing Pages', icon: LayoutTemplate, href: '/admin/landing-pages' },
   {
     section: 'Sales',
     label: 'Orders',
