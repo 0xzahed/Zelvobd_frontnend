@@ -23,7 +23,7 @@ const convertToEnglishDigits = (str: string) => {
 
 export default function LandingPageCheckoutForm({ landingPage }: { landingPage: any }) {
   const checkoutData = landingPage.checkoutSection || {};
-  const UNIT_PRICE = Number(checkoutData.price || 0);
+  const UNIT_PRICE = Number(landingPage.heroSection?.offerPrice || checkoutData.price || 0);
 
   const [form, setForm] = useState({
     name: '',
@@ -54,8 +54,6 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       return;
     }
 
-    const fullAddress = `[Qty: ${form.qty}, Area: ${form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}] ${form.address}`;
-
     setLoading(true);
     try {
       const res = await fetch(`${BASE_URL}/orders/checkout-landing-page`, {
@@ -64,9 +62,11 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
         body: JSON.stringify({
           customerName: form.name,
           customerPhone: englishPhone,
-          address: fullAddress,
+          address: form.address,
           landingPageId: landingPage.id,
           district: form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka',
+          quantity: form.qty,
+          price: UNIT_PRICE,
         }),
       });
 
