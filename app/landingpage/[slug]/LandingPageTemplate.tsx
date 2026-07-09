@@ -608,7 +608,10 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                   className='shrink-0 w-10 h-10 rounded-full bg-white/70 grid place-items-center'
                   style={{ color: 'var(--lp-cta)' }}
                 >
-                  <Lightbulb size={22} />
+                  {(() => {
+                    const TipIcon = tips.icon ? ((LucideIcons as any)[tips.icon] || Lightbulb) : Lightbulb;
+                    return <TipIcon size={22} />;
+                  })()}
                 </span>
                 <div className='min-w-0'>
                   <h3 className='font-bold text-lg' style={{ color: 'var(--lp-navy)' }}>

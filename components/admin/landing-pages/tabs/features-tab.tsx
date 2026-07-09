@@ -163,6 +163,43 @@ export default function FeaturesTab({ register, control }: { register: any, cont
         </div>
       </div>
 
+      {/* Secret Care Tip Section */}
+      <div className="space-y-4 pt-4 border-t">
+        <h3 className="text-lg font-semibold">Secret Care Tip (Optional)</h3>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-2">
+            <Label>Icon</Label>
+            <Controller
+              name="tipsSection.icon"
+              control={control}
+              render={({ field }) => {
+                const IconC = field.value ? (LucideIcons as any)[field.value] : null;
+                return (
+                  <div className="flex items-center mt-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIconPickerOpenFor({ name: field.name, onChange: field.onChange })}
+                      className="p-2 border rounded-md hover:bg-gray-50 flex items-center justify-center min-w-10 min-h-10"
+                    >
+                      {IconC ? <IconC className="w-5 h-5" /> : <div className="text-xs">Pick</div>}
+                    </button>
+                    <Input {...field} className="hidden" />
+                  </div>
+                )
+              }}
+            />
+          </div>
+          <div className="col-span-5">
+            <Label>Title</Label>
+            <Input {...register('tipsSection.title')} placeholder="e.g. দীর্ঘদিন ভালো রাখার ১টি গোপন টিপস!" className="mt-1" />
+          </div>
+          <div className="col-span-5">
+            <Label>Description</Label>
+            <Input {...register('tipsSection.subtitle')} placeholder="Description..." className="mt-1" />
+          </div>
+        </div>
+      </div>
+
       {iconPickerOpenFor && (
         <LucideIconPickerModal
           isOpen={true}

@@ -34,7 +34,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
       timerSection: { targetDateTime: '' },
       videoSection: { caption: '', videoLink: '', customThumbnail: '', cards: [{ icon: 'check', title: '', subtitle: '' }] },
       bulletPointsSection: { image: '', caption: '', title: '', subtitle: '', points: [''] },
-      tipsSection: { title: '', subtitle: '' },
+      tipsSection: { icon: 'lightbulb', title: '', subtitle: '' },
       checkoutSection: { caption: '', title: '', subtitle: '', productName: '', subName: '', price: '', deliveryText: 'Cash on Delivery' },
       faqSection: { caption: '', title: '', qas: [{ question: '', answer: '' }] },
       whatsappSection: { phoneNumber: '', prefilledMessage: '' }
