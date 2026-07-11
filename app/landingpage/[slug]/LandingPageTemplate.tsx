@@ -181,7 +181,7 @@ function useCountdown(targetDateTimeStr?: string) {
 function CtaButton({ children, href = '#order' }: { children: React.ReactNode; href?: string }) {
   return (
     <div className='w-full flex justify-center'>
-      <a href={href} className='btn-cta'>
+      <a href={href} className='btn-cta shiny-button'>
         {children} <ArrowRight size={20} />
       </a>
     </div>
@@ -765,7 +765,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           </div>
         </div>
         <div className='flex justify-center'>
-          <a href='#order' className='btn-cta py-2! px-3! text-sm'>
+          <a href='#order' className='btn-cta shiny-button py-2! px-3! text-sm'>
             অর্ডার করুন <ArrowRight size={16} />
           </a>
         </div>

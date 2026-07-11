@@ -231,7 +231,7 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       )}
 
       <div className='flex justify-center mt-2'>
-        <button type='submit' disabled={loading} className='btn-cta w-full'>
+        <button type='submit' disabled={loading} className='btn-cta shiny-button w-full'>
           {loading ? (
             'Processing...'
           ) : (
