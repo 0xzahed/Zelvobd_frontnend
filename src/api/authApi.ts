@@ -1,4 +1,4 @@
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { BASE_URL, authHeaders } from "@/src/api/mainApi"
 
 type AuthPayload = Record<string, unknown>
 

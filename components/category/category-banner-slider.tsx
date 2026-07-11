@@ -1,7 +1,7 @@
 'use client';
 
 import type { CategoryBanner } from '@/lib/types';
-import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
+import { toAbsoluteUploadUrl } from '@/src/api/mainApi';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Autoplay, Pagination } from 'swiper/modules';

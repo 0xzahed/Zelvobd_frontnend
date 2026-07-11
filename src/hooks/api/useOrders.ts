@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { getOrders, updateOrderStatus, deleteOrder } from "@/src/api/orderApi"
 
 export const ORDER_KEYS = {
   all: ["orders"] as const,
@@ -59,61 +58,6 @@ export type GetOrdersParams = {
   limit?: number
   search?: string
   status?: OrderStatus | ""
-}
-
-const getOrders = async (params: GetOrdersParams) => {
-  const url = new URL(`${BASE_URL}/orders`)
-  if (params.page) url.searchParams.append("page", params.page.toString())
-  if (params.limit) url.searchParams.append("limit", params.limit.toString())
-  if (params.search) url.searchParams.append("search", params.search)
-  if (params.status) url.searchParams.append("status", params.status)
-
-  const response = await adminFetch(url.toString(), {
-    method: "GET",
-    headers: { ...authHeaders() },
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload.data as {
-    meta: { page: number; limit: number; total: number; totalPage: number }
-    orders: Order[]
-  }
-}
-
-const updateOrderStatus = async (id: string, status: OrderStatus) => {
-  const response = await adminFetch(`${BASE_URL}/orders/${id}/status`, {
-    method: "PATCH",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload.data as Order
-}
-
-const deleteOrder = async (id: string) => {
-  const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
-    method: "DELETE",
-    headers: { ...authHeaders() },
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
 }
 
 export function useOrders(params: GetOrdersParams) {

@@ -1,332 +1,225 @@
 "use client"
 
-import { useEffect, useState, type FormEvent } from "react"
-import { Pencil, Plus, Trash2, X } from "lucide-react"
-import { createAdmin, deleteAdmin, getAdmins, updateAdmin } from "@/src/api/adminApi"
-import { notify } from "@/lib/notify"
+import { useMemo, useState } from "react"
+import { Plus, ShieldCheck, Trash2, EyeOff, Eye } from "lucide-react"
+import type { Admin } from "@/lib/types"
 import { useConfirm } from "@/components/ui/confirm-dialog"
-import { useAuth } from "@/contexts/auth-context"
-import { handleApiError } from "@/lib/api-utils"
-import {
-  AdminPage,
-  AdminPageHeader,
-  AdminPrimaryButton,
-} from "@/components/admin/admin-ui"
-
-type AdminUser = {
-  id: string
-  email: string
-  active: boolean
-  createdAt: string
-}
-
-type BackendAdmin = {
-  id: string
-  email: string
-  isActive: boolean
-  createdAt: string
-}
-
-function useEscapeToClose(open: boolean, onClose: () => void) {
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-    document.addEventListener("keydown", onKey)
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.removeEventListener("keydown", onKey)
-      document.body.style.overflow = ""
-    }
-  }, [open, onClose])
-}
-
-type FormState = {
-  id: string | null
-  email: string
-  password: string
-  active: boolean
-}
-
-const emptyForm: FormState = {
-  id: null,
-  email: "",
-  password: "",
-  active: true,
-}
-
-export default function AdminsPage() {
-  const { admin: currentAdmin } = useAuth()
+import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin } from "@/src/hooks/api/useAdmins"
+import { DashPage, DashHeader, DashPanel, DashLoading, DashEmptyState } from "@/dashboard/components/dash-ui"
+export default function DashboardAdminsPage() {
+  const { data: admins = [], isLoading } = useAdmins()
+  const createMutation = useCreateAdmin()
+  const updateMutation = useUpdateAdmin()
+  const deleteMutation = useDeleteAdmin()
   const confirm = useConfirm()
-  const [admins, setAdmins] = useState<AdminUser[]>([])
-  const [open, setOpen] = useState(false)
-  const [form, setForm] = useState<FormState>(emptyForm)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
-  useEscapeToClose(open, () => setOpen(false))
+  const [showModal, setShowModal] = useState(false)
+  const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [isActive, setIsActive] = useState(true)
 
-  const loadAdmins = async () => {
-    try {
-      setLoading(true)
-      const res = await getAdmins()
-      const list: BackendAdmin[] = Array.isArray(res?.data) ? res.data : []
+  const openCreate = () => {
+    setEditingAdmin(null)
+    setEmail("")
+    setPassword("")
+    setIsActive(true)
+    setShowModal(true)
+  }
 
-      setAdmins(
-        list.map((adminItem) => {
-          return {
-            id: adminItem.id,
-            email: adminItem.email,
-            active: Boolean(adminItem.isActive),
-            createdAt: String(adminItem.createdAt || "").slice(0, 10),
-          }
-        }),
-      )
-    } catch (error) {
-      handleApiError(error, "Failed to load admins")
-    } finally {
-      setLoading(false)
+  const openEdit = (admin: Admin) => {
+    setEditingAdmin(admin)
+    setEmail(admin.email)
+    setPassword("")
+    setIsActive(admin.isActive)
+    setShowModal(true)
+  }
+
+  const handleSave = async () => {
+    if (editingAdmin) {
+      const body: { email: string; password?: string; isActive: boolean } = { email, isActive }
+      if (password.trim()) body.password = password.trim()
+      await updateMutation.mutateAsync({ id: editingAdmin.id, ...body })
+    } else {
+      if (!password.trim()) return
+      await createMutation.mutateAsync({ email, password: password.trim() })
     }
+    setShowModal(false)
   }
 
-  useEffect(() => {
-    void loadAdmins()
-  }, [currentAdmin?.id])
-
-  const openAdd = () => {
-    setForm(emptyForm)
-    setOpen(true)
-  }
-
-  const openEdit = (a: AdminUser) => {
-    setForm({
-      id: a.id,
-      email: a.email,
-      password: "",
-      active: a.active,
-    })
-    setOpen(true)
-  }
-
-  const onSave = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!form.email.trim()) return
-    if (!form.id && !form.password.trim()) return
-
-    try {
-      setSaving(true)
-      if (form.id) {
-        const payload: { email: string; isActive: boolean; password?: string } = {
-          email: form.email.trim(),
-          isActive: form.active,
-        }
-        if (form.password.trim()) {
-          payload.password = form.password.trim()
-        }
-        await updateAdmin(form.id, payload)
-        notify.success({ title: "Admin updated", message: "Changes saved successfully." })
-      } else {
-        await createAdmin({
-          email: form.email.trim(),
-          password: form.password.trim(),
-          isActive: form.active,
-        })
-        notify.success({ title: "Admin created", message: "New admin added successfully." })
-      }
-      await loadAdmins()
-      setOpen(false)
-    } catch (error) {
-      handleApiError(error, "Save failed")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const onDelete = async (id: string) => {
-    if (id === currentAdmin?.id) {
-      notify.error({
-        title: "Action not allowed",
-        message: "You cannot delete the currently logged-in admin.",
-      })
-      return
-    }
-
-    const target = admins.find((a) => a.id === id)
+  const handleDelete = async (admin: Admin) => {
     const ok = await confirm({
-      title: "Remove this admin?",
-      message: target
-        ? `Are you sure you want to remove "${target.email}"? This action cannot be undone.`
-        : "Are you sure you want to remove this admin? This action cannot be undone.",
-      confirmText: "Remove",
+      title: "Delete Admin",
+      message: `Are you sure you want to delete admin "${admin.email}"?`,
+      confirmText: "Delete",
+      cancelText: "Cancel",
       variant: "danger",
     })
-    if (ok) {
-      try {
-        await deleteAdmin(id)
-        notify.success({ title: "Admin deleted", message: "Admin removed successfully." })
-        await loadAdmins()
-      } catch (error) {
-        handleApiError(error, "Delete failed")
-      }
-    }
+    if (ok) deleteMutation.mutate(admin.id)
   }
 
-  const toggleActive = async (id: string) => {
-    if (id === currentAdmin?.id) {
-      notify.error({
-        title: "Action not allowed",
-        message: "You cannot deactivate the currently logged-in admin.",
-      })
-      return
-    }
+  const isPending = createMutation.isPending || updateMutation.isPending
 
-    const target = admins.find((a) => a.id === id)
-    if (!target) return
-    try {
-      await updateAdmin(id, { isActive: !target.active })
-      await loadAdmins()
-    } catch (error) {
-      handleApiError(error, "Status update failed")
-    }
+  if (isLoading) {
+    return (
+      <DashPage>
+        <DashHeader title="Admins" subtitle="Manage admin users" />
+        <DashLoading label="Loading admins..." />
+      </DashPage>
+    )
   }
 
   return (
-    <AdminPage>
-      <AdminPageHeader
+    <DashPage>
+      <DashHeader
         title="Admins"
-        count={`${admins.length} total`}
+        subtitle="Manage admin users"
         actions={
-          <AdminPrimaryButton onClick={openAdd}>
-            <Plus className="h-4 w-4" /> Add Admin
-          </AdminPrimaryButton>
+          <button
+            onClick={openCreate}
+            className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 active:scale-[0.98]"
+          >
+            <Plus className="h-4 w-4" />
+            Add Admin
+          </button>
         }
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {!loading && admins.map((a) => (
-          <div key={a.id} className="flex flex-col rounded-[8px] border border-border/40 bg-card p-4 shadow-sm min-h-[120px]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-foreground">{a.email}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{a.createdAt}</p>
-              </div>
-              <button
-                onClick={() => toggleActive(a.id)}
-                className={
-                  a.active
-                    ? "inline-flex shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success"
-                    : "inline-flex shrink-0 rounded-full bg-muted-foreground/10 px-2 py-0.5 text-xs font-semibold text-muted-foreground"
-                }
-              >
-                {a.active ? "Active" : "Inactive"}
-              </button>
-            </div>
-            <div className="mt-3 flex flex-nowrap gap-1.5">
-              <button
-                onClick={() => openEdit(a)}
-                aria-label="Edit"
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => onDelete(a.id)}
-                aria-label="Delete"
-                disabled={a.id === currentAdmin?.id}
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-40"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
+      {admins.length === 0 ? (
+        <DashEmptyState icon={ShieldCheck} title="No admins found" description="Add your first admin user to get started." />
+      ) : (
+        <DashPanel noPadding>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-surface/50 text-muted-foreground">
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Email</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Status</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Created</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Updated</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map((admin) => (
+                  <tr key={admin.id} className="border-b border-border/30 transition hover:bg-surface/50">
+                    <td className="px-5 py-3.5 font-medium text-foreground">{admin.email}</td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${
+                          admin.isActive
+                            ? "bg-emerald-50 text-emerald-600"
+                            : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {admin.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{new Date(admin.createdAt).toLocaleDateString("en-GB")}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{new Date(admin.updatedAt).toLocaleDateString("en-GB")}</td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => openEdit(admin)}
+                          className="grid h-8 w-8 place-items-center rounded-md text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                          title="Edit"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(admin)}
+                          disabled={deleteMutation.isPending}
+                          className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-        {!loading && admins.length === 0 && (
-          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
-            No admins yet.
-          </div>
-        )}
-        {loading && (
-          <div className="col-span-full rounded-[8px] border border-border/40 bg-card p-10 text-center text-sm text-muted-foreground">
-            Loading admins...
-          </div>
-        )}
-      </div>
+        </DashPanel>
+      )}
 
-      {open && (
+      {/* Create/Edit Modal */}
+      {showModal && (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4"
-          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setShowModal(false)}
         >
-          <div
-            className="w-full max-w-md overflow-hidden rounded-lg bg-card shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-border px-5 py-3">
-              <h3 className="text-base font-bold text-foreground">
-                {form.id ? "Edit Admin" : "Add Admin"}
-              </h3>
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-foreground">{editingAdmin ? "Edit Admin" : "Add Admin"}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {editingAdmin ? "Update admin user details." : "Create a new admin user."}
+            </p>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-foreground">Email</label>
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="admin@example.com"
+                  className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-foreground">
+                  Password {editingAdmin && <span className="font-normal text-muted-foreground">(leave blank to keep current)</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    type={showPassword ? "text" : "password"}
+                    placeholder={editingAdmin ? "New password..." : "Min 8 characters"}
+                    className="h-10 w-full rounded-lg border border-border/60 bg-surface pr-10 pl-3 text-sm text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((p) => !p)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none"
+                  style={{ backgroundColor: isActive ? "#22c55e" : "#d1d5db" }}
+                  onClick={() => setIsActive((p) => !p)}
+                >
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${isActive ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
+                </div>
+                <label className="text-sm text-foreground cursor-pointer select-none" onClick={() => setIsActive((p) => !p)}>Active</label>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
               <button
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-                className="grid h-8 w-8 place-items-center rounded-full hover:bg-secondary"
+                onClick={() => setShowModal(false)}
+                className="inline-flex h-10 items-center rounded-lg border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:bg-secondary"
               >
-                <X className="h-4 w-4" />
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!email.trim() || (!editingAdmin && !password.trim()) || isPending}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+              >
+                {isPending ? "Saving..." : editingAdmin ? "Update" : "Create"}
               </button>
             </div>
-            <form onSubmit={onSave} className="space-y-4 p-5">
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-foreground">Email</label>
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm cursor-text caret-current"
-                  placeholder="admin@example.com"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-foreground">
-                  Password {form.id && <span className="text-muted-foreground">(leave blank to keep)</span>}
-                </label>
-                <input
-                  type="password"
-                  required={!form.id}
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm cursor-text caret-current"
-                  placeholder="••••••••"
-                />
-              </div>
-              <label className="flex items-center gap-2 text-sm text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={form.active}
-                      onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
-                    />
-                Active
-                </label>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-foreground"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
-                >
-                  {saving ? "Saving..." : form.id ? "Save Changes" : "Add Admin"}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
-    </AdminPage>
+    </DashPage>
   )
 }

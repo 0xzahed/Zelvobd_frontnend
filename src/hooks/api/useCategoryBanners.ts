@@ -1,8 +1,7 @@
 import { handleApiError } from '@/lib/api-utils';
 import { notify } from '@/lib/notify';
 import type { CategoryBanner } from '@/lib/types';
-import { adminFetch } from '@/src/api/_shared/adminFetch';
-import { BASE_URL } from '@/src/api/_shared/client';
+import { adminFetch, BASE_URL } from '@/src/api/mainApi';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCategoryBanners() {

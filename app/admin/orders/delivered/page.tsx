@@ -1,12 +1,5 @@
-import { OrderList } from "@/components/admin/order-list"
+import { OrderList } from "@/dashboard/components/order-list"
 
 export default function DeliveredOrdersPage() {
-  return (
-    <OrderList
-      title="Delivered Orders"
-      description="Successfully delivered orders"
-      defaultStatus="DELIVERED"
-      lockStatus
-    />
-  )
+  return <OrderList status="DELIVERED" title="Delivered Orders" subtitle="Successfully delivered orders" />
 }

@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react"
 import { AppShell } from "@/components/layout/app-shell"
+import { CategoriesListSkeleton } from "@/components/ui/skeletons/categories-list-skeleton"
 import { useCategories } from "@/lib/use-store-data"
 
 export default function MorePage() {
@@ -36,6 +37,7 @@ export default function MorePage() {
         <h1 className="text-xl font-bold text-foreground md:text-2xl">More</h1>
 
         {/* Categories */}
+        {!loaded && <CategoriesListSkeleton />}
         {loaded && categories.length > 0 && (
           <div className="overflow-hidden rounded-2xl border border-border bg-card">
             {categories.map((cat) => {

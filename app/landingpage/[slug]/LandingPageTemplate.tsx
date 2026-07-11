@@ -25,7 +25,7 @@ import {
   Shield,
   Check,
 } from 'lucide-react';
-import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
+import { toAbsoluteUploadUrl } from '@/src/api/mainApi';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 import './landing-page.css';
 

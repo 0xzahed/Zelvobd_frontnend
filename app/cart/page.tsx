@@ -9,10 +9,10 @@ import { formatBDT } from '@/lib/format';
 import { notify } from '@/lib/notify';
 import { initiateCheckout, purchase } from '@/lib/pixel';
 import type { Product } from '@/lib/types';
-import { mapProduct } from '@/src/api/_shared/mappers';
-import { placeOrderAPI } from '@/src/api/orders/placeOrder';
-import { getProductDetails } from '@/src/api/products/getProductDetails';
-import { applyPromoAPI } from '@/src/api/promo/applyPromo';
+import { mapProduct } from '@/src/api/mainApi';
+import { placeOrderAPI } from '@/src/api/orderApi';
+import { getProductDetails } from '@/src/api/productApi';
+import { applyPromoAPI } from '@/src/api/promoApi';
 import { useProducts } from '@/src/hooks/api/useProducts';
 import {
   ArrowLeft,
@@ -378,6 +378,10 @@ export default function CartPage() {
         union: null,
         orderNotes: form.notes || null,
         promoCode: appliedPromo?.code || null,
+        subtotal,
+        shippingCharge: shippingTax,
+        discountAmount,
+        total,
         items: selectedEnriched.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,

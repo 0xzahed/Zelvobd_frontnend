@@ -1,298 +1,347 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Copy, Eye, Pencil, Plus, Trash2, X } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
-import type { Product } from "@/lib/types"
+import { Plus, Search, Eye, Pencil, Trash2, Copy } from "lucide-react"
+import { useProducts, useDeleteProduct, useCopyProduct, useToggleProductField } from "@/src/hooks/api/useProducts"
+import { useCategories } from "@/src/hooks/api/useCategories"
 import { formatBDT, cx } from "@/lib/format"
 import { useConfirm } from "@/components/ui/confirm-dialog"
-import {
-  useProducts,
-  useDeleteProduct,
-  useCopyProduct,
-  useCreateProduct,
-  useToggleProductField,
-} from "@/src/hooks/api/useProducts"
-import { ProductForm } from "@/components/admin/product-form"
-import { ProductViewDialog } from "@/components/admin/product-view-dialog"
-import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
-import {
-  AdminLoadingState,
-  AdminPage,
-  AdminPageHeader,
-  AdminPrimaryButton,
-  AdminSearchInput,
-  AdminToolbar,
-} from "@/components/admin/admin-ui"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
+import { DashPage, DashHeader, DashPanel, DashLoading } from "@/dashboard/components/dash-ui"
+import { ViewToggle, type ViewMode } from "@/dashboard/components/view-toggle"
+import type { Product } from "@/lib/types"
+import { ProductModal } from "./product-modal"
 
-export default function AdminProductsPage() {
-  const { data: products = [], isLoading } = useProducts()
+export default function DashboardProductsPage() {
+  const { data: products = [], isLoading } = useProducts({ limit: 1000 })
+  const { data: categories = [] } = useCategories()
   const deleteMutation = useDeleteProduct()
   const copyMutation = useCopyProduct()
-  const createMutation = useCreateProduct()
   const toggleMutation = useToggleProductField()
   const confirm = useConfirm()
 
   const [q, setQ] = useState("")
-  const [addOpen, setAddOpen] = useState(false)
-  const [viewProductId, setViewProductId] = useState<string | null>(null)
-  const [editProductId, setEditProductId] = useState<string | null>(null)
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [stockFilter, setStockFilter] = useState("all")
+  const [page, setPage] = useState(1)
+  const [view, setView] = useState<ViewMode>("table")
+  const [showModal, setShowModal] = useState(false)
+  const [editProduct, setEditProduct] = useState<Product | null>(null)
+  const rowsPerPage = 10
+
+  const openAdd = () => {
+    setEditProduct(null)
+    setShowModal(true)
+  }
+
+  const openEdit = (p: Product) => {
+    setEditProduct(p)
+    setShowModal(true)
+  }
 
   const handleDelete = async (p: Product) => {
     const ok = await confirm({
       title: "Delete product?",
-      message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
+      message: `Are you sure you want to delete "${p.name}"?`,
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) {
-      deleteMutation.mutate(p.id)
-    }
-  }
-
-  const handleCopy = (id: string) => {
-    copyMutation.mutate(id)
+    if (ok) deleteMutation.mutate(p.id)
   }
 
   const handleToggle = (id: string, field: "stock" | "availability", value: boolean) => {
     toggleMutation.mutate({ id, field, value })
   }
 
-  const handleCreate = (
-    product: Product,
-    descriptionDelta: any,
-    extraDescriptionDelta: any,
-    categoryId: string,
-    subCategoryId: string,
-  ) => {
-    createMutation.mutate(
-      {
-        product,
-        descriptionDelta,
-        extraDescriptionDelta,
-        categoryId,
-        subCategoryId,
-      },
-      {
-        onSuccess: () => {
-          setAddOpen(false)
-        },
-      },
+  const filtered = useMemo(() => {
+    let list = [...products]
+    const lc = q.toLowerCase().trim()
+    if (lc) {
+      list = list.filter((p: any) => p.name.toLowerCase().includes(lc) || (p.brand || "").toLowerCase().includes(lc))
+    }
+    if (categoryFilter !== "all") {
+      list = list.filter((p: any) => p.categoryId === categoryFilter || p.categorySlug === categoryFilter)
+    }
+    if (stockFilter === "in") list = list.filter((p: any) => p.stock)
+    if (stockFilter === "out") list = list.filter((p: any) => !p.stock)
+    return list
+  }, [products, q, categoryFilter, stockFilter])
+
+  const paginated = useMemo(() => {
+    const start = (page - 1) * rowsPerPage
+    return filtered.slice(start, start + rowsPerPage)
+  }, [filtered, page])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage))
+
+  if (isLoading) {
+    return (
+      <DashPage>
+        <DashHeader title="Products List" subtitle="Track your store's progress to boost your sales." />
+        <DashLoading label="Loading products..." />
+      </DashPage>
     )
   }
 
-  const filtered = useMemo(() => {
-    const lc = q.toLowerCase().trim()
-    if (!lc) return products
-    return products.filter(
-      (p: any) =>
-        p.name.toLowerCase().includes(lc) || (p.brand || "").toLowerCase().includes(lc),
-    )
-  }, [products, q])
-
   return (
-    <AdminPage>
-      <AdminPageHeader
-        title="Products"
-        count={`${products.length} total`}
+    <DashPage>
+      <DashHeader
+        title="Products List"
+        subtitle="Track your store's progress to boost your sales."
         actions={
-          <AdminToolbar>
-            <AdminSearchInput
-              value={q}
-              onChange={setQ}
-              placeholder="Search products..."
-            />
-            <AdminPrimaryButton onClick={() => setAddOpen(true)}>
-              <Plus className="h-4 w-4" />
-              <span className="md:hidden">Add</span>
-              <span className="hidden md:inline">Add Product</span>
-            </AdminPrimaryButton>
-          </AdminToolbar>
+          <button onClick={openAdd} className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90">
+            <Plus className="h-3.5 w-3.5" />
+            Add Product
+          </button>
         }
       />
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent
-          showCloseButton={false}
-          className="flex h-dvh w-screen max-w-[100vw]! flex-col overflow-hidden rounded-none border-0 p-0 sm:h-auto sm:max-h-[85dvh] sm:max-w-5xl! sm:rounded-2xl sm:border sm:border-border/60 sm:p-6 sm:shadow-2xl"
-          onInteractOutside={(e) => e.preventDefault()}
-        >
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 sm:py-4">
-            <DialogHeader className="text-left">
-              <DialogTitle className="text-lg font-bold sm:text-xl">New Product</DialogTitle>
-              <DialogDescription className="hidden text-sm sm:block">Add a new product to the catalog.</DialogDescription>
-            </DialogHeader>
-            <DialogClose
-              aria-label="Close"
-              className="grid h-9 w-9 place-items-center rounded-full bg-muted/40 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-            </DialogClose>
-          </div>
-          <div className="no-scrollbar flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-0 sm:pt-6">
-            <ProductForm
-              onSave={handleCreate}
-              onCancel={() => setAddOpen(false)}
-              isSaving={createMutation.isPending}
-              variant="plain"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Filters */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex h-10 min-w-0 max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search..."
+            className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="h-10 rounded-lg border border-border/60 bg-card px-3 text-sm text-foreground outline-none"
+          >
+            <option value="all">All Categories</option>
+            {categories.map((c: any) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={stockFilter}
+            onChange={(e) => setStockFilter(e.target.value)}
+            className="h-10 rounded-lg border border-border/60 bg-card px-3 text-sm text-foreground outline-none"
+          >
+            <option value="all">All Stock</option>
+            <option value="in">In Stock</option>
+            <option value="out">Out of Stock</option>
+          </select>
+          <ViewToggle mode={view} onChange={setView} />
+        </div>
+      </div>
 
-      <ProductViewDialog
-        productId={viewProductId}
-        open={Boolean(viewProductId)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setViewProductId(null)
-          }
-        }}
-      />
-
-      <ProductEditDialog
-        productId={editProductId}
-        open={Boolean(editProductId)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setEditProductId(null)
-          }
-        }}
-      />
-
-      {/* Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {isLoading && (
-          <div className="col-span-full rounded-xl border border-border/70 bg-card">
-            <AdminLoadingState label="Loading products..." />
+      {view === "table" ? (
+        <DashPanel noPadding>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-surface/50 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <th className="px-5 py-3">Products</th>
+                  <th className="px-5 py-3">Category</th>
+                  <th className="px-5 py-3">Brand</th>
+                  <th className="px-5 py-3">Price</th>
+                  <th className="px-5 py-3">Stock</th>
+                  <th className="px-5 py-3">Created At</th>
+                  <th className="px-5 py-3"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-12 text-center text-sm text-muted-foreground">
+                      No products found.
+                    </td>
+                  </tr>
+                )}
+                {paginated.map((p: any) => (
+                  <tr key={p.id} className="border-b border-border/30 transition hover:bg-surface/50">
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border/40 bg-surface">
+                          <Image
+                            src={p.images?.[0] || "/placeholder.svg"}
+                            alt={p.name}
+                            fill
+                            className="object-contain p-1"
+                            unoptimized
+                          />
+                        </div>
+                        <span className="font-medium text-foreground">{p.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{p.categoryName || p.categorySlug || "-"}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{p.brand || "-"}</td>
+                    <td className="px-5 py-3.5 font-medium text-foreground">{formatBDT(p.price || 0)}</td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={cx(
+                          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                          p.stock ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600",
+                        )}
+                      >
+                        {p.stock ? "In Stock" : "Out of Stock"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-muted-foreground">
+                      {p.createdAt
+                        ? new Date(p.createdAt).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })
+                        : "-"}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => openEdit(p)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => openEdit(p)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => copyMutation.mutate(p.id)}
+                          disabled={copyMutation.isPending}
+                          className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:opacity-50"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p)}
+                          disabled={deleteMutation.isPending}
+                          className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-        {!isLoading && filtered.length === 0 && (
-          <div className="col-span-full rounded-xl border border-border/70 bg-card p-10 text-center text-sm text-muted-foreground">
-            No products found.
-          </div>
-        )}
-        {!isLoading && filtered.map((p: any) => (
-          <div key={p.id} className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card shadow-card transition hover:border-primary/20 hover:shadow-md sm:h-48 sm:flex-row">
-            {/* Image */}
-            <div className="relative h-48 w-full shrink-0 overflow-hidden bg-muted/10 sm:h-full sm:w-36 sm:border-r sm:border-border/40">
-              <Image
-                src={p.images?.[0] || "/placeholder.svg"}
-                alt={p.name}
-                fill
-                sizes="(max-width: 640px) 100vw, 144px"
-                className="object-contain p-2"
-                unoptimized
-              />
+
+          {filtered.length > rowsPerPage && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/40 bg-card p-4">
+              <p className="text-xs text-muted-foreground">
+                Showing {(page - 1) * rowsPerPage + 1} to {Math.min(page * rowsPerPage, filtered.length)} of {filtered.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage((p: number) => Math.max(1, p - 1))} disabled={page === 1} className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:bg-secondary disabled:opacity-50">&lt;</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} onClick={() => setPage(p)} className={`h-8 min-w-[32px] rounded-lg text-sm font-medium transition ${page === p ? "bg-primary text-white" : "text-muted-foreground hover:bg-secondary"}`}>{p}</button>
+                ))}
+                <button onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:bg-secondary disabled:opacity-50">&gt;</button>
+              </div>
             </div>
-
-            {/* Content */}
-            <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5">
-              {/* Top info */}
-              <div className="space-y-2">
-                <div className="min-w-0">
-                  <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground sm:line-clamp-1">
-                    {p.name}
-                  </p>
+          )}
+        </DashPanel>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {paginated.length === 0 && (
+              <div className="col-span-full rounded-xl border border-border/40 bg-card p-12 text-center text-sm text-muted-foreground">
+                No products found.
+              </div>
+            )}
+            {paginated.map((p: any) => (
+              <div
+                key={p.id}
+                className="group flex flex-col overflow-hidden rounded-xl border border-border/40 bg-card transition hover:border-primary/20 hover:shadow-md"
+              >
+                <div className="relative h-44 w-full overflow-hidden border-b border-border/30 bg-secondary/20">
+                  <Image
+                    src={p.images?.[0] || "/placeholder.svg"}
+                    alt={p.name}
+                    fill
+                    className="object-contain p-3 transition group-hover:scale-105"
+                    unoptimized
+                  />
+                  <div className="absolute right-2 top-2 flex gap-1.5">
+                    {p.stock ? (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 shadow-sm">
+                        In Stock
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-600 shadow-sm">
+                        Out of Stock
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col p-3.5">
+                  <p className="line-clamp-2 text-sm font-semibold text-foreground">{p.name}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{p.brand || "No Brand"}</p>
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
                     {p.categoryName || p.categorySlug || "Uncategorized"}
                   </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">
-                    {formatBDT(p.price)}
-                  </span>
-                  {p.discount > 0 && (
-                    <span className="rounded bg-accent/10 px-1.5 py-px text-[10px] font-semibold text-accent">
-                      -{p.discount}%
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Switch
-                      checked={Boolean(p.stock)}
-                      onCheckedChange={(val) => handleToggle(p.id, "stock", val)}
-                      disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "stock"}
-                    />
-                    Stock
-                  </label>
-                  <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Switch
-                      checked={Boolean(p.availability)}
-                      onCheckedChange={(val) => handleToggle(p.id, "availability", val)}
-                      disabled={toggleMutation.isPending && toggleMutation.variables?.id === p.id && toggleMutation.variables?.field === "availability"}
-                    />
-                    Avail
-                  </label>
-                  {p.isTrending && (
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">Trending</span>
-                  )}
-                  {p.isFlashSale && (
-                    <span className="rounded-full bg-pink-50 px-2 py-0.5 text-[10px] font-semibold text-accent">Flash</span>
-                  )}
-                  {p.isFreeDelivery && (
-                    <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">Free</span>
-                  )}
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-sm font-bold text-foreground">{formatBDT(p.price || 0)}</span>
+                    {p.discount > 0 && (
+                      <span className="rounded bg-accent/10 px-1.5 py-px text-[10px] font-semibold text-accent">
+                        -{p.discount}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => openEdit(p)}
+                      className="flex h-8 items-center justify-center gap-1.5 rounded-lg bg-secondary text-xs font-semibold text-foreground transition hover:bg-primary hover:text-white"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      View
+                    </button>
+                    <button
+                      onClick={() => openEdit(p)}
+                      className="flex h-8 items-center justify-center gap-1.5 rounded-lg bg-secondary text-xs font-semibold text-foreground transition hover:bg-primary hover:text-white"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => copyMutation.mutate(p.id)}
+                      disabled={copyMutation.isPending}
+                      className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-border/40 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                      Copy
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p)}
+                      disabled={deleteMutation.isPending}
+                      className="flex h-8 items-center justify-center gap-1.5 rounded-lg border border-red-200/40 text-xs font-semibold text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* Buttons */}
-              <div className="mt-3 grid grid-cols-4 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setViewProductId(p.id)}
-                  aria-label="View"
-                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span className="hidden text-[11px] font-semibold sm:inline">View</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditProductId(p.id)}
-                  aria-label="Edit"
-                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-foreground transition hover:bg-primary hover:text-white"
-                >
-                  <Pencil className="h-4 w-4" />
-                  <span className="hidden text-[11px] font-semibold sm:inline">Edit</span>
-                </button>
-                <button
-                  onClick={() => handleCopy(p.id)}
-                  disabled={copyMutation.isPending}
-                  aria-label="Copy"
-                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-secondary px-2 text-primary transition hover:bg-primary hover:text-white disabled:opacity-50"
-                >
-                  <Copy className="h-4 w-4" />
-                  <span className="hidden text-[11px] font-semibold sm:inline">Copy</span>
-                </button>
-                <button
-                  onClick={() => handleDelete(p)}
-                  disabled={deleteMutation.isPending}
-                  aria-label="Delete"
-                  className="flex h-9 items-center justify-center gap-1.5 rounded-sm bg-red-50 px-2 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="hidden text-[11px] font-semibold sm:inline">Delete</span>
-                </button>
+          {filtered.length > rowsPerPage && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/40 bg-card p-4">
+              <p className="text-xs text-muted-foreground">
+                Showing {(page - 1) * rowsPerPage + 1} to {Math.min(page * rowsPerPage, filtered.length)} of {filtered.length}
+              </p>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage((p: number) => Math.max(1, p - 1))} disabled={page === 1} className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:bg-secondary disabled:opacity-50">&lt;</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} onClick={() => setPage(p)} className={`h-8 min-w-[32px] rounded-lg text-sm font-medium transition ${page === p ? "bg-primary text-white" : "text-muted-foreground hover:bg-secondary"}`}>{p}</button>
+                ))}
+                <button onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:bg-secondary disabled:opacity-50">&gt;</button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </AdminPage>
+          )}
+        </>
+      )}
+      {showModal && (
+        <ProductModal editProduct={editProduct} onClose={() => setShowModal(false)} />
+      )}
+    </DashPage>
   )
 }
+
+

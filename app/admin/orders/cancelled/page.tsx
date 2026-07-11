@@ -1,12 +1,5 @@
-import { OrderList } from "@/components/admin/order-list"
+import { OrderList } from "@/dashboard/components/order-list"
 
 export default function CancelledOrdersPage() {
-  return (
-    <OrderList
-      title="Cancelled Orders"
-      description="Orders cancelled by admin"
-      defaultStatus="CANCELLED"
-      lockStatus
-    />
-  )
+  return <OrderList status="CANCELLED" title="Cancelled Orders" subtitle="Orders that have been cancelled" />
 }

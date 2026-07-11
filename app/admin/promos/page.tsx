@@ -1,26 +1,12 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Pencil, Plus, Trash2, X } from "lucide-react"
+import { Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { notify } from "@/lib/notify"
 import { Switch } from "@/components/ui/switch"
-import {
-  AdminPage,
-  AdminPageHeader,
-  AdminPrimaryButton,
-  AdminSearchInput,
-  AdminToolbar,
-} from "@/components/admin/admin-ui"
-import {
-  usePromos,
-  useCreatePromo,
-  useUpdatePromo,
-  useDeletePromo,
-  type PromoCode,
-  type PromoDiscountType,
-  type CreatePromoPayload,
-} from "@/src/hooks/api/usePromos"
+import { DashPage, DashHeader, DashPanel, DashLoading } from "@/dashboard/components/dash-ui"
+import { usePromos, useCreatePromo, useUpdatePromo, useDeletePromo, type PromoCode, type CreatePromoPayload } from "@/src/hooks/api/usePromos"
 
 const emptyDraft: CreatePromoPayload = {
   code: "",
@@ -33,7 +19,7 @@ const emptyDraft: CreatePromoPayload = {
   isActive: true,
 }
 
-export default function AdminPromosPage() {
+export default function DashboardPromosPage() {
   const { data: promos = [], isLoading } = usePromos()
   const createMutation = useCreatePromo()
   const updateMutation = useUpdatePromo()
@@ -58,19 +44,14 @@ export default function AdminPromosPage() {
       confirmText: "Delete",
       variant: "danger",
     })
-    if (ok) {
-      deleteMutation.mutate(p.id)
-    }
+    if (ok) deleteMutation.mutate(p.id)
   }
 
   const handleToggle = (id: string, isActive: boolean) => {
     updateMutation.mutate({ id, isActive })
   }
 
-  const openCreate = () => {
-    setDraft(emptyDraft)
-    setOpen(true)
-  }
+  const openCreate = () => { setDraft(emptyDraft); setOpen(true) }
 
   const openEdit = (p: PromoCode) => {
     setDraft({
@@ -89,12 +70,10 @@ export default function AdminPromosPage() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!draft.code || draft.discountValue <= 0) {
       notify.error({ title: "Validation Error", message: "Code and a positive discount value are required." })
       return
     }
-
     const payload: any = {
       code: draft.code,
       discountType: draft.discountType,
@@ -105,328 +84,224 @@ export default function AdminPromosPage() {
       endDate: draft.endDate ? new Date(draft.endDate).toISOString() : null,
       isActive: draft.isActive,
     }
-
     if (editing && draft.id) {
-      updateMutation.mutate(
-        { id: draft.id, ...payload },
-        { onSuccess: () => setOpen(false) }
-      )
+      updateMutation.mutate({ id: draft.id, ...payload }, { onSuccess: () => setOpen(false) })
     } else {
       createMutation.mutate(payload, { onSuccess: () => setOpen(false) })
     }
   }
 
   return (
-    <AdminPage>
-      <AdminPageHeader
+    <DashPage>
+      <DashHeader
         title="Promo Codes"
-        count={`${promos.length} total`}
+        subtitle={`${promos.length} total codes`}
         actions={
-          <AdminToolbar>
-            <AdminSearchInput
-              value={q}
-              onChange={setQ}
-              placeholder="Search code..."
-              className="md:w-64"
-            />
-            <AdminPrimaryButton onClick={openCreate}>
-              <Plus className="h-4 w-4" /> Add
-            </AdminPrimaryButton>
-          </AdminToolbar>
+          <button
+            onClick={openCreate}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add Promo
+          </button>
         }
       />
 
-      <div className="space-y-3 md:hidden">
-        {isLoading && (
-          <div className="rounded-[10px] border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
-            Loading promos...
-          </div>
-        )}
-        {!isLoading && filtered.length === 0 && (
-          <div className="rounded-[10px] border border-border/60 bg-card p-6 text-center text-sm text-muted-foreground">
-            No promo codes found.
-          </div>
-        )}
-        {!isLoading &&
-          filtered.map((p: PromoCode) => (
-            <div key={p.id} className="rounded-[10px] border border-border/60 bg-card p-2.5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-xs text-muted-foreground">Code</p>
-                  <p className="text-sm font-semibold text-foreground">{p.code}</p>
-                </div>
-                <span className="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-                  {p.discountType === "PERCENT" ? `${p.discountValue}%` : `৳${p.discountValue}`}
-                </span>
-              </div>
-              <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
-                <div className="flex items-center justify-between">
-                  <span>Usage</span>
-                  <span className="text-foreground">{p.usageCount} times</span>
-                </div>
-                <div>
-                  <p className="mb-1 text-xs text-muted-foreground">Constraints</p>
-                  <div className="space-y-0.5">
-                    {p.minOrderValue && <div>Min: ৳{p.minOrderValue}</div>}
-                    {p.maxDiscount && <div>Max: ৳{p.maxDiscount}</div>}
-                    {p.startDate && <div>From: {new Date(p.startDate).toLocaleDateString()}</div>}
-                    {p.endDate && <div>To: {new Date(p.endDate).toLocaleDateString()}</div>}
-                    {!p.minOrderValue && !p.maxDiscount && !p.startDate && !p.endDate && (
-                      <span>None</span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Active</span>
-                  <Switch
-                    checked={p.isActive}
-                    onCheckedChange={(val) => handleToggle(p.id, val)}
-                    disabled={updateMutation.isPending && updateMutation.variables?.id === p.id}
-                  />
-                </div>
-              </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <button
-                  onClick={() => openEdit(p)}
-                  aria-label="Edit"
-                  className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
-                >
-                  <Pencil className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(p)}
-                  disabled={deleteMutation.isPending}
-                  aria-label="Delete"
-                  className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+      {/* Search */}
+      <div className="flex h-10 max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3">
+        <Search className="h-4 w-4 text-muted-foreground" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search promo codes..."
+          className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+        />
       </div>
 
-      <div className="hidden overflow-hidden rounded-[10px] border border-border/60 bg-card shadow-sm md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-245 text-left text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary/50 text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="px-5 py-3 font-medium">Code</th>
-                <th className="px-5 py-3 font-medium">Discount</th>
-                <th className="px-5 py-3 font-medium">Constraints</th>
-                <th className="px-5 py-3 font-medium">Usage</th>
-                <th className="px-5 py-3 font-medium">Active</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">
-                    Loading promos...
-                  </td>
+      {isLoading ? (
+        <DashLoading label="Loading promo codes..." />
+      ) : filtered.length === 0 ? (
+        <DashPanel>
+          <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+            <p className="text-base font-medium text-foreground">No promo codes found</p>
+            <p className="text-sm text-muted-foreground">Click "Add Promo" to create your first promo code.</p>
+          </div>
+        </DashPanel>
+      ) : (
+        <DashPanel noPadding>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border/40 bg-surface/50 text-muted-foreground">
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Code</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Discount</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Min Order</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Max Discount</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Usage</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Active</th>
+                  <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide">Actions</th>
                 </tr>
-              )}
-              {!isLoading && filtered.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">
-                    No promo codes found.
-                  </td>
-                </tr>
-              )}
-              {!isLoading &&
-                filtered.map((p: PromoCode) => (
-                  <tr key={p.id} className="border-b border-border/60 transition hover:bg-secondary/50 last:border-b-0">
-                    <td className="px-5 py-3">
-                      <span className="font-bold tracking-wide text-foreground">{p.code}</span>
+              </thead>
+              <tbody>
+                {filtered.map((p: PromoCode) => (
+                  <tr key={p.id} className="border-b border-border/30 transition hover:bg-surface/50">
+                    <td className="px-5 py-3.5">
+                      <span className="rounded-md bg-secondary px-2 py-0.5 font-mono text-sm font-bold text-foreground">{p.code}</span>
                     </td>
-                    <td className="px-5 py-3">
-                      <span className="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-                        {p.discountType === "PERCENT" ? `${p.discountValue}%` : `৳${p.discountValue}`}
-                      </span>
+                    <td className="px-5 py-3.5 text-foreground">
+                      {p.discountType === "PERCENT" ? `${p.discountValue}%` : `৳${p.discountValue}`}
                     </td>
-                    <td className="px-5 py-3 text-xs text-muted-foreground">
-                      {p.minOrderValue && <div>Min: ৳{p.minOrderValue}</div>}
-                      {p.maxDiscount && <div>Max: ৳{p.maxDiscount}</div>}
-                      {p.startDate && <div>From: {new Date(p.startDate).toLocaleDateString()}</div>}
-                      {p.endDate && <div>To: {new Date(p.endDate).toLocaleDateString()}</div>}
-                      {!p.minOrderValue && !p.maxDiscount && !p.startDate && !p.endDate && (
-                        <span>None</span>
-                      )}
+                    <td className="px-5 py-3.5 text-muted-foreground">
+                      {p.minOrderValue ? `৳${p.minOrderValue}` : "-"}
                     </td>
-                    <td className="px-5 py-3 text-muted-foreground">{p.usageCount} times</td>
-                    <td className="px-5 py-3">
-                      <Switch
-                        checked={p.isActive}
-                        onCheckedChange={(val) => handleToggle(p.id, val)}
-                        disabled={updateMutation.isPending && updateMutation.variables?.id === p.id}
-                      />
+                    <td className="px-5 py-3.5 text-muted-foreground">
+                      {p.maxDiscount ? `৳${p.maxDiscount}` : "-"}
                     </td>
-                    <td className="px-5 py-3">
-                      <div className="flex justify-end gap-1">
+                    <td className="px-5 py-3.5 text-muted-foreground">{p.usageCount}</td>
+                    <td className="px-5 py-3.5">
+                      <Switch checked={p.isActive} onCheckedChange={(v) => handleToggle(p.id, v)} />
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => openEdit(p)}
-                          aria-label="Edit"
-                          className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-foreground transition hover:bg-primary hover:text-white"
+                          className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                         >
-                          <Pencil className="h-3.5 w-3.5" />
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(p)}
-                          disabled={deleteMutation.isPending}
-                          aria-label="Delete"
-                          className="grid h-8 w-8 place-items-center rounded-full bg-accent/10 text-accent transition hover:bg-accent hover:text-white disabled:opacity-50"
+                          className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-red-50 hover:text-red-500"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </DashPanel>
+      )}
 
+      {/* Modal */}
       {open && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/40 p-4"
-          onClick={() => setOpen(false)}
-        >
-          <form
-            onSubmit={submit}
-            onClick={(e) => e.stopPropagation()}
-            className="my-auto w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
-          >
-            <div className="relative mb-5 border-b border-border pb-3 text-center">
-              <h3 className="text-lg font-semibold text-foreground">
-                {editing ? "Edit Promo Code" : "Create Promo Code"}
-              </h3>
-              <button
-                type="button"
-                aria-label="Close"
-                onClick={() => setOpen(false)}
-                className="absolute right-0 top-0 rounded-full p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
-              >
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+          <form onSubmit={submit} onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+            <div className="relative mb-6 border-b border-border/40 pb-3 text-center">
+              <h3 className="text-base font-bold text-foreground">{editing ? "Edit Promo Code" : "Add New Promo Code"}</h3>
+              <button type="button" aria-label="Close" onClick={() => setOpen(false)} className="absolute right-0 top-0 text-muted-foreground hover:text-foreground">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">Code *</span>
-                  <input
-                    value={draft.code}
-                    onChange={(e) => setDraft({ ...draft, code: e.target.value.toUpperCase() })}
-                    placeholder="e.g. SUMMER20"
-                    required
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">Discount Type *</span>
-                  <select
-                    value={draft.discountType}
-                    onChange={(e) => setDraft({ ...draft, discountType: e.target.value as PromoDiscountType })}
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
-                  >
-                    <option value="PERCENT">Percent (%)</option>
-                    <option value="AMOUNT">Fixed Amount (৳)</option>
-                  </select>
-                </label>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Code</label>
+                <input
+                  type="text"
+                  value={draft.code}
+                  onChange={(e) => setDraft({ ...draft, code: e.target.value })}
+                  placeholder="e.g., SUMMER20"
+                  className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
+                  required
+                />
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">Discount Value *</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Discount Type</label>
+                  <select
+                    value={draft.discountType}
+                    onChange={(e) => setDraft({ ...draft, discountType: e.target.value as "PERCENT" | "AMOUNT" })}
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
+                  >
+                    <option value="PERCENT">Percentage (%)</option>
+                    <option value="AMOUNT">Flat Amount (৳)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Discount Value</label>
                   <input
                     type="number"
-                    min={0.01}
-                    step={0.01}
+                    min="1"
                     value={draft.discountValue || ""}
                     onChange={(e) => setDraft({ ...draft, discountValue: Number(e.target.value) })}
-                    placeholder="e.g. 20"
+                    placeholder="e.g. 10"
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
                     required
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
                   />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">Min Order Value (৳)</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Min Order (৳)</label>
                   <input
                     type="number"
-                    min={0}
                     value={draft.minOrderValue || ""}
                     onChange={(e) => setDraft({ ...draft, minOrderValue: e.target.value ? Number(e.target.value) : null })}
                     placeholder="Optional"
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
                   />
-                </label>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Max Discount (৳)</label>
+                  <input
+                    type="number"
+                    value={draft.maxDiscount || ""}
+                    onChange={(e) => setDraft({ ...draft, maxDiscount: e.target.value ? Number(e.target.value) : null })}
+                    placeholder="Optional"
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
+                  />
+                </div>
               </div>
 
-              <label className="block text-sm">
-                <span className="mb-1.5 block font-medium text-foreground">Max Discount Limit (৳)</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={draft.maxDiscount || ""}
-                  onChange={(e) => setDraft({ ...draft, maxDiscount: e.target.value ? Number(e.target.value) : null })}
-                  placeholder="Optional limit for percent discounts"
-                  className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
-                />
-              </label>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">Start Date</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Start Date</label>
                   <input
                     type="datetime-local"
                     value={draft.startDate || ""}
                     onChange={(e) => setDraft({ ...draft, startDate: e.target.value || null })}
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
                   />
-                </label>
-                <label className="block text-sm">
-                  <span className="mb-1.5 block font-medium text-foreground">End Date</span>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">End Date</label>
                   <input
                     type="datetime-local"
                     value={draft.endDate || ""}
                     onChange={(e) => setDraft({ ...draft, endDate: e.target.value || null })}
-                    className="h-10 w-full rounded-md border border-border bg-transparent px-3 outline-none focus:border-primary"
+                    className="h-10 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40"
                   />
-                </label>
+                </div>
               </div>
 
-              <label className="flex items-center gap-2 pt-2 text-sm text-foreground cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
                 <input
                   type="checkbox"
                   checked={draft.isActive}
                   onChange={(e) => setDraft({ ...draft, isActive: e.target.checked })}
                   className="h-4 w-4 rounded border-border text-primary focus:ring-primary/20"
                 />
-                Active (Users can apply this code)
+                Active
               </label>
 
-              <div className="mt-4 flex justify-end gap-3 border-t border-border pt-4">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary"
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-center pt-2">
                 <button
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
-                  className="rounded-md bg-primary px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
+                  className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-70"
                 >
-                  {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save Promo"}
+                  {createMutation.isPending || updateMutation.isPending ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </div>
           </form>
         </div>
       )}
-    </AdminPage>
+    </DashPage>
   )
 }

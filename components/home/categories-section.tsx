@@ -50,9 +50,10 @@ export function CategoriesSection() {
         </span>
       </h2>
 
+      {/* Mobile View */}
       <div
         ref={containerRef}
-        className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory"
+        className="flex md:hidden overflow-x-auto no-scrollbar snap-x snap-mandatory"
       >
         {Array.from({ length: totalPages }).map((_, pageIdx) => {
           const start = pageIdx * ITEMS_PER_PAGE
@@ -79,8 +80,17 @@ export function CategoriesSection() {
         })}
       </div>
 
+      {/* Desktop View */}
+      <div className="hidden md:grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-x-3 gap-y-4">
+        {categories.map((c) => (
+          <div key={c.id} className="flex justify-center">
+            <CategoryCard category={c} />
+          </div>
+        ))}
+      </div>
+
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-1">
+        <div className="flex md:hidden items-center justify-center gap-2 pt-1">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}

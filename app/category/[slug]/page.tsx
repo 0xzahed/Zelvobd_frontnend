@@ -11,13 +11,14 @@ import { BackHeader } from '@/components/layout/back-header';
 import { SubCategoryCard } from '@/components/ui/category-card';
 import { SliderBanner } from '@/components/ui/slider-banner';
 import { SubCategoryProductsSections } from '@/components/category/sub-category-products-sections';
-import { getBannersByCategory } from '@/src/api/banner/getBannersByCategory';
-import { getCategoryBannersPublic } from '@/src/api/categoryBanner/getCategoryBannersPublic';
+import { getBannersByCategory } from '@/src/api/bannerApi';
+import { getCategoryBannersPublic } from '@/src/api/categoryBannerApi';
 import { getSubCategories } from '@/src/api/categoryApi';
-import { mapBanner, mapSubCategory } from '@/src/api/_shared/mappers';
+import { mapBanner, mapSubCategory } from '@/src/api/mainApi';
 import { CategoryBannerSlider } from '@/components/category/category-banner-slider';
 import type { CategoryBanner } from '@/lib/types';
 import { FloatingRotatingIcon } from '@/components/home/floating-rotating-icon';
+import { ProductSliderSkeleton } from '@/components/ui/skeletons/product-slider-skeleton';
 
 export default function CategoryPage(props: { params: any }) {
   const [slug, setSlug] = useState<string>('');
@@ -89,8 +90,21 @@ export default function CategoryPage(props: { params: any }) {
   if (!loaded) {
     return (
       <AppShell>
-        <div className='flex min-h-[50vh] items-center justify-center'>
-          <div className='h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+        <BackHeader title="" />
+        <div className='py-4 md:py-6 space-y-6'>
+          <div className='h-8 w-48 rounded bg-muted/60 animate-pulse' />
+          <div className='flex gap-2'>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className='h-7 w-20 rounded-full bg-muted/60 animate-pulse' />
+            ))}
+          </div>
+          <div className='flex gap-3'>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className='h-16 w-24 rounded-lg bg-muted/60 animate-pulse shrink-0' />
+            ))}
+          </div>
+          <ProductSliderSkeleton title="" />
+          <ProductSliderSkeleton title="" />
         </div>
       </AppShell>
     );

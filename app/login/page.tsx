@@ -20,7 +20,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (authLoading) return
     if (isAdmin) {
-      router.replace("/admin")
+      router.replace("/dashboard")
     }
   }, [authLoading, isAdmin, router])
 
