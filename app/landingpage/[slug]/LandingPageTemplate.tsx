@@ -29,6 +29,7 @@ import * as LucideIcons from 'lucide-react';
 import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
 import { SiteFooter } from '@/components/layout/site-footer';
+import { SliderBanner } from '@/components/ui/slider-banner';
 import './landing-page.css';
 
 const googleSans = localFont({
@@ -459,7 +460,19 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         </div>
       </section>
 
-
+      {/* Banner Slider */}
+      {data.sliderSection?.images && data.sliderSection.images.length > 0 && data.sliderSection.images[0]?.url && (
+        <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
+          <div className='mx-auto max-w-5xl px-4'>
+            <SliderBanner slides={data.sliderSection.images.map((img: any, i: number) => ({
+              id: String(i),
+              image: toAbsoluteUploadUrl(img.url),
+              link: '#',
+              title: `Banner ${i}`
+            }))} />
+          </div>
+        </section>
+      )}
 
       {/* Video Section */}
       {(video.videoLink || video.cards?.length > 0) && (

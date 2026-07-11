@@ -32,6 +32,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
       tableSection: { caption: '', title: '', subtitle: '', tableData: [{ key: '', value: '' }], totalItemsKey: '', totalItemsValue: '', offerPriceKey: '', offerPriceValue: '', buttonText: 'Order Now' },
       featureCards: [{ icon: 'truck', title: 'Free Delivery' }],
       timerSection: { targetDateTime: '' },
+      sliderSection: { images: [] },
       videoSection: { caption: '', videoLink: '', customThumbnail: '', cards: [{ icon: 'check', title: '', subtitle: '' }] },
       bulletPointsSection: { image: '', caption: '', title: '', subtitle: '', points: [''] },
       tipsSection: { icon: 'lightbulb', title: '', subtitle: '' },
