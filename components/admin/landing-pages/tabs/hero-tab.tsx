@@ -11,7 +11,7 @@ export default function HeroTab({ register, control }: { register: any, control:
       <div className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-2">Hero Section</h3>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Caption (e.g. "Limited Time Offer")</Label>
             <Input {...register('heroSection.caption')} placeholder="Caption" />
@@ -41,7 +41,7 @@ export default function HeroTab({ register, control }: { register: any, control:
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Regular Price (e.g. "8500")</Label>
             <Input {...register('heroSection.regularPrice')} placeholder="8500" />
@@ -73,7 +73,7 @@ export default function HeroTab({ register, control }: { register: any, control:
             <Plus className="h-4 w-4" /> Add Image
           </button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {sliderImages.map((field, index) => (
             <div key={field.id} className="relative p-2 border rounded-md">
               <Controller

@@ -74,7 +74,7 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
 
       <div>
         <Label>Color Palette</Label>
-        <div className="flex gap-4 mt-2">
+        <div className="flex flex-wrap gap-4 mt-2">
           {COLOR_PALETTES.map(palette => (
             <label key={palette.id} className="flex items-center gap-2 cursor-pointer">
               <input type="radio" {...register('colorPalette')} value={palette.id} className="accent-primary" />
@@ -89,13 +89,13 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="flex border-b border-border mb-6">
+      <div className="flex overflow-x-auto hide-scrollbar border-b border-border mb-6">
         {tabs.map(tab => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+            className={`whitespace-nowrap px-4 py-2 text-sm font-medium border-b-2 ${activeTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
           >
             {tab.label}
           </button>
@@ -109,11 +109,11 @@ export default function LandingPageForm({ initialData, onSubmit, isSubmitting }:
         {activeTab === 'checkout' && <CheckoutTab register={register} control={control} />}
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button type="button" onClick={() => router.back()} className="px-4 py-2 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
+        <button type="button" onClick={() => router.back()} className="w-full sm:w-auto px-4 py-2 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground text-center">
           Cancel
         </button>
-        <AdminPrimaryButton type="submit" disabled={isSubmitting}>
+        <AdminPrimaryButton type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
           {isSubmitting ? 'Saving...' : 'Save Landing Page'}
         </AdminPrimaryButton>
       </div>

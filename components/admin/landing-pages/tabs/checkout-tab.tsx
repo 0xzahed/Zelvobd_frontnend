@@ -14,7 +14,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
       {/* Specifications Table */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-2">Specifications Table</h3>
-        <div className="grid grid-cols-3 gap-4 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
           <div><Label>Caption</Label><Input {...register('tableSection.caption')} /></div>
           <div><Label>Title</Label><Input {...register('tableSection.title')} /></div>
           <div><Label>Subtitle</Label><Input {...register('tableSection.subtitle')} /></div>
@@ -40,7 +40,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4 mt-4 border-t pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t pt-4">
           <div><Label>Total Items Row (Key)</Label><Input {...register('tableSection.totalItemsKey')} placeholder="e.g. মোট আইটেম" /></div>
           <div><Label>Total Items Row (Value)</Label><Input {...register('tableSection.totalItemsValue')} placeholder="e.g. ৯টি" /></div>
           
@@ -56,7 +56,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
       {/* Checkout Form Config */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-2">Checkout Form Details</h3>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div><Label>Caption</Label><Input {...register('checkoutSection.caption')} /></div>
           <div><Label>Title</Label><Input {...register('checkoutSection.title')} /></div>
           <div><Label>Subtitle</Label><Input {...register('checkoutSection.subtitle')} /></div>
@@ -65,7 +65,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
           <div><Label>Product SubName</Label><Input {...register('checkoutSection.subName')} /></div>
           <div><Label>Price (shown on form)</Label><Input {...register('checkoutSection.price')} /></div>
           
-          <div className="col-span-3">
+          <div className="md:col-span-3">
             <Label>Delivery Options Text (e.g. "Cash on Delivery / Free Delivery")</Label>
             <Input {...register('checkoutSection.deliveryText')} />
           </div>
@@ -80,7 +80,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
             <Plus className="h-4 w-4" /> Add FAQ
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
           <div><Label>Caption</Label><Input {...register('faqSection.caption')} /></div>
           <div><Label>Title</Label><Input {...register('faqSection.title')} /></div>
         </div>
@@ -102,7 +102,7 @@ export default function CheckoutTab({ register, control }: { register: any, cont
       {/* WhatsApp Section */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-2">WhatsApp Support Widget</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><Label>Phone Number</Label><Input {...register('whatsappSection.phoneNumber')} placeholder="e.g. 01700000000" /></div>
           <div><Label>Pre-filled Message</Label><Input {...register('whatsappSection.prefilledMessage')} placeholder="Hi, I want to order..." /></div>
         </div>

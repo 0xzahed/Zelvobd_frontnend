@@ -26,13 +26,13 @@ export default function FeaturesTab({ register, control }: { register: any, cont
             <Plus className="h-4 w-4" /> Add Card
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {featureCards.map((field, index) => (
             <div key={field.id} className="p-4 border rounded-md relative group">
               <button type="button" onClick={() => removeCard(index)} className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition">
                 <Trash2 className="h-4 w-4" />
               </button>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <Label>Icon Name</Label>
                   <Controller
@@ -69,7 +69,7 @@ export default function FeaturesTab({ register, control }: { register: any, cont
       <div className="space-y-4">
         <h3 className="text-lg font-semibold border-b pb-2">Video & Why It's Best Section</h3>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><Label>Caption</Label><Input {...register('videoSection.caption')} placeholder="Caption" /></div>
           <div><Label>Youtube Video Link</Label><Input {...register('videoSection.videoLink')} placeholder="https://youtube.com/..." /></div>
           <div>
@@ -94,7 +94,7 @@ export default function FeaturesTab({ register, control }: { register: any, cont
           <div className="space-y-3">
             {videoCards.map((field, index) => (
               <div key={field.id} className="p-3 border rounded-md flex gap-3 items-center">
-                <div className="flex-1 grid grid-cols-3 gap-2">
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
                   <Controller
                     name={`videoSection.cards.${index}.icon`}
                     control={control}
@@ -135,7 +135,7 @@ export default function FeaturesTab({ register, control }: { register: any, cont
             <Plus className="h-4 w-4" /> Add Point
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-4">
             <div><Label>Caption</Label><Input {...register('bulletPointsSection.caption')} /></div>
             <div><Label>Title</Label><Input {...register('bulletPointsSection.title')} /></div>
@@ -166,8 +166,8 @@ export default function FeaturesTab({ register, control }: { register: any, cont
       {/* Secret Care Tip Section */}
       <div className="space-y-4 pt-4 border-t">
         <h3 className="text-lg font-semibold">Secret Care Tip (Optional)</h3>
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div className="md:col-span-2">
             <Label>Icon</Label>
             <Controller
               name="tipsSection.icon"
@@ -189,11 +189,11 @@ export default function FeaturesTab({ register, control }: { register: any, cont
               }}
             />
           </div>
-          <div className="col-span-5">
+          <div className="md:col-span-5">
             <Label>Title</Label>
             <Input {...register('tipsSection.title')} placeholder="e.g. দীর্ঘদিন ভালো রাখার ১টি গোপন টিপস!" className="mt-1" />
           </div>
-          <div className="col-span-5">
+          <div className="md:col-span-5">
             <Label>Description</Label>
             <Input {...register('tipsSection.subtitle')} placeholder="Description..." className="mt-1" />
           </div>
