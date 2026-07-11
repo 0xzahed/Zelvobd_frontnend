@@ -1,0 +1,59 @@
+.landing-page-wrapper {
+  background-color: var(--lp-background);
+  color: var(--lp-foreground);
+  font-family: var(--font-google-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.landing-page-wrapper * {
+  border-color: var(--lp-border);
+}
+
+.landing-page-wrapper h1, 
+.landing-page-wrapper h2, 
+.landing-page-wrapper h3, 
+.landing-page-wrapper h4 {
+  font-family: var(--font-google-sans), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.95rem 1.5rem;
+  border-radius: 9999px;
+  background: var(--lp-gradient-cta);
+  color: var(--lp-cta-foreground);
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: var(--lp-shadow-cta);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-cta:hover {
+  transform: translateY(-1px);
+}
+.btn-cta:active {
+  transform: translateY(0);
+}
+
+.pill-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  background: var(--lp-highlight);
+  color: var(--lp-highlight-foreground);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.card-soft {
+  background: var(--lp-card);
+  border-radius: 1rem;
+  box-shadow: var(--lp-shadow-card);
+  /* padding: 1.25rem; */
+}

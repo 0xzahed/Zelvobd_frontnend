@@ -99,7 +99,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-10 border-t border-slate-800 bg-slate-950 text-slate-100">
-      <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
+      <div className="mx-auto w-full max-w-7xl px-4 pt-10 pb-4 md:px-6">
         <div className="grid gap-8 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-4">
@@ -190,6 +190,23 @@ export function SiteFooter() {
           <p className="mt-4 text-center text-xs tracking-wide text-slate-500">
             © {new Date().getFullYear()} — <a href="https://motionbooster.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">MotionBooster</a>. All rights reserved.
           </p>
+          <div className="mt-2 flex justify-center">
+            <a
+              href="https://www.motionbooster.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-slate-500 transition hover:text-slate-300"
+            >
+              <span>Developed By Motionbooster</span>
+              <Image
+                src="/mb/Motion Booster White Logo-footer.svg"
+                alt="Motionbooster"
+                width={80}
+                height={20}
+                className="h-4 w-auto object-contain"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

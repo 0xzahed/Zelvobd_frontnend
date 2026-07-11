@@ -1,7 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import Link from "next/link"
+import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText } from "lucide-react"
 import { useOrders, useUpdateOrderStatus, useDeleteOrder, type Order, type OrderStatus } from "@/src/hooks/api/useOrders"
 import { useFraudCheck, useSteadfastDeliveryStatus, useSyncOrders } from "@/src/hooks/api/useSteadfast"
 import { formatBDT, formatRelativeTime } from "@/lib/format"
@@ -180,6 +181,13 @@ function OrderCard({
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-1">
+          <Link
+            href={`/admin/orders/invoice/${order.id}`}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-secondary"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Invoice
+          </Link>
           {onSyncSteadfast && !order.consignmentId && (
             <button
               onClick={() => onSyncSteadfast(order.id)}

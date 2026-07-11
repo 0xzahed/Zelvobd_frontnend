@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import { getOrders, updateOrderStatus, deleteOrder } from "@/src/api/orderApi"
+import { getOrders, getOrderById, updateOrderStatus, deleteOrder } from "@/src/api/orderApi"
 
 export const ORDER_KEYS = {
   all: ["orders"] as const,
@@ -58,6 +58,14 @@ export type GetOrdersParams = {
   limit?: number
   search?: string
   status?: OrderStatus | ""
+}
+
+export function useOrderById(id: string) {
+  return useQuery({
+    queryKey: ORDER_KEYS.details(id),
+    queryFn: () => getOrderById(id),
+    enabled: !!id,
+  })
 }
 
 export function useOrders(params: GetOrdersParams) {

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ZELVO BD - Invoice</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #e8e8e8;
+    padding: 20px;
+  }
+  .invoice {
+    width: 840px;
+    margin: 0 auto;
+    background: #ffffff;
+    position: relative;
+    border: 1px solid #cfd8e8;
+  }
+  .top-bar {
+    height: 80px;
+    background: linear-gradient(90deg, #7f9fd0 0%, #2b4a8c 55%, #1a3570 100%);
+  }
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 25px 35px 15px 35px;
+  }
+  .logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid #2b4a8c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #fff;
+  }
+  .logo .z-icon {
+    width: 55px;
+    height: 55px;
+    margin-bottom: 2px;
+  }
+  .logo .zelvo-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a3570;
+    font-style: italic;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .logo .bd-text {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #1a3570;
+    margin-top: 2px;
+  }
+  .logo .underline {
+    width: 55px;
+    height: 1px;
+    background: #1a3570;
+    margin-top: 2px;
+  }
+  .header-info {
+    padding-top: 8px;
+  }
+  .header-info h1 {
+    font-size: 26px;
+    color: #1a3570;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .header-info .addr {
+    font-size: 18px;
+    color: #2b4a8c;
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .header-info .phone {
+    font-size: 20px;
+    color: #2b4a8c;
+    font-weight: 600;
+  }
+  .form-fields {
+    padding: 10px 35px 0 35px;
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .label {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a3570;
+    white-space: nowrap;
+    margin-right: 10px;
+  }
+  .line {
+    flex: 1;
+    border-bottom: 2px solid #2b4a8c;
+    height: 22px;
+  }
+  .no-date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .no-field {
+    display: flex;
+    align-items: baseline;
+    width: 45%;
+  }
+  .date-field {
+    display: flex;
+    align-items: baseline;
+    width: 45%;
+  }
+  .address-block .line {
+    display: block;
+    margin-top: 8px;
+  }
+  .mobile-section {
+    padding: 5px 35px 0 35px;
+  }
+  .mobile-label {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a3570;
+    margin-bottom: 8px;
+  }
+  .mobile-boxes {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .box-group {
+    display: flex;
+    flex: 1;
+  }
+  .box-group .box {
+    flex: 1;
+    height: 38px;
+    border: 1.5px solid #2b4a8c;
+    border-left: none;
+  }
+  .box-group .box:first-child {
+    border-left: 1.5px solid #2b4a8c;
+  }
+  .table-wrap {
+    padding: 0 35px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr.head-row td {
+    background: #2b4a8c;
+    height: 30px;
+    border: 1px solid #2b4a8c;
+  }
+  td, th {
+    border: 1px solid #6b85bb;
+    font-size: 16px;
+    color: #1a3570;
+    font-weight: 700;
+  }
+  .idx-col {
+    width: 8%;
+    text-align: center;
+    padding: 10px 0;
+  }
+  .desc-col {
+    width: 52%;
+  }
+  .qty-col, .rate-col, .amt-col {
+    width: 13.33%;
+  }
+  tbody tr td {
+    height: 40px;
+  }
+  tfoot .total-row td {
+    background: #2b4a8c;
+    color: #fff;
+    text-align: right;
+    padding-right: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    border-color: #2b4a8c;
+  }
+  tfoot .total-row .amt-cell {
+    background: #fff;
+  }
+  .watermark {
+    position: absolute;
+    top: 610px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .signatures {
+    display: flex;
+    justify-content: space-between;
+    padding: 45px 35px 30px 35px;
+  }
+  .sig {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a3570;
+  }
+  .sig .sig-line {
+    width: 220px;
+    border-bottom: 2px solid #2b4a8c;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="invoice">
+  <div class="top-bar"></div>
+
+  <div class="header">
+    <div class="logo">
+      <svg class="z-icon" viewBox="0 0 100 100">
+        <text x="50" y="70" font-size="70" font-weight="900" font-style="italic" fill="#1a3570" text-anchor="middle" font-family="Arial">Z</text>
+      </svg>
+      <div class="zelvo-text">ZELVO</div>
+      <div class="underline"></div>
+      <div class="bd-text">B D</div>
+    </div>
+    <div class="header-info">
+      <h1>All Kinds Of Crockeries &amp; Electronics Item</h1>
+      <div class="addr">136/137 Mudi Market, 2nd Floor<br>Kachabazar, Dhaka New Market, Dhaka</div>
+      <div class="phone">01765-804147</div>
+    </div>
+  </div>
+
+  <div class="form-fields">
+    <div class="no-date-row">
+      <div class="no-field">
+        <span class="label">No:</span>
+        <div class="line"></div>
+      </div>
+      <div class="date-field">
+        <span class="label">Date</span>
+        <div class="line"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="label">Name</span>
+      <div class="line"></div>
+    </div>
+
+    <div class="address-block">
+      <div class="row" style="margin-bottom:4px;">
+        <span class="label">Address</span>
+        <div class="line"></div>
+      </div>
+      <div class="line"></div>
+    </div>
+  </div>
+
+  <div class="mobile-section">
+    <div class="mobile-label">Mobile No.</div>
+    <div class="mobile-boxes">
+      <div class="box-group">
+        <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+        <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+        <div class="box"></div><div class="box"></div>
+      </div>
+      <div class="box-group">
+        <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+        <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+        <div class="box"></div><div class="box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap" style="position:relative;">
+    <img class="watermark" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='90' r='85' fill='none' stroke='%231a3570' stroke-width='3'/><text x='100' y='115' font-size='90' font-weight='900' font-style='italic' fill='%231a3570' text-anchor='middle' font-family='Arial'>Z</text></svg>" alt="">
+    <table>
+      <thead>
+        <tr class="head-row">
+          <td></td><td></td><td></td><td></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="idx-col">01</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">02</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">03</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">04</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">05</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">06</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">07</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">08</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">09</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+        <tr><td class="idx-col">10</td><td class="desc-col"></td><td class="qty-col"></td><td class="amt-col"></td></tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="3">Total Amount</td>
+          <td class="amt-cell"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="signatures">
+    <div class="sig">
+      <div class="sig-line"></div>
+      Customer Signature
+    </div>
+    <div class="sig">
+      <div class="sig-line"></div>
+      Seller's Signature
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,9 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { BadgeCheck } from 'lucide-react';
 import { BASE_URL } from '@/src/api/mainApi';
 import { bnDigits } from './LandingPageTemplate'; // Assuming exported or re-implemented
+=======
+import { BadgeCheck, ArrowRight } from 'lucide-react';
+import { BASE_URL } from '@/src/api/_shared/client';
+import { bnDigits } from './LandingPageTemplate';
+>>>>>>> ab5cb7bbb22194bd51e463dd48e304a02300547d
 
 const convertToEnglishDigits = (str: string) => {
   const map: Record<string, string> = {
@@ -21,27 +27,36 @@ const convertToEnglishDigits = (str: string) => {
   return str.replace(/[০-৯]/g, (match) => map[match]);
 };
 
-export default function LandingPageCheckoutForm({
-  landingPageId,
-  checkoutData,
-}: {
-  landingPageId: string;
-  checkoutData: any;
-}) {
-  const [form, setForm] = useState({ name: '', phone: '', address: '' });
+export default function LandingPageCheckoutForm({ landingPage }: { landingPage: any }) {
+  const checkoutData = landingPage.checkoutSection || {};
+  const UNIT_PRICE = Number(landingPage.heroSection?.offerPrice || checkoutData.price || 0);
+
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    qty: 1,
+    area: 'inside' as 'inside' | 'outside',
+  });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  const subtotal = Number(checkoutData.price || 0);
+  const subtotal = UNIT_PRICE * form.qty;
+
+  const setField =
+    (k: 'name' | 'phone' | 'address') =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm({ ...form, [k]: e.target.value });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) return;
     setError('');
 
     const englishPhone = convertToEnglishDigits(form.phone).replace(/\s/g, '');
     if (!englishPhone.match(/^01[3-9]\d{8}$/)) {
-      setError('Please provide a valid 11-digit Bangladeshi phone number (e.g. 017...).');
+      setError('Please provide a valid 11-digit phone number (e.g. 017...).');
       return;
     }
 
@@ -54,8 +69,10 @@ export default function LandingPageCheckoutForm({
           customerName: form.name,
           customerPhone: englishPhone,
           address: form.address,
-          landingPageId: landingPageId,
-          district: 'Inside Dhaka', // Optional: you can add a dropdown if needed
+          landingPageId: landingPage.id,
+          district: form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka',
+          quantity: form.qty,
+          price: UNIT_PRICE,
         }),
       });
 
@@ -74,93 +91,162 @@ export default function LandingPageCheckoutForm({
 
   if (submitted) {
     return (
-      <div className='bg-white rounded-3xl p-8 shadow-xl text-center max-w-lg mx-auto'>
-        <BadgeCheck size={64} className='text-green-500 mx-auto mb-4' />
-        <h3 className='text-2xl font-bold text-slate-800 mb-2'>Order Confirmed!</h3>
-        <p className='text-slate-500'>
-          Your order has been successfully placed. Our team will contact you shortly to confirm the
-          delivery.
+      <div className='text-center py-6'>
+        <div className='mb-2 flex justify-center'>
+          <BadgeCheck size={40} style={{ color: 'var(--lp-success)' }} />
+        </div>
+        <div className='text-lg font-bold' style={{ color: 'var(--lp-navy)' }}>
+          অর্ডার গ্রহণ হয়েছে!
+        </div>
+        <p className='mt-1 text-sm opacity-80'>
+          শীঘ্রই আমাদের প্রতিনিধি {form.phone} নম্বরে কল করে অর্ডার কনফার্ম করবেন।
         </p>
       </div>
     );
   }
 
   return (
-    <div
-      className='bg-white rounded-3xl p-6 md:p-8 shadow-xl max-w-xl mx-auto border-4'
-      style={{ borderColor: 'var(--lp-cta)' }}
-    >
-      <div className='mb-6 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4 border border-slate-100'>
-        <div className='min-w-0 text-left'>
-          <div className='font-bold text-slate-800 text-lg truncate'>
-            {checkoutData.productName || 'Special Product'}
-          </div>
-          <div className='text-sm text-slate-500'>{checkoutData.subName || 'Limited offer'}</div>
-        </div>
-        <div className='shrink-0 text-2xl font-extrabold text-[var(--lp-cta)] tabular-nums'>
-          {checkoutData.price ? `${bnDigits(subtotal)}৳` : 'Free'}
+    <form onSubmit={handleSubmit} className='grid gap-4 text-left'>
+      {error && <div className='bg-red-50 text-red-600 p-3 rounded-lg text-sm'>{error}</div>}
+
+      <label className='grid gap-1.5'>
+        <span className='text-sm font-semibold' style={{ color: 'var(--lp-navy)' }}>
+          আপনার নাম *
+        </span>
+        <input
+          required
+          value={form.name}
+          onChange={setField('name')}
+          placeholder='যেমন: রহিম উদ্দিন'
+          className='w-full rounded-lg border bg-white px-3 py-2.5 text-sm outline-none transition-shadow'
+          style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-foreground)' }}
+        />
+      </label>
+
+      <label className='grid gap-1.5'>
+        <span className='text-sm font-semibold' style={{ color: 'var(--lp-navy)' }}>
+          মোবাইল নাম্বার *
+        </span>
+        <input
+          required
+          type='tel'
+          inputMode='tel'
+          value={form.phone}
+          onChange={setField('phone')}
+          placeholder='01XXXXXXXXX'
+          className='w-full rounded-lg border bg-white px-3 py-2.5 text-sm outline-none transition-shadow'
+          style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-foreground)' }}
+        />
+      </label>
+
+      <div className='grid gap-1.5'>
+        <span className='text-sm font-semibold' style={{ color: 'var(--lp-navy)' }}>
+          পরিমাণ (কতটি) *
+        </span>
+        <div className='flex items-center gap-3'>
+          <button
+            type='button'
+            aria-label='কমান'
+            onClick={() => setForm({ ...form, qty: Math.max(1, form.qty - 1) })}
+            className='w-10 h-10 rounded-full border text-xl font-bold grid place-items-center hover:bg-black/5'
+            style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-navy)' }}
+          >
+            −
+          </button>
+          <input
+            readOnly
+            value={bnDigits(form.qty)}
+            className='w-16 text-center rounded-lg border bg-white px-2 py-2.5 text-base font-bold tabular-nums'
+            style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-navy)' }}
+          />
+          <button
+            type='button'
+            aria-label='বাড়ান'
+            onClick={() => setForm({ ...form, qty: Math.min(99, form.qty + 1) })}
+            className='w-10 h-10 rounded-full border text-xl font-bold grid place-items-center hover:bg-black/5'
+            style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-navy)' }}
+          >
+            +
+          </button>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className='space-y-4 text-left'>
-        {error && <div className='bg-red-50 text-red-600 p-3 rounded-lg text-sm'>{error}</div>}
-
-        <div>
-          <label className='block text-sm font-semibold text-slate-700 mb-1'>
-            আপনার নাম (Your Name) <span className='text-red-500'>*</span>
-          </label>
-          <input
-            type='text'
-            required
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className='w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--lp-cta)] text-lg'
-            placeholder='আপনার সম্পূর্ণ নাম লিখুন'
-          />
+      <div className='grid gap-1.5'>
+        <span className='text-sm font-semibold' style={{ color: 'var(--lp-navy)' }}>
+          ডেলিভারি এরিয়া *
+        </span>
+        <div className='grid grid-cols-2 gap-2'>
+          {(
+            [
+              { v: 'inside', label: 'ঢাকার ভিতরে' },
+              { v: 'outside', label: 'ঢাকার বাইরে' },
+            ] as const
+          ).map((opt) => {
+            const active = form.area === opt.v;
+            return (
+              <label
+                key={opt.v}
+                className='flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition'
+                style={{
+                  borderColor: active ? 'var(--lp-cta)' : 'var(--lp-border)',
+                  backgroundColor: active ? 'var(--lp-highlight)' : 'white',
+                  color: 'var(--lp-navy)',
+                  fontWeight: active ? 600 : 400,
+                }}
+              >
+                <input
+                  type='radio'
+                  name='area'
+                  value={opt.v}
+                  checked={active}
+                  onChange={() => setForm({ ...form, area: opt.v })}
+                  className='accent-(--lp-cta)'
+                />
+                <span>{opt.label}</span>
+              </label>
+            );
+          })}
         </div>
+      </div>
 
-        <div>
-          <label className='block text-sm font-semibold text-slate-700 mb-1'>
-            মোবাইল নাম্বার (Mobile Number) <span className='text-red-500'>*</span>
-          </label>
-          <input
-            type='tel'
-            required
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className='w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--lp-cta)] text-lg'
-            placeholder='01XXXXXXXXX'
-          />
-        </div>
+      <label className='grid gap-1.5'>
+        <span className='text-sm font-semibold' style={{ color: 'var(--lp-navy)' }}>
+          সম্পূর্ণ ঠিকানা *
+        </span>
+        <textarea
+          required
+          value={form.address}
+          onChange={setField('address')}
+          placeholder='বাসা/রোড, এলাকা, থানা, জেলা'
+          rows={3}
+          className='w-full rounded-lg border bg-white px-3 py-2.5 text-sm outline-none transition-shadow'
+          style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-foreground)' }}
+        />
+      </label>
 
-        <div>
-          <label className='block text-sm font-semibold text-slate-700 mb-1'>
-            সম্পূর্ণ ঠিকানা (Full Address) <span className='text-red-500'>*</span>
-          </label>
-          <textarea
-            required
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            className='w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-(--lp-cta) text-lg h-24 resize-none'
-            placeholder='গ্রাম/মহল্লা, থানা, জেলা'
-          />
-        </div>
-
-        {checkoutData.deliveryText && (
-          <div className='text-center text-sm font-semibold bg-(--lp-highlight) text-[var(--lp-navy)] py-2 rounded-lg mt-2'>
-            {checkoutData.deliveryText}
-          </div>
-        )}
-
-        <button
-          type='submit'
-          disabled={loading}
-          className='w-full mt-4 py-4 rounded-xl text-white font-bold text-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-70 flex items-center justify-center gap-2'
-          style={{ backgroundColor: 'var(--lp-cta)' }}
+      {checkoutData.deliveryText && (
+        <div
+          className='rounded-lg px-3 py-2.5 text-sm'
+          style={{
+            backgroundColor: 'var(--lp-highlight)',
+            color: 'var(--lp-highlight-foreground)',
+          }}
         >
-          {loading ? 'Processing...' : 'Confirm Order 🚀'}
+          {checkoutData.deliveryText}
+        </div>
+      )}
+
+      <div className='flex justify-center mt-2'>
+        <button type='submit' disabled={loading} className='btn-cta shiny-button w-full'>
+          {loading ? (
+            'Processing...'
+          ) : (
+            <>
+              {checkoutData.buttonText || 'অর্ডার কনফার্ম করুন'} <ArrowRight size={20} />
+            </>
+          )}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

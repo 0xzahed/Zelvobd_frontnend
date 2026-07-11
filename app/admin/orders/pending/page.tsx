@@ -129,7 +129,7 @@ export default function DashboardOrdersPendingPage() {
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1">
                       <Link
-                        href={`/admin/orders/${order.id}`}
+                        href={`/admin/orders/invoice/${order.id}`}
                         className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground"
                       >
                         <Eye className="h-4 w-4" />

@@ -83,6 +83,16 @@ export const updateOrderStatus = async (id: string, status: string) => {
   return payload.data
 }
 
+export const getOrderById = async (id: string) => {
+  const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
+    method: "GET",
+    headers: { ...authHeaders() },
+  })
+  const payload = await parseJsonSafe(response)
+  assertOk(response, payload)
+  return payload.data
+}
+
 export const deleteOrder = async (id: string) => {
   const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
     method: "DELETE",
