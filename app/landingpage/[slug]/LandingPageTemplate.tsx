@@ -28,6 +28,7 @@ import {
 import * as LucideIcons from 'lucide-react';
 import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 import LandingPageCheckoutForm from './LandingPageCheckoutForm';
+import { SiteFooter } from '@/components/layout/site-footer';
 import './landing-page.css';
 
 const googleSans = localFont({
@@ -751,7 +752,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           </div>
         </div>
         <div className='flex justify-center'>
-          <a href='#order' className='btn-cta !py-2 !px-3 text-sm'>
+          <a href='#order' className='btn-cta py-2! px-3! text-sm'>
             অর্ডার করুন <ArrowRight size={16} />
           </a>
         </div>
@@ -770,6 +771,10 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           <MessageCircle size={28} />
         </a>
       )}
+
+      {/* Main Website Footer */}
+      <SiteFooter />
     </div>
   );
 }
+
