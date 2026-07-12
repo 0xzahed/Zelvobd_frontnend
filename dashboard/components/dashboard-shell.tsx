@@ -26,7 +26,7 @@ const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
   { match: '/admin/orders/delivered', title: 'Delivered Orders' },
   { match: '/admin/orders/cancelled', title: 'Cancelled Orders' },
   { match: '/admin/customers', title: 'Customers' },
-  { match: '/admin/chat', title: 'Live Chat' },
+  // { match: '/admin/chat', title: 'Live Chat' },
   { match: '/admin/admins', title: 'Admins' },
   { match: '/admin/footer', title: 'Footer' },
   { match: '/admin/notifications', title: 'Notifications' },

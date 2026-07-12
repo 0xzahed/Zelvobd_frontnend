@@ -14,7 +14,7 @@ import {
 } from '@/src/hooks/api/useProducts';
 import { Copy, Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { ProductModal } from './product-modal';
 
 export default function DashboardProductsPage() {
@@ -23,6 +23,7 @@ export default function DashboardProductsPage() {
   const deleteMutation = useDeleteProduct();
   const copyMutation = useCopyProduct();
   const toggleMutation = useToggleProductField();
+  const copyingIdRef = useRef<string | null>(null);
   const confirm = useConfirm();
 
   const [q, setQ] = useState('');
@@ -234,7 +235,13 @@ export default function DashboardProductsPage() {
                           <Pencil className='h-4 w-4' />
                         </button>
                         <button
-                          onClick={() => copyMutation.mutate(p.id)}
+                          type='button'
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (copyingIdRef.current) return;
+                            copyingIdRef.current = p.id;
+                            copyMutation.mutate(p.id, { onSettled: () => (copyingIdRef.current = null) });
+                          }}
                           disabled={copyMutation.isPending}
                           className='grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:opacity-50'
                         >
@@ -356,7 +363,13 @@ export default function DashboardProductsPage() {
                   </div>
                   <div className='mt-2 grid grid-cols-2 gap-2'>
                     <button
-                      onClick={() => copyMutation.mutate(p.id)}
+                      type='button'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (copyingIdRef.current) return;
+                        copyingIdRef.current = p.id;
+                        copyMutation.mutate(p.id, { onSettled: () => (copyingIdRef.current = null) });
+                      }}
                       disabled={copyMutation.isPending}
                       className='flex h-8 items-center justify-center gap-1.5 rounded-lg border border-border/40 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white disabled:opacity-50'
                     >
