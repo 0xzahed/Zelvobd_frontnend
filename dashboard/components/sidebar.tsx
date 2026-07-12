@@ -100,7 +100,7 @@ const MENU: Section[] = [
     title: 'System',
     items: [
       { label: 'Admins', icon: ShieldCheck, href: '/admin/admins' },
-      { label: 'Footer', icon: Settings2, href: '/admin/footer' },
+      // { label: 'Footer', icon: Settings2, href: '/admin/footer' },
     ],
   },
 ];
