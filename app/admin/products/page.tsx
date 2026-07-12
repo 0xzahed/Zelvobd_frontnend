@@ -100,27 +100,27 @@ export default function DashboardProductsPage() {
       <DashHeader
         title='Products List'
         subtitle="Track your store's progress to boost your sales."
-        actions={
-          <button
-            onClick={openAdd}
-            className='inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-primary/90'
-          >
-            <Plus className='h-3.5 w-3.5' />
-            Add Product
-          </button>
-        }
       />
 
       {/* Filters */}
-      <div className='flex flex-wrap items-center justify-between gap-3'>
-        <div className='flex h-10 min-w-0 max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3'>
-          <Search className='h-4 w-4 text-muted-foreground' />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder='Search...'
-            className='w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground'
-          />
+      <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-3'>
+        <div className='flex w-full md:w-auto items-center gap-2'>
+          <div className='flex flex-1 h-10 min-w-0 md:max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3'>
+            <Search className='h-4 w-4 shrink-0 text-muted-foreground' />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder='Search...'
+              className='w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground'
+            />
+          </div>
+          <button
+            onClick={openAdd}
+            className='inline-flex shrink-0 h-10 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90'
+          >
+            <Plus className='h-4 w-4' />
+            <span>Add Product</span>
+          </button>
         </div>
         <div className='flex items-center gap-2'>
           <select
