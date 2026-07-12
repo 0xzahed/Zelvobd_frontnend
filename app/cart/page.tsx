@@ -348,7 +348,16 @@ export default function CartPage() {
   };
 
   const updateForm = (key: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    let finalValue = value;
+    if (key === 'phone') {
+      const map: Record<string, string> = {
+        '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+        '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9',
+      };
+      finalValue = finalValue.replace(/[০-৯]/g, (match) => map[match]).replace(/\s+/g, '');
+      finalValue = finalValue.replace(/^(?:\+88|88)/, '');
+    }
+    setForm((prev) => ({ ...prev, [key]: finalValue }));
   };
 
   const onCheckout = async () => {
@@ -361,6 +370,14 @@ export default function CartPage() {
       notify.error({
         title: 'Validation Error',
         message: 'Please fill in all required fields including Location',
+      });
+      return;
+    }
+
+    if (!form.phone.match(/^01[3-9]\d{8}$/)) {
+      notify.error({
+        title: 'Validation Error',
+        message: 'Please provide a valid 11-digit Bangladeshi phone number (e.g. 017...).',
       });
       return;
     }
