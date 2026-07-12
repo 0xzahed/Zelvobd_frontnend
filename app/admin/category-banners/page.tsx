@@ -269,7 +269,7 @@ export default function DashboardCategoryBannersPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="relative flex min-h-[140px] w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-primary/40 bg-surface/50 transition hover:bg-surface"
+                  className="relative flex min-h-35 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-primary/40 bg-surface/50 transition hover:bg-surface"
                 >
                   {draft.imageUrl ? (
                     <div className="flex flex-col items-center gap-2 p-4">

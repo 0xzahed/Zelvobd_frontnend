@@ -196,7 +196,7 @@ export default function DashboardAdminsPage() {
                   style={{ backgroundColor: isActive ? "#22c55e" : "#d1d5db" }}
                   onClick={() => setIsActive((p) => !p)}
                 >
-                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${isActive ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out ${isActive ? "translate-x-5.5" : "translate-x-0.5"}`} />
                 </div>
                 <label className="text-sm text-foreground cursor-pointer select-none" onClick={() => setIsActive((p) => !p)}>Active</label>
               </div>
