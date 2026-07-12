@@ -40,6 +40,7 @@ export default function DashboardSubCategoriesPage() {
         ...sub,
         categoryName: c.name,
         categoryId: c.id,
+        createdAt: sub.createdAt || c.createdAt || new Date().toISOString(),
       })),
     );
   }, [categories]);
@@ -294,7 +295,9 @@ export default function DashboardSubCategoriesPage() {
                 <p className='text-sm font-semibold text-foreground'>{s.name}</p>
                 <p className='mt-0.5 text-xs text-muted-foreground'>/{s.slug}</p>
                 <p className='mt-2 text-xs text-muted-foreground'>
-                  Created {formatRelativeTime(s.createdAt)}
+                  Created {s.createdAt
+                    ? new Date(s.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : '-'}
                 </p>
                 <div className='mt-3 grid grid-cols-2 gap-2'>
                   <button
