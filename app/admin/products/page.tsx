@@ -12,13 +12,12 @@ import {
   useProducts,
   useToggleProductField,
 } from '@/src/hooks/api/useProducts';
-import { getProductDetails } from '@/src/api/productApi';
-import { mapProduct } from '@/src/api/mainApi';
+import { ProductEditDialog } from './product-edit-dialog';
+import { ProductViewDialog } from './product-view-dialog';
 import { Copy, Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo, useState, useRef } from 'react';
-import { ProductModal } from './product-modal';
-import { ProductViewDialog } from './product-view-dialog';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardProductsPage() {
   const { data: products = [], isLoading } = useProducts({ limit: 1000 });
@@ -28,22 +27,21 @@ export default function DashboardProductsPage() {
   const toggleMutation = useToggleProductField();
   const copyingIdRef = useRef<string | null>(null);
   const confirm = useConfirm();
+  const router = useRouter();
 
   const [q, setQ] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [view, setView] = useState<ViewMode>('grid');
-  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editProductId, setEditProductId] = useState<string | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewProductId, setViewProductId] = useState<string | null>(null);
-  const [viewLoading, setViewLoading] = useState(false);
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
   const rowsPerPage = 10;
 
   const openAdd = () => {
-    setEditProduct(null);
-    setShowModal(true);
+    router.push('/admin/products/new');
   };
 
   const openView = (p: Product) => {
@@ -51,19 +49,9 @@ export default function DashboardProductsPage() {
     setShowViewModal(true);
   };
 
-  const openEdit = async (p: Product) => {
-    try {
-      setViewLoading(true);
-      const res = await getProductDetails(p.id);
-      const fullProduct = mapProduct(res?.data);
-      setEditProduct(fullProduct);
-    } catch (err) {
-      console.error('Failed to fetch full product details', err);
-      setEditProduct(p);
-    } finally {
-      setViewLoading(false);
-      setShowModal(true);
-    }
+  const openEdit = (p: Product) => {
+    setEditProductId(p.id);
+    setShowEditModal(true);
   };
 
   const handleDelete = async (p: Product) => {
@@ -450,22 +438,17 @@ export default function DashboardProductsPage() {
           )}
         </>
       )}
-      {showModal && <ProductModal editProduct={editProduct} onClose={() => setShowModal(false)} />}
+      <ProductEditDialog
+        productId={editProductId}
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+      />
 
       <ProductViewDialog
         productId={viewProductId}
         open={showViewModal}
         onOpenChange={setShowViewModal}
       />
-
-      {viewLoading && (
-        <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/20'>
-          <div className='flex items-center gap-3 rounded-lg bg-card p-4 text-sm font-medium text-foreground shadow-xl'>
-            <div className='h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent' />
-            Loading details...
-          </div>
-        </div>
-      )}
     </DashPage>
   );
 }
