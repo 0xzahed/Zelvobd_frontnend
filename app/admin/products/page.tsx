@@ -12,10 +12,13 @@ import {
   useProducts,
   useToggleProductField,
 } from '@/src/hooks/api/useProducts';
+import { getProductDetails } from '@/src/api/productApi';
+import { mapProduct } from '@/src/api/mainApi';
 import { Copy, Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo, useState, useRef } from 'react';
 import { ProductModal } from './product-modal';
+import { ProductViewDialog } from './product-view-dialog';
 
 export default function DashboardProductsPage() {
   const { data: products = [], isLoading } = useProducts({ limit: 1000 });
@@ -32,6 +35,9 @@ export default function DashboardProductsPage() {
   const [page, setPage] = useState(1);
   const [view, setView] = useState<ViewMode>('grid');
   const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewProductId, setViewProductId] = useState<string | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const rowsPerPage = 10;
 
@@ -40,9 +46,24 @@ export default function DashboardProductsPage() {
     setShowModal(true);
   };
 
-  const openEdit = (p: Product) => {
-    setEditProduct(p);
-    setShowModal(true);
+  const openView = (p: Product) => {
+    setViewProductId(p.id);
+    setShowViewModal(true);
+  };
+
+  const openEdit = async (p: Product) => {
+    try {
+      setViewLoading(true);
+      const res = await getProductDetails(p.id);
+      const fullProduct = mapProduct(res?.data);
+      setEditProduct(fullProduct);
+    } catch (err) {
+      console.error('Failed to fetch full product details', err);
+      setEditProduct(p);
+    } finally {
+      setViewLoading(false);
+      setShowModal(true);
+    }
   };
 
   const handleDelete = async (p: Product) => {
@@ -223,7 +244,7 @@ export default function DashboardProductsPage() {
                     <td className='px-5 py-3.5'>
                       <div className='flex items-center gap-1'>
                         <button
-                          onClick={() => openEdit(p)}
+                          onClick={() => openView(p)}
                           className='grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground'
                         >
                           <Eye className='h-4 w-4' />
@@ -240,7 +261,9 @@ export default function DashboardProductsPage() {
                             e.preventDefault();
                             if (copyingIdRef.current) return;
                             copyingIdRef.current = p.id;
-                            copyMutation.mutate(p.id, { onSettled: () => (copyingIdRef.current = null) });
+                            copyMutation.mutate(p.id, {
+                              onSettled: () => (copyingIdRef.current = null),
+                            });
                           }}
                           disabled={copyMutation.isPending}
                           className='grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:opacity-50'
@@ -347,7 +370,7 @@ export default function DashboardProductsPage() {
                   </div>
                   <div className='mt-3 grid grid-cols-2 gap-2'>
                     <button
-                      onClick={() => openEdit(p)}
+                      onClick={() => openView(p)}
                       className='flex h-8 items-center justify-center gap-1.5 rounded-lg bg-secondary text-xs font-semibold text-foreground transition hover:bg-primary hover:text-white'
                     >
                       <Eye className='h-3.5 w-3.5' />
@@ -368,7 +391,9 @@ export default function DashboardProductsPage() {
                         e.preventDefault();
                         if (copyingIdRef.current) return;
                         copyingIdRef.current = p.id;
-                        copyMutation.mutate(p.id, { onSettled: () => (copyingIdRef.current = null) });
+                        copyMutation.mutate(p.id, {
+                          onSettled: () => (copyingIdRef.current = null),
+                        });
                       }}
                       disabled={copyMutation.isPending}
                       className='flex h-8 items-center justify-center gap-1.5 rounded-lg border border-border/40 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white disabled:opacity-50'
@@ -426,6 +451,21 @@ export default function DashboardProductsPage() {
         </>
       )}
       {showModal && <ProductModal editProduct={editProduct} onClose={() => setShowModal(false)} />}
+
+      <ProductViewDialog
+        productId={viewProductId}
+        open={showViewModal}
+        onOpenChange={setShowViewModal}
+      />
+
+      {viewLoading && (
+        <div className='fixed inset-0 z-100 flex items-center justify-center bg-black/20'>
+          <div className='flex items-center gap-3 rounded-lg bg-card p-4 text-sm font-medium text-foreground shadow-xl'>
+            <div className='h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+            Loading details...
+          </div>
+        </div>
+      )}
     </DashPage>
   );
 }
