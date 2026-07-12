@@ -1,34 +1,34 @@
-"use client"
+'use client';
 
-import Script from "next/script"
-import { usePathname, useSearchParams } from "next/navigation"
-import { useEffect, Suspense } from "react"
-import { FB_PIXEL_ID, pageview } from "@/lib/pixel"
+import Script from 'next/script';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+import { FB_PIXEL_ID, pageview } from '@/lib/pixel';
 
 function PixelPageviewTracker() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!pathname.startsWith('/dashboard')) {
-      pageview()
+    if (!pathname.startsWith('/admin')) {
+      pageview();
     }
-  }, [pathname, searchParams])
+  }, [pathname, searchParams]);
 
-  return null
+  return null;
 }
 
 export function FacebookPixel() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
-  if (!FB_PIXEL_ID) return null
-  if (pathname.startsWith('/dashboard')) return null
+  if (!FB_PIXEL_ID) return null;
+  if (pathname.startsWith('/admin')) return null;
 
   return (
     <>
       <Script
-        id="fb-pixel"
-        strategy="afterInteractive"
+        id='fb-pixel'
+        strategy='afterInteractive'
         dangerouslySetInnerHTML={{
           __html: `
             !function(f,b,e,v,n,t,s)
@@ -46,16 +46,16 @@ export function FacebookPixel() {
       <noscript>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
+          height='1'
+          width='1'
+          style={{ display: 'none' }}
           src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
-          alt=""
+          alt=''
         />
       </noscript>
       <Suspense fallback={null}>
         <PixelPageviewTracker />
       </Suspense>
     </>
-  )
+  );
 }
