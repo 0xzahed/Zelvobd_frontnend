@@ -8,6 +8,7 @@ import {
   Gauge,
   Layout,
   LayoutDashboard,
+  LogOut,
   Package,
   Settings2,
   ShieldCheck,
@@ -20,8 +21,11 @@ import {
   Youtube,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { notify } from '@/lib/notify';
 
 type NavChild = { href: string; label: string };
 type NavItem = {
@@ -127,7 +131,34 @@ function isGroupActive(pathname: string, item: NavItem) {
 
 export function DashboardSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { admin, logoutAdmin } = useAuth();
+  const confirm = useConfirm();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    const approved = await confirm({
+      title: 'Logout?',
+      message: 'Are you sure you want to log out?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      variant: 'danger',
+    });
+    if (!approved) return;
+    setLoggingOut(true);
+    try {
+      await logoutAdmin();
+      notify.success({ title: 'Logged out', message: 'You have been signed out.' });
+      router.replace('/login');
+    } catch {
+      router.replace('/login');
+    } finally {
+      setLoggingOut(false);
+      onClose();
+    }
+  };
 
   const initialOpenGroups = useMemo(() => {
     const set: Record<string, boolean> = {};
@@ -289,14 +320,29 @@ export function DashboardSidebar({ open, onClose }: { open: boolean; onClose: ()
           ))}
         </nav>
 
+        {/* Logout */}
+        <div className='mx-3 mb-3'>
+          <button
+            type='button'
+            onClick={() => void handleLogout()}
+            disabled={loggingOut}
+            className='flex w-full items-center gap-2 rounded-xl border border-border/40 bg-card px-3 py-2.5 text-[13px] font-medium text-foreground transition hover:bg-secondary disabled:opacity-60'
+          >
+            <LogOut className='h-4 w-4 text-muted-foreground' />
+            {loggingOut ? 'Logging out...' : 'Logout'}
+          </button>
+        </div>
+
         {/* Admin user */}
         <div className='mx-3 mb-4 flex items-center gap-3 rounded-xl border border-border/40 bg-card p-3'>
           <div className='grid h-9 w-9 place-items-center rounded-full bg-primary text-xs font-bold text-white'>
-            A
+            {admin?.email?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className='min-w-0 flex-1'>
-            <p className='truncate text-[13px] font-semibold text-foreground'>Admin</p>
-            <p className='truncate text-[11px] text-muted-foreground'>admin@gmail.com</p>
+            <p className='truncate text-[13px] font-semibold text-foreground'>
+              {admin?.email || 'Administrator'}
+            </p>
+            <p className='truncate text-[11px] text-muted-foreground'>Administrator</p>
           </div>
         </div>
       </aside>

@@ -83,6 +83,41 @@ export const updateOrderStatus = async (id: string, status: string) => {
   return payload.data
 }
 
+export type UpdateOrderItemInput = {
+  id?: string
+  productId?: string
+  productName: string
+  productImage?: string | null
+  price: number
+  quantity: number
+  color?: string | null
+  size?: string | null
+}
+
+export type UpdateOrderPayload = {
+  customerName?: string
+  customerPhone?: string
+  address?: string
+  district?: string
+  union?: string | null
+  orderNotes?: string | null
+  items?: UpdateOrderItemInput[]
+  shippingCharge?: number
+  discountAmount?: number
+  promoCode?: string | null
+}
+
+export const updateOrder = async (id: string, data: UpdateOrderPayload) => {
+  const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
+    method: "PATCH",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+  const payload = await parseJsonSafe(response)
+  assertOk(response, payload)
+  return payload.data
+}
+
 export const getOrderById = async (id: string) => {
   const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
     method: "GET",

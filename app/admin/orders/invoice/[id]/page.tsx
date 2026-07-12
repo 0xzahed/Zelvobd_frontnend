@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 import { Printer } from "lucide-react"
 import { useOrderById } from "@/src/hooks/api/useOrders"
@@ -21,24 +21,33 @@ export default function InvoicePage() {
   const id = params.id as string
   const { data: order, isLoading } = useOrderById(id)
   const printRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+  const [scaledHeight, setScaledHeight] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    const update = () => {
+      const container = containerRef.current
+      const wrapper = printRef.current
+      if (!container || !wrapper) return
+      const containerWidth = container.clientWidth
+      const naturalWidth = 880
+      const newScale = containerWidth >= naturalWidth ? 1 : containerWidth / naturalWidth
+      setScale(newScale)
+      setScaledHeight(wrapper.scrollHeight * newScale)
+    }
+    update()
+    window.addEventListener("resize", update)
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null
+    if (ro && containerRef.current) ro.observe(containerRef.current)
+    return () => {
+      window.removeEventListener("resize", update)
+      if (ro && containerRef.current) ro.unobserve(containerRef.current)
+    }
+  }, [order])
 
   const handlePrint = () => {
-    const w = window.open("", "_blank")
-    if (!w || !printRef.current) return
-    const style = Array.from(document.styleSheets)
-      .map((s) => {
-        try {
-          return Array.from(s.cssRules || [])
-            .map((r) => r.cssText)
-            .join("")
-        } catch {
-          return ""
-        }
-      })
-      .join("")
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice - ${order?.code || ""}</title><style>${style}</style></head><body style="margin:0;background:#e8e8e8">${printRef.current.outerHTML}<script>window.onload=function(){window.print();window.close()}</script></body></html>`
-    w.document.write(html)
-    w.document.close()
+    window.print()
   }
 
   if (isLoading) {
@@ -75,24 +84,31 @@ export default function InvoicePage() {
         </button>
       </div>
 
-      <div ref={printRef} className="invoice-wrapper" style={{ background: "#e8e8e8", padding: 20 }}>
+      <div
+        ref={containerRef}
+        className="invoice-container print:overflow-visible"
+        style={{ width: "100%", height: scaledHeight, overflow: "hidden" }}
+      >
         <div
+          ref={printRef}
+          className="invoice-wrapper"
           style={{
-            width: 840,
-            margin: "0 auto",
-            background: "#ffffff",
-            position: "relative",
-            border: "1px solid #cfd8e8",
+            width: 880,
+            background: "#e8e8e8",
+            padding: 20,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
           }}
         >
-          {/* Top bar */}
           <div
             style={{
-              height: 80,
-              background: "linear-gradient(90deg, #7f9fd0 0%, #2b4a8c 55%, #1a3570 100%)",
+              width: 840,
+              margin: "0 auto",
+              background: "#ffffff",
+              position: "relative",
+              border: "1px solid #cfd8e8",
             }}
-          />
-
+          >
           {/* Header */}
           <div
             style={{
@@ -161,49 +177,49 @@ export default function InvoicePage() {
           <div style={{ padding: "10px 35px 0 35px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
               <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
-                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
                   No:
                 </span>
-                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.code}</span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 28 }}>
+                  <span style={{ fontSize: 18, color: "#1a3570", paddingLeft: 6 }}>{order.code}</span>
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
-                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
                   Date
                 </span>
-                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{dateStr}</span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 28 }}>
+                  <span style={{ fontSize: 18, color: "#1a3570", paddingLeft: 6 }}>{dateStr}</span>
                 </div>
               </div>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
               <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
-                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
                   Name
                 </span>
-                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.customerName}</span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 28 }}>
+                  <span style={{ fontSize: 18, color: "#1a3570", paddingLeft: 6 }}>{order.customerName}</span>
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "baseline", width: "45%" }}>
-                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
                   Consignment No
                 </span>
-                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>{order.consignmentId || ""}</span>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 28 }}>
+                  <span style={{ fontSize: 18, color: "#1a3570", paddingLeft: 6 }}>{order.consignmentId || ""}</span>
                 </div>
               </div>
             </div>
 
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", alignItems: "baseline", marginBottom: 4 }}>
-                <span style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", whiteSpace: "nowrap", marginRight: 10 }}>
                   Address
                 </span>
-                <div style={{ flex: 1, ...LINE_STYLE, height: 22 }}>
-                  <span style={{ fontSize: 16, color: "#1a3570", paddingLeft: 6 }}>
+                <div style={{ flex: 1, ...LINE_STYLE, height: 28 }}>
+                  <span style={{ fontSize: 18, color: "#1a3570", paddingLeft: 6 }}>
                     {order.address}
                     {order.district ? `, ${order.district}` : ""}
                   </span>
@@ -215,45 +231,39 @@ export default function InvoicePage() {
 
           {/* Mobile number boxes */}
           <div style={{ padding: "5px 35px 0 35px" }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: "#1a3570", marginBottom: 8 }}>Mobile No.</div>
-            <div style={{ display: "flex", gap: 15, marginBottom: 20 }}>
-              {[0, 1].map((grp) => (
-                <div key={grp} style={{ display: "flex", flex: 1 }}>
-                  {digitsArray(phone, 11).slice(grp * 6, grp * 6 + 6).length > 0
-                    ? digitsArray(phone, 11)
-                        .slice(grp * 6, grp * 6 + 6)
-                        .map((d, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              flex: 1,
-                              height: 38,
-                              ...BOX_STYLE,
-                              borderLeft: i === 0 ? "1.5px solid #2b4a8c" : "none",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: 18,
-                              fontWeight: 700,
-                              color: "#1a3570",
-                            }}
-                          >
-                            {d}
-                          </div>
-                        ))
-                    : Array.from({ length: 11 }).map((_, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            flex: 1,
-                            height: 38,
-                            ...BOX_STYLE,
-                            borderLeft: i === 0 ? "1.5px solid #2b4a8c" : "none",
-                          }}
-                        />
-                      ))}
-                </div>
-              ))}
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#1a3570", marginBottom: 8 }}>Mobile No.</div>
+            <div style={{ display: "flex", marginBottom: 20 }}>
+              {digitsArray(phone, 11).length > 0
+                ? digitsArray(phone, 11).map((d, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        flex: 1,
+                        height: 38,
+                        ...BOX_STYLE,
+                        borderLeft: i === 0 ? "1.5px solid #2b4a8c" : "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 18,
+                        fontWeight: 700,
+                        color: "#1a3570",
+                      }}
+                    >
+                      {d}
+                    </div>
+                  ))
+                : Array.from({ length: 11 }).map((_, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        flex: 1,
+                        height: 38,
+                        ...BOX_STYLE,
+                        borderLeft: i === 0 ? "1.5px solid #2b4a8c" : "none",
+                      }}
+                    />
+                  ))}
             </div>
           </div>
 
@@ -266,27 +276,17 @@ export default function InvoicePage() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 380,
-                opacity: 0.12,
+                width: 360,
+                opacity: 0.1,
                 pointerEvents: "none",
                 zIndex: 1,
               }}
             >
-              <svg viewBox="0 0 200 200" style={{ width: "100%", height: "auto" }}>
-                <circle cx="100" cy="90" r="85" fill="none" stroke="#1a3570" strokeWidth="3" />
-                <text
-                  x="100"
-                  y="115"
-                  fontSize="90"
-                  fontWeight="900"
-                  fontStyle="italic"
-                  fill="#1a3570"
-                  textAnchor="middle"
-                  fontFamily="Arial"
-                >
-                  Z
-                </text>
-              </svg>
+              <img
+                src="/logo.png"
+                alt=""
+                style={{ width: "100%", height: "auto", objectFit: "contain" }}
+              />
             </div>
 
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -391,9 +391,18 @@ export default function InvoicePage() {
           </div>
         </div>
       </div>
+      </div>
 
       <style jsx global>{`
+        @page {
+          margin: 0;
+          size: auto;
+        }
         @media print {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           body * {
             visibility: hidden;
           }
@@ -401,13 +410,20 @@ export default function InvoicePage() {
           .invoice-wrapper * {
             visibility: visible;
           }
+          .invoice-container {
+            height: auto !important;
+            overflow: visible !important;
+          }
           .invoice-wrapper {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            min-width: 0 !important;
             padding: 0 !important;
+            overflow: visible !important;
             background: #e8e8e8 !important;
+            transform: none !important;
           }
           .invoice-wrapper > div {
             width: 100% !important;

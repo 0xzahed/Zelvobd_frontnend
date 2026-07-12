@@ -9,6 +9,8 @@ import {
   useDeleteSubCategory,
   useUpdateSubCategory,
 } from '@/src/hooks/api/useCategories';
+import { getSubCategoryDetails } from '@/src/api/categoryApi';
+import { handleApiError, toAbsoluteUrl } from '@/lib/api-utils';
 import { Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useMemo, useRef, useState } from 'react';
@@ -24,6 +26,9 @@ export default function DashboardSubCategoriesPage() {
   const rowsPerPage = 10;
   const [showModal, setShowModal] = useState(false);
   const [editingSub, setEditingSub] = useState<any>(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [viewSub, setViewSub] = useState<any>(null);
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -71,6 +76,31 @@ export default function DashboardSubCategoriesPage() {
     setImage(sub.image || '');
     setCategoryId(sub.categoryId);
     setShowModal(true);
+  };
+
+  const openView = async (sub: any) => {
+    setViewOpen(true);
+    setViewLoading(true);
+    setViewSub(null);
+    try {
+      const res = await getSubCategoryDetails(sub.id);
+      const details = res?.data;
+      if (!details?.id) throw new Error('Sub-category details not found');
+      setViewSub({
+        id: String(details.id),
+        title: String(details.title || sub.name),
+        slug: String(details.slug || sub.slug),
+        categoryName: String(details.category?.name || sub.categoryName || '-'),
+        imageUrl: toAbsoluteUrl(details.imageUrl || sub.image),
+        createdAt: details.createdAt ? String(details.createdAt) : undefined,
+        updatedAt: details.updatedAt ? String(details.updatedAt) : undefined,
+      });
+    } catch (error) {
+      handleApiError(error, 'Failed to load sub-category');
+      setViewOpen(false);
+    } finally {
+      setViewLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -211,7 +241,7 @@ export default function DashboardSubCategoriesPage() {
                     <td className='px-5 py-3.5'>
                       <div className='flex items-center gap-1'>
                         <button
-                          onClick={() => openEdit(s)}
+                          onClick={() => void openView(s)}
                           className='grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-secondary hover:text-foreground'
                         >
                           <Eye className='h-4 w-4' />
@@ -268,7 +298,7 @@ export default function DashboardSubCategoriesPage() {
                 </p>
                 <div className='mt-3 grid grid-cols-2 gap-2'>
                   <button
-                    onClick={() => openEdit(s)}
+                    onClick={() => void openView(s)}
                     className='flex h-8 items-center justify-center gap-1.5 rounded-lg bg-secondary text-xs font-semibold text-foreground transition hover:bg-primary hover:text-white'
                   >
                     <Eye className='h-3.5 w-3.5' />
@@ -423,6 +453,73 @@ export default function DashboardSubCategoriesPage() {
                 {createMutation.isPending || updateMutation.isPending ? 'Submitting...' : 'Submit'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {viewOpen && (
+        <div
+          className='fixed inset-0 z-50 grid place-items-center bg-black/40 p-4'
+          role='dialog'
+          aria-modal='true'
+          onClick={() => setViewOpen(false)}
+        >
+          <div
+            className='relative w-full max-w-md rounded-2xl bg-card p-6 shadow-xl'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type='button'
+              aria-label='Close'
+              onClick={() => setViewOpen(false)}
+              className='absolute right-4 top-4 text-muted-foreground hover:text-foreground'
+            >
+              <X className='h-4 w-4' />
+            </button>
+            <h3 className='text-center text-base font-bold text-foreground'>Sub Category Details</h3>
+            <div className='mx-auto mt-4 h-px w-full bg-border/60' />
+
+            {viewLoading && (
+              <p className='py-10 text-center text-sm text-muted-foreground'>Loading details...</p>
+            )}
+
+            {!viewLoading && viewSub && (
+              <div className='mt-5 space-y-4'>
+                <div className='mx-auto h-36 w-36 overflow-hidden rounded-xl border border-border/60 bg-secondary'>
+                  <img
+                    src={viewSub.imageUrl || '/placeholder.svg'}
+                    alt={viewSub.title}
+                    className='h-full w-full object-cover'
+                  />
+                </div>
+                <div className='space-y-2 rounded-xl border border-border/60 bg-secondary/30 p-4 text-sm'>
+                  <p className='text-foreground'>
+                    <span className='mr-2 font-semibold'>Title:</span>
+                    {viewSub.title}
+                  </p>
+                  <p className='text-foreground'>
+                    <span className='mr-2 font-semibold'>Slug:</span>/{viewSub.slug}
+                  </p>
+                  <p className='text-foreground'>
+                    <span className='mr-2 font-semibold'>Parent Category:</span>
+                    {viewSub.categoryName}
+                  </p>
+                  <p className='text-muted-foreground'>
+                    <span className='mr-2 font-semibold text-foreground'>Created:</span>
+                    {viewSub.createdAt
+                      ? new Date(viewSub.createdAt).toLocaleString()
+                      : 'N/A'}
+                  </p>
+                  <p className='text-muted-foreground'>
+                    <span className='mr-2 font-semibold text-foreground'>Updated:</span>
+                    {viewSub.updatedAt
+                      ? new Date(viewSub.updatedAt).toLocaleString()
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

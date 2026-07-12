@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText } from "lucide-react"
-import { useOrders, useUpdateOrderStatus, useDeleteOrder, type Order, type OrderStatus } from "@/src/hooks/api/useOrders"
+import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
+import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
+import { useProducts } from "@/src/hooks/api/useProducts"
+import type { Product, ProductVariant } from "@/lib/types"
 import { useFraudCheck, useSteadfastDeliveryStatus, useSyncOrders } from "@/src/hooks/api/useSteadfast"
 import { formatBDT, formatRelativeTime } from "@/lib/format"
 import { useConfirm } from "@/components/ui/confirm-dialog"
@@ -42,6 +44,7 @@ type OrderListProps = {
 function OrderCard({
   order,
   onDelete,
+  onEdit,
   onFraudCheck,
   onStatusChange,
   onSyncSteadfast,
@@ -49,6 +52,7 @@ function OrderCard({
 }: {
   order: Order
   onDelete: (o: Order) => void
+  onEdit: (o: Order) => void
   onFraudCheck: (phone: string) => void
   onStatusChange?: (id: string, status: OrderStatus) => void
   onSyncSteadfast?: (id: string) => void
@@ -100,23 +104,29 @@ function OrderCard({
         </div>
 
         {/* Courier Info */}
-        {(order.consignmentId || order.trackingCode) && (
-          <div className="mb-3 rounded-lg border border-primary/10 bg-primary/5 p-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
-              <Package className="h-3.5 w-3.5" />
-              Courier Status
-            </div>
-            <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-              {order.consignmentId && (
-                <p><span className="font-semibold text-foreground/70">Consignment:</span> {order.consignmentId}</p>
+        <div className="mb-3 rounded-lg border border-primary/10 bg-primary/5 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
+            <Package className="h-3.5 w-3.5" />
+            Courier Status
+          </div>
+          <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+            <p>
+              <span className="font-semibold text-foreground/70">Consignment:</span>{" "}
+              {order.consignmentId || "-"}
+            </p>
+            <p>
+              <span className="font-semibold text-foreground/70">Tracking:</span>{" "}
+              {order.trackingCode ? (
+                <span className="font-mono text-primary">{order.trackingCode}</span>
+              ) : (
+                "-"
               )}
-              {order.trackingCode && (
-                <p><span className="font-semibold text-foreground/70">Tracking:</span> <span className="font-mono text-primary">{order.trackingCode}</span></p>
-              )}
-              <div className="mt-1.5 border-t border-primary/10 pt-1.5">
-                <p className="flex items-center gap-2">
-                  <span className="font-semibold text-foreground/70">Live Status:</span>
-                  {statusLoading ? (
+            </p>
+            <div className="mt-1.5 border-t border-primary/10 pt-1.5">
+              <p className="flex items-center gap-2">
+                <span className="font-semibold text-foreground/70">Live Status:</span>
+                {order.consignmentId ? (
+                  statusLoading ? (
                     <span className="flex items-center gap-1 text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       Fetching...
@@ -127,12 +137,14 @@ function OrderCard({
                     </span>
                   ) : (
                     <span className="text-red-500">Failed</span>
-                  )}
-                </p>
-              </div>
+                  )
+                ) : (
+                  <span className="text-muted-foreground">Not synced yet</span>
+                )}
+              </p>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Items */}
         {order.items && order.items.length > 0 && (
@@ -206,6 +218,12 @@ function OrderCard({
             Fraud Check
           </button>
           <button
+            onClick={() => onEdit(order)}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-foreground transition hover:bg-secondary"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
             onClick={() => onDelete(order)}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-500 transition hover:bg-red-100"
           >
@@ -271,6 +289,350 @@ function FraudCheckModal({ phone, onClose }: { phone: string | null; onClose: ()
   )
 }
 
+function EditOrderModal({ order, onClose }: { order: Order; onClose: () => void }) {
+  const updateOrder = useUpdateOrder()
+  const { data: productsData } = useProducts({ limit: 1000 })
+  const products = (productsData as Product[]) || []
+  const [draft, setDraft] = useState({
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    address: order.address,
+    district: order.district,
+    union: order.union || "",
+    orderNotes: order.orderNotes || "",
+    shippingCharge: Number(order.shippingCharge),
+    discountAmount: Number(order.discountAmount),
+    promoCode: order.promoCode || "",
+    items: order.items.map((item) => ({ ...item, price: Number(item.price) })),
+  })
+
+  const subtotal = useMemo(
+    () => draft.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [draft.items]
+  )
+  const total = useMemo(
+    () => Math.max(0, subtotal + draft.shippingCharge - draft.discountAmount),
+    [subtotal, draft.shippingCharge, draft.discountAmount]
+  )
+
+  const updateItem = (idx: number, field: keyof OrderItem, value: string | number | null) => {
+    setDraft((prev) => {
+      const items = [...prev.items]
+      items[idx] = { ...items[idx], [field]: value } as OrderItem
+      return { ...prev, items }
+    })
+  }
+
+  const applyProductToItem = (idx: number, productId: string, variantId?: string) => {
+    const product = products.find((p) => p.id === productId)
+    if (!product) return
+    const variant = variantId
+      ? product.variants?.find((v) => v.id === variantId)
+      : product.variants?.[0]
+    if (!variant) return
+    setDraft((prev) => {
+      const items = [...prev.items]
+      items[idx] = {
+        ...items[idx],
+        productId: product.id,
+        productName: product.name,
+        productImage: variant.image || null,
+        price: variant.discountedPrice,
+        color: variant.color || null,
+        size: variant.size || null,
+      } as OrderItem
+      return { ...prev, items }
+    })
+  }
+
+  const removeItem = (idx: number) => {
+    setDraft((prev) => ({ ...prev, items: prev.items.filter((_, i) => i !== idx) }))
+  }
+
+  const addItem = () => {
+    setDraft((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          id: "",
+          orderId: order.id,
+          productId: "",
+          productName: "",
+          productImage: null,
+          price: 0,
+          quantity: 1,
+          color: null,
+          size: null,
+        },
+      ],
+    }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (draft.items.length === 0) {
+      notify.error({ title: "Error", message: "At least one item is required." })
+      return
+    }
+    updateOrder.mutate(
+      {
+        id: order.id,
+        data: {
+          customerName: draft.customerName,
+          customerPhone: draft.customerPhone,
+          address: draft.address,
+          district: draft.district,
+          union: draft.union || null,
+          orderNotes: draft.orderNotes || null,
+          shippingCharge: draft.shippingCharge,
+          discountAmount: draft.discountAmount,
+          promoCode: draft.promoCode || null,
+          items: draft.items.map((item) => ({
+            productId: item.productId || undefined,
+            productName: item.productName,
+            productImage: item.productImage,
+            price: Number(item.price),
+            quantity: Number(item.quantity),
+            color: item.color || null,
+            size: item.size || null,
+          })),
+        },
+      },
+      { onSuccess: onClose }
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onClose}>
+      <form
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={handleSubmit}
+        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-card shadow-xl"
+      >
+        <div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
+          <div>
+            <h3 className="text-base font-bold text-foreground">Edit Order #{order.code}</h3>
+            <p className="text-xs text-muted-foreground">Update customer details, items and prices.</p>
+          </div>
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-5">
+          <div className="space-y-5">
+            {/* Customer Details */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer Details</h4>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Name</label>
+                  <input
+                    required
+                    value={draft.customerName}
+                    onChange={(e) => setDraft((p) => ({ ...p, customerName: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Phone</label>
+                  <input
+                    required
+                    value={draft.customerPhone}
+                    onChange={(e) => setDraft((p) => ({ ...p, customerPhone: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs font-medium text-foreground">Address</label>
+                  <input
+                    required
+                    value={draft.address}
+                    onChange={(e) => setDraft((p) => ({ ...p, address: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">District</label>
+                  <input
+                    required
+                    value={draft.district}
+                    onChange={(e) => setDraft((p) => ({ ...p, district: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Union / Area</label>
+                  <input
+                    value={draft.union}
+                    onChange={(e) => setDraft((p) => ({ ...p, union: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Items */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Items</h4>
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Item
+                </button>
+              </div>
+              <div className="space-y-2">
+                {draft.items.map((item, idx) => {
+                  const selectedProduct = products.find((p) => p.id === item.productId)
+                  const variants = selectedProduct?.variants || []
+                  return (
+                    <div key={idx} className="rounded-lg border border-border/40 bg-muted/10 p-3">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-12">
+                        <div className="sm:col-span-4">
+                          <label className="text-[10px] font-medium uppercase text-muted-foreground">Product</label>
+                          <select
+                            required
+                            value={item.productId}
+                            onChange={(e) => applyProductToItem(idx, e.target.value)}
+                            className="mt-1 h-8 w-full rounded-md border border-border/60 bg-card px-2 text-sm outline-none focus:border-primary/40"
+                          >
+                            <option value="">Select product</option>
+                            {products.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="sm:col-span-3">
+                          <label className="text-[10px] font-medium uppercase text-muted-foreground">Variant</label>
+                          <select
+                            value={variants.find((v) => (v.color || "") === (item.color || "") && (v.size || "") === (item.size || ""))?.id || ""}
+                            onChange={(e) => applyProductToItem(idx, item.productId, e.target.value || undefined)}
+                            disabled={variants.length === 0}
+                            className="mt-1 h-8 w-full rounded-md border border-border/60 bg-card px-2 text-sm outline-none focus:border-primary/40 disabled:opacity-50"
+                          >
+                            <option value="">{variants.length === 0 ? "Select product first" : "Select variant"}</option>
+                            {variants.map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {[v.color, v.size].filter(Boolean).join(" / ") || "Default"}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] font-medium uppercase text-muted-foreground">Price</label>
+                          <input
+                            required
+                            type="number"
+                            min={0}
+                            step={0.01}
+                            value={item.price}
+                            onChange={(e) => updateItem(idx, "price", Number(e.target.value))}
+                            className="mt-1 h-8 w-full rounded-md border border-border/60 bg-card px-2 text-sm outline-none focus:border-primary/40"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] font-medium uppercase text-muted-foreground">Qty</label>
+                          <input
+                            required
+                            type="number"
+                            min={1}
+                            value={item.quantity}
+                            onChange={(e) => updateItem(idx, "quantity", Number(e.target.value))}
+                            className="mt-1 h-8 w-full rounded-md border border-border/60 bg-card px-2 text-sm outline-none focus:border-primary/40"
+                          />
+                        </div>
+                        <div className="flex items-end sm:col-span-1">
+                          <button
+                            type="button"
+                            onClick={() => removeItem(idx)}
+                            className="grid h-8 w-full place-items-center rounded-md bg-red-50 text-red-500 transition hover:bg-red-100"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pricing</h4>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Shipping Charge</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={draft.shippingCharge}
+                    onChange={(e) => setDraft((p) => ({ ...p, shippingCharge: Number(e.target.value) }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Discount</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={draft.discountAmount}
+                    onChange={(e) => setDraft((p) => ({ ...p, discountAmount: Number(e.target.value) }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-foreground">Promo Code</label>
+                  <input
+                    value={draft.promoCode}
+                    onChange={(e) => setDraft((p) => ({ ...p, promoCode: e.target.value }))}
+                    className="h-9 w-full rounded-lg border border-border/60 bg-card px-3 text-sm outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between rounded-lg border border-border/40 bg-muted/10 p-3 text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-semibold text-foreground">{formatBDT(subtotal)}</span>
+              </div>
+              <div className="flex justify-between rounded-lg border border-border/40 bg-muted/10 p-3 text-sm font-bold text-foreground">
+                <span>Total</span>
+                <span>{formatBDT(total)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-border/40 px-5 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-border/60 bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={updateOrder.isPending}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-50"
+          >
+            {updateOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
 const ROWS_PER_PAGE = 12
 
 export function OrderList({ status, title, subtitle, showSteadfast }: OrderListProps) {
@@ -282,6 +644,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
   const [q, setQ] = useState("")
   const [page, setPage] = useState(1)
   const [fraudPhone, setFraudPhone] = useState<string | null>(null)
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null)
 
   const orders: Order[] = useMemo(() => {
     const list = (ordersData as any)?.orders || []
@@ -378,6 +741,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
                 key={order.id}
                 order={order}
                 onDelete={handleDelete}
+                onEdit={setEditingOrder}
                 onFraudCheck={setFraudPhone}
                 onStatusChange={handleStatusChange}
                 onSyncSteadfast={handleSyncOrder}
@@ -424,6 +788,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
       )}
 
       {fraudPhone && <FraudCheckModal phone={fraudPhone} onClose={() => setFraudPhone(null)} />}
+      {editingOrder && <EditOrderModal order={editingOrder} onClose={() => setEditingOrder(null)} />}
     </DashPage>
   )
 }

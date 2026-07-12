@@ -6,6 +6,7 @@ import { useConfirm } from "@/components/ui/confirm-dialog"
 import { notify } from "@/lib/notify"
 import { Switch } from "@/components/ui/switch"
 import { DashPage, DashHeader, DashPanel, DashLoading } from "@/dashboard/components/dash-ui"
+import { ViewToggle, type ViewMode } from "@/dashboard/components/view-toggle"
 import { usePromos, useCreatePromo, useUpdatePromo, useDeletePromo, type PromoCode, type CreatePromoPayload } from "@/src/hooks/api/usePromos"
 
 const emptyDraft: CreatePromoPayload = {
@@ -27,6 +28,7 @@ export default function DashboardPromosPage() {
   const confirm = useConfirm()
 
   const [q, setQ] = useState("")
+  const [view, setView] = useState<ViewMode>("grid")
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<CreatePromoPayload & { id?: string }>(emptyDraft)
   const editing = Boolean(draft.id)
@@ -108,14 +110,17 @@ export default function DashboardPromosPage() {
       />
 
       {/* Search */}
-      <div className="flex h-10 max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3">
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search promo codes..."
-          className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-        />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex h-10 min-w-0 max-w-xs items-center gap-2 rounded-lg border border-border/60 bg-card px-3">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search promo codes..."
+            className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          />
+        </div>
+        <ViewToggle mode={view} onChange={setView} />
       </div>
 
       {isLoading ? (
@@ -127,7 +132,7 @@ export default function DashboardPromosPage() {
             <p className="text-sm text-muted-foreground">Click "Add Promo" to create your first promo code.</p>
           </div>
         </DashPanel>
-      ) : (
+      ) : view === "table" ? (
         <DashPanel noPadding>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
@@ -183,6 +188,54 @@ export default function DashboardPromosPage() {
             </table>
           </div>
         </DashPanel>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((p: PromoCode) => (
+            <div
+              key={p.id}
+              className="flex flex-col overflow-hidden rounded-xl border border-border/40 bg-card p-4 transition hover:border-primary/20 hover:shadow-md"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="rounded-md bg-secondary px-2 py-0.5 font-mono text-sm font-bold text-foreground">{p.code}</span>
+                <Switch checked={p.isActive} onCheckedChange={(v) => handleToggle(p.id, v)} />
+              </div>
+              <div className="mt-3 space-y-1 text-sm">
+                <p className="text-foreground">
+                  <span className="font-semibold">Discount:</span>{" "}
+                  {p.discountType === "PERCENT" ? `${p.discountValue}%` : `৳${p.discountValue}`}
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-semibold text-foreground">Min Order:</span>{" "}
+                  {p.minOrderValue ? `৳${p.minOrderValue}` : "-"}
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-semibold text-foreground">Max Discount:</span>{" "}
+                  {p.maxDiscount ? `৳${p.maxDiscount}` : "-"}
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-semibold text-foreground">Usage:</span>{" "}
+                  {p.usageCount}
+                </p>
+              </div>
+              <div className="mt-auto flex items-center gap-1 pt-4">
+                <button
+                  onClick={() => openEdit(p)}
+                  className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg bg-secondary text-xs font-semibold text-foreground transition hover:bg-primary hover:text-white"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(p)}
+                  className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg bg-red-50 text-xs font-semibold text-red-500 transition hover:bg-red-500 hover:text-white"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Modal */}

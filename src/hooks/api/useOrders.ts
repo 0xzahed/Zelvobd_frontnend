@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import { getOrders, getOrderById, updateOrderStatus, deleteOrder } from "@/src/api/orderApi"
+import { getOrders, getOrderById, updateOrderStatus, updateOrder, deleteOrder } from "@/src/api/orderApi"
 
 export const ORDER_KEYS = {
   all: ["orders"] as const,
@@ -82,6 +82,19 @@ export function useUpdateOrderStatus() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
       notify.success({ title: "Status Updated", message: `Order ${data.code} marked as ${data.status}.` })
+    },
+    onError: (error) => handleApiError(error),
+  })
+}
+
+export function useUpdateOrder() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: import("@/src/api/orderApi").UpdateOrderPayload }) => updateOrder(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.details(data.id) })
+      notify.success({ title: "Order Updated", message: `Order ${data.code} has been updated.` })
     },
     onError: (error) => handleApiError(error),
   })
