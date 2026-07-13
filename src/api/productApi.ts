@@ -56,7 +56,7 @@ export const getStorefrontProductBySlug = async (slug: string): Promise<Product 
   try {
     const response = await fetch(`${BASE_URL}/products/slug/${slug}`, {
       method: "GET",
-      next: { revalidate: 60 },
+      cache: "no-store",
       signal: AbortSignal.timeout(10_000),
     })
     const payload = await response.json()
