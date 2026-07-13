@@ -67,17 +67,19 @@ export function DashMetricCard({
   value,
   subLabel,
 }: {
-  icon: React.ComponentType<{ className?: string }>
-  color: string
+  icon?: React.ComponentType<{ className?: string }>
+  color?: string
   label: string
   value: string | number
   subLabel?: string
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-border/40 bg-card p-4 shadow-sm">
-      <div className={cx("grid h-11 w-11 shrink-0 place-items-center rounded-xl", color)}>
-        <Icon className="h-5 w-5 text-white" />
-      </div>
+    <div className="flex flex-col gap-1 rounded-2xl border border-border/40 bg-card p-4 shadow-sm">
+      {Icon && (
+        <div className={cx("grid h-11 w-11 shrink-0 place-items-center rounded-xl mb-1", color)}>
+          <Icon className="h-5 w-5 text-white" />
+        </div>
+      )}
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-lg font-bold text-foreground">{value}</p>
