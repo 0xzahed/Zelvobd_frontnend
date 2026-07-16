@@ -1,10 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError, fileFromUrl } from "@/lib/api-utils"
-import { getYoutubeVideos } from "@/src/api/youtubeVideo/getYoutubeVideos"
-import { createYoutubeVideo } from "@/src/api/youtubeVideo/createYoutubeVideo"
-import { updateYoutubeVideo } from "@/src/api/youtubeVideo/updateYoutubeVideo"
-import { deleteYoutubeVideo } from "@/src/api/youtubeVideo/deleteYoutubeVideo"
+import { getYoutubeVideos, createYoutubeVideo, updateYoutubeVideo, deleteYoutubeVideo } from "@/src/api/youtubeVideoApi"
 
 export const YOUTUBE_VIDEO_KEYS = {
   all: ["youtubeVideos"] as const,

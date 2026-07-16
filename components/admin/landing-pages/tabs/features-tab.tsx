@@ -2,7 +2,6 @@ import { useFieldArray, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, Plus } from 'lucide-react';
-import { AdminPrimaryButton } from '@/components/admin/admin-ui';
 import { ImageUpload } from '../../image-upload';
 import { LucideIconPickerModal } from '../../lucide-icon-picker';
 import * as LucideIcons from 'lucide-react';

@@ -10,25 +10,19 @@ function OrderTracker() {
   const searchParams = useSearchParams();
   const hasTracked = useRef(false);
 
+  const orderId = searchParams.get('orderId');
+  const value = searchParams.get('value');
+
   useEffect(() => {
     if (hasTracked.current) return;
     hasTracked.current = true;
 
-    const orderId = searchParams.get('orderId');
-    const value = searchParams.get('value');
-
     if (orderId && value) {
       purchase({ value: Number(value), orderId });
     }
-  }, [searchParams]);
+  }, [orderId, value]);
 
-  return (
-    <>
-      {searchParams.get('orderId') && (
-        <p className='text-sm font-medium mt-2'>Order ID: {searchParams.get('orderId')}</p>
-      )}
-    </>
-  );
+  return null;
 }
 
 export default function PlaceOrderPage() {

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCreateLandingPage } from '@/src/hooks/api/useLandingPages';
-import { AdminPage, AdminPageHeader } from '@/components/admin/admin-ui';
+import { DashPage, DashHeader } from '@/dashboard/components/dash-ui';
 import LandingPageForm from '@/components/admin/landing-pages/landing-page-form';
 
 export default function NewLandingPage() {
@@ -10,11 +10,10 @@ export default function NewLandingPage() {
   const createMutation = useCreateLandingPage();
 
   const handleSubmit = (data: any) => {
-    // Sanitize productId if 'none' is selected
     if (data.productId === 'none' || data.productId === '') {
       delete data.productId;
     }
-    
+
     createMutation.mutate(data, {
       onSuccess: () => {
         router.push('/admin/landing-pages');
@@ -23,14 +22,14 @@ export default function NewLandingPage() {
   };
 
   return (
-    <AdminPage>
-      <AdminPageHeader
+    <DashPage>
+      <DashHeader
         title='Create New Landing Page'
       />
-      
+
       <div className="mt-6">
         <LandingPageForm onSubmit={handleSubmit} isSubmitting={createMutation.isPending} />
       </div>
-    </AdminPage>
+    </DashPage>
   );
 }

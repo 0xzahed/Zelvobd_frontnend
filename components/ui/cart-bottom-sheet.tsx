@@ -8,8 +8,8 @@ import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getProductDetails } from '@/src/api/products/getProductDetails';
-import { mapProduct } from '@/src/api/_shared/mappers';
+import { getProductDetails } from '@/src/api/productApi';
+import { mapProduct } from '@/src/api/mainApi';
 
 export function CartBottomSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items } = useCart();

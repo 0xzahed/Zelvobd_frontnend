@@ -1,12 +1,5 @@
-import { OrderList } from "@/components/admin/order-list"
+import { OrderList } from "@/dashboard/components/order-list"
 
 export default function PickupOrdersPage() {
-  return (
-    <OrderList
-      title="Pickup Orders"
-      description="Orders ready for pickup"
-      defaultStatus="PICKUP"
-      lockStatus
-    />
-  )
+  return <OrderList status="PICKUP" title="Pickup Orders" subtitle="Orders ready for pickup" showSteadfast />
 }

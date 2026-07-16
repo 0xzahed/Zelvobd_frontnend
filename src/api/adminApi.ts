@@ -1,4 +1,4 @@
-import { requestWithAdminAuth } from "@/src/api/_shared/requestWithAdminAuth"
+import { requestWithAdminAuth } from "@/src/api/mainApi"
 
 type AdminPayload = Record<string, unknown>
 

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { getTrendingAdmin, updateTrendingCampaign, updateTrendingProducts } from "@/src/api/trendingApi"
 import { notify } from "@/lib/notify"
 
 export type TrendingAdminResponse = {
@@ -40,12 +39,8 @@ export function useTrendingAdmin() {
   return useQuery({
     queryKey: ["trending-admin"],
     queryFn: async (): Promise<TrendingAdminResponse> => {
-      const res = await adminFetch(`${BASE_URL}/trending/admin`, {
-        headers: authHeaders(),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to fetch trending config")
-      return data.data
+      const res = await getTrendingAdmin()
+      return res.data
     },
   })
 }
@@ -54,14 +49,8 @@ export function useUpdateTrendingCampaign() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: { title?: string; isActive?: boolean }) => {
-      const res = await adminFetch(`${BASE_URL}/trending/campaign`, {
-        method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to update campaign")
-      return data.data
+      const res = await updateTrendingCampaign(payload)
+      return res.data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trending-admin"] })
@@ -77,14 +66,8 @@ export function useUpdateTrendingProducts() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: { addProductIds?: string[]; removeProductIds?: string[] }) => {
-      const res = await adminFetch(`${BASE_URL}/trending/products`, {
-        method: "PATCH",
-        headers: { ...authHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || "Failed to update products")
-      return data.data
+      const res = await updateTrendingProducts(payload)
+      return res.data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trending-admin"] })

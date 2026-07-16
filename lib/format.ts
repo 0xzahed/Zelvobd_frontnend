@@ -1,5 +1,6 @@
-export function formatBDT(amount: number | null | undefined): string {
-  const value = typeof amount === "number" && Number.isFinite(amount) ? amount : 0
+export function formatBDT(amount: number | string | null | undefined): string {
+  const num = typeof amount === "string" ? Number(amount) : amount
+  const value = typeof num === "number" && Number.isFinite(num) ? num : 0
   return `TK. ${value.toLocaleString("en-BD")}`
 }
 

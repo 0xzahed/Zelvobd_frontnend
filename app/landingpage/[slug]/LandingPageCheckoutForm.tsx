@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { BadgeCheck, ArrowRight } from 'lucide-react';
-import { BASE_URL } from '@/src/api/_shared/client';
+import { useRouter } from 'next/navigation';
+import { BASE_URL } from '@/src/api/mainApi';
 import { bnDigits } from './LandingPageTemplate';
 import { purchase } from '@/lib/pixel';
 
@@ -23,6 +24,7 @@ const convertToEnglishDigits = (str: string) => {
 };
 
 export default function LandingPageCheckoutForm({ landingPage }: { landingPage: any }) {
+  const router = useRouter();
   const checkoutData = landingPage.checkoutSection || {};
   const UNIT_PRICE = Number(landingPage.heroSection?.offerPrice || checkoutData.price || 0);
 
@@ -78,7 +80,6 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
 
       // Manually fire the purchase event only on success
       purchase({ value: subtotal });
-
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
@@ -87,21 +88,6 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
     }
   };
 
-  if (submitted) {
-    return (
-      <div className='text-center py-6'>
-        <div className='mb-2 flex justify-center'>
-          <BadgeCheck size={40} style={{ color: 'var(--lp-success)' }} />
-        </div>
-        <div className='text-lg font-bold' style={{ color: 'var(--lp-navy)' }}>
-          অর্ডার গ্রহণ হয়েছে!
-        </div>
-        <p className='mt-1 text-sm opacity-80'>
-          শীঘ্রই আমাদের প্রতিনিধি {form.phone} নম্বরে কল করে অর্ডার কনফার্ম করবেন।
-        </p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className='grid gap-4 text-left'>

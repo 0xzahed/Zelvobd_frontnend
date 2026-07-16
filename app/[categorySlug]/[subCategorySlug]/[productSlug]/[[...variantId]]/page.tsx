@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { ProductDetail } from "@/components/product/product-detail"
-import { getStorefrontProductBySlug } from "@/src/api/products/getStorefrontProductBySlug"
+import { getStorefrontProductBySlug } from "@/src/api/productApi"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
 
 export default async function ProductDetailPage(props: {

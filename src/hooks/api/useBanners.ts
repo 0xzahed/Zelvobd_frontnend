@@ -1,12 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError, fileFromUrl } from "@/lib/api-utils"
-import { getBanners } from "@/src/api/banner/getBanners"
-import { getHomePageBanners } from "@/src/api/banner/getHomePageBanners"
-import { createBanner } from "@/src/api/banner/createBanner"
-import { updateBanner } from "@/src/api/banner/updateBanner"
-import { deleteBanner } from "@/src/api/banner/deleteBanner"
-import { mapBanner } from "@/src/api/_shared/mappers"
+import { getBanners, getHomePageBanners, createBanner, updateBanner, deleteBanner } from "@/src/api/bannerApi"
+import { mapBanner } from "@/src/api/mainApi"
 
 export const BANNER_KEYS = {
   all: ["banners"] as const,

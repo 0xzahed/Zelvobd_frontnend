@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { BASE_URL } from '@/src/api/_shared/client';
+import { BASE_URL } from '@/src/api/mainApi';
 import LandingPageTemplate from './LandingPageTemplate';
 
 async function getLandingPage(slug: string) {

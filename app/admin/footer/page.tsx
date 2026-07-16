@@ -1,358 +1,298 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Plus, Trash2 } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
+import Image from "next/image"
+import { Plus, Trash2, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube, ImagePlus, Loader2 } from "lucide-react"
+import { useFooter, useUpdateFooter } from "@/src/hooks/api/useFooter"
+import { uploadFooterImage } from "@/src/api/footerApi"
+import { DashPage, DashHeader, DashPanel, DashLoading } from "@/dashboard/components/dash-ui"
+import { toAbsoluteUploadUrl } from "@/src/api/mainApi"
 
-type FooterNavLink = { label: string; href: string }
-type FooterNavGroup = { title: string; links: FooterNavLink[] }
-type FooterSocial = { label: string; href: string; icon?: "facebook" | "instagram" | "twitter" | "youtube" | "" }
+type NavLink = { label: string; href: string }
+type NavGroup = { title: string; links: NavLink[] }
+type Social = { label: string; href: string; icon?: string }
 
-type FooterSettings = {
+type FooterForm = {
   brandName: string
   brandTagline: string
+  logoUrl: string
   supportEmail: string
   supportPhone: string
   supportAddress: string
-  navGroups: FooterNavGroup[]
-  socials: FooterSocial[]
+  navGroups: NavGroup[]
+  socials: Social[]
 }
 
-const STORAGE_KEY = "zelvobd_footer"
-
-const DEFAULT_FOOTER: FooterSettings = {
-  brandName: "Zelvobd",
-  brandTagline: "Everyday essentials and the latest tech, delivered fast with care.",
-  supportEmail: "support@zelvobd.app",
-  supportPhone: "+880 1700 000 000",
-  supportAddress: "Dhaka, Bangladesh",
-  navGroups: [
-    {
-      title: "Shop",
-      links: [
-        { label: "All Products", href: "/search" },
-        { label: "Categories", href: "/categories" },
-        { label: "Offers", href: "/offers" },
-        { label: "Flash Sale", href: "/offers" },
-      ],
-    },
-    {
-      title: "Account",
-      links: [
-        { label: "Help & Support", href: "/support" },
-        { label: "More", href: "/more" },
-      ],
-    },
-    {
-      title: "Company",
-      links: [
-        { label: "About Us", href: "#" },
-        { label: "Careers", href: "#" },
-        { label: "Privacy Policy", href: "#" },
-        { label: "Terms of Service", href: "#" },
-      ],
-    },
-  ],
-  socials: [
-    { label: "Facebook", href: "#", icon: "facebook" },
-    { label: "Instagram", href: "#", icon: "instagram" },
-    { label: "Twitter", href: "#", icon: "twitter" },
-    { label: "YouTube", href: "#", icon: "youtube" },
-  ],
+const emptyFooter: FooterForm = {
+  brandName: "",
+  brandTagline: "",
+  logoUrl: "",
+  supportEmail: "",
+  supportPhone: "",
+  supportAddress: "",
+  navGroups: [],
+  socials: [],
 }
 
-const ICON_OPTIONS: Array<FooterSocial["icon"]> = ["", "facebook", "instagram", "twitter", "youtube"]
-
-function mergeFooter(base: FooterSettings, patch: Partial<FooterSettings>) {
-  return {
-    ...base,
-    ...patch,
-    navGroups: Array.isArray(patch.navGroups) ? patch.navGroups : base.navGroups,
-    socials: Array.isArray(patch.socials) ? patch.socials : base.socials,
-  }
+const NAMED_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  facebook: Facebook,
+  instagram: Instagram,
+  twitter: Twitter,
+  youtube: Youtube,
 }
 
-export default function AdminFooterPage() {
-  const [footer, setFooter] = useState<FooterSettings>(DEFAULT_FOOTER)
-  const [saved, setSaved] = useState(false)
+function isImageUrl(val: string) {
+  return /^https?:\/\//i.test(val) || /^\/upload\//i.test(val)
+}
+
+export default function DashboardFooterPage() {
+  const { data: footerData, isLoading } = useFooter()
+  const updateMutation = useUpdateFooter()
+  const [form, setForm] = useState<FooterForm>(emptyFooter)
+  const [uploading, setUploading] = useState(false)
+  const [socialUploadIdx, setSocialUploadIdx] = useState<number | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const socialFileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (!raw) return
-      const parsed = JSON.parse(raw) as Partial<FooterSettings>
-      setFooter(mergeFooter(DEFAULT_FOOTER, parsed))
-    } catch {
-      // noop
+    if (footerData) {
+      setForm({
+        brandName: footerData.brandName || "",
+        brandTagline: footerData.brandTagline || "",
+        logoUrl: footerData.logoUrl || "",
+        supportEmail: footerData.supportEmail || "",
+        supportPhone: footerData.supportPhone || "",
+        supportAddress: footerData.supportAddress || "",
+        navGroups: footerData.navGroups || [],
+        socials: footerData.socials || [],
+      })
     }
-  }, [])
+  }, [footerData])
 
-  function update<K extends keyof FooterSettings>(key: K, value: FooterSettings[K]) {
-    setFooter((prev) => ({ ...prev, [key]: value }))
+  const update = (patch: Partial<FooterForm>) => setForm((prev) => ({ ...prev, ...patch }))
+
+  const addNavGroup = () => update({ navGroups: [...form.navGroups, { title: "", links: [{ label: "", href: "" }] }] })
+  const updateNavGroup = (i: number, patch: Partial<NavGroup>) => {
+    const groups = [...form.navGroups]; groups[i] = { ...groups[i], ...patch }; update({ navGroups: groups })
+  }
+  const removeNavGroup = (i: number) => update({ navGroups: form.navGroups.filter((_, idx) => idx !== i) })
+  const addNavLink = (gi: number) => {
+    const groups = [...form.navGroups]; groups[gi] = { ...groups[gi], links: [...groups[gi].links, { label: "", href: "" }] }; update({ navGroups: groups })
+  }
+  const updateNavLink = (gi: number, li: number, patch: Partial<NavLink>) => {
+    const groups = [...form.navGroups]; const links = [...groups[gi].links]; links[li] = { ...links[li], ...patch }; groups[gi] = { ...groups[gi], links }; update({ navGroups: groups })
+  }
+  const removeNavLink = (gi: number, li: number) => {
+    const groups = [...form.navGroups]; groups[gi] = { ...groups[gi], links: groups[gi].links.filter((_, idx) => idx !== li) }; update({ navGroups: groups })
+  }
+  const addSocial = () => update({ socials: [...form.socials, { label: "", href: "", icon: "" }] })
+  const updateSocial = (i: number, patch: Partial<Social>) => {
+    const list = [...form.socials]; list[i] = { ...list[i], ...patch }; update({ socials: list })
+  }
+  const removeSocial = (i: number) => update({ socials: form.socials.filter((_, idx) => idx !== i) })
+
+  const handleLogoUpload = async (file: File) => {
+    setUploading(true)
+    try {
+      const url = await uploadFooterImage(file)
+      update({ logoUrl: url })
+    } catch {
+      // error handled by uploadFooterImage
+    }
+    setUploading(false)
   }
 
-  function updateGroupTitle(groupIndex: number, value: string) {
-    setFooter((prev) => {
-      const navGroups = [...prev.navGroups]
-      navGroups[groupIndex] = { ...navGroups[groupIndex], title: value }
-      return { ...prev, navGroups }
-    })
+  const handleSocialIconUpload = async (file: File, idx: number) => {
+    setSocialUploadIdx(idx)
+    try {
+      const url = await uploadFooterImage(file)
+      updateSocial(idx, { icon: url })
+    } catch {
+      // error handled by uploadFooterImage
+    }
+    setSocialUploadIdx(null)
   }
 
-  function updateGroupLink(groupIndex: number, linkIndex: number, field: keyof FooterNavLink, value: string) {
-    setFooter((prev) => {
-      const navGroups = [...prev.navGroups]
-      const links = [...navGroups[groupIndex].links]
-      links[linkIndex] = { ...links[linkIndex], [field]: value }
-      navGroups[groupIndex] = { ...navGroups[groupIndex], links }
-      return { ...prev, navGroups }
-    })
-  }
+  const handleSave = () => updateMutation.mutate(form)
 
-  function addGroup() {
-    setFooter((prev) => ({
-      ...prev,
-      navGroups: [...prev.navGroups, { title: "New Group", links: [{ label: "New link", href: "#" }] }],
-    }))
-  }
-
-  function removeGroup(groupIndex: number) {
-    setFooter((prev) => ({
-      ...prev,
-      navGroups: prev.navGroups.filter((_, index) => index !== groupIndex),
-    }))
-  }
-
-  function addLink(groupIndex: number) {
-    setFooter((prev) => {
-      const navGroups = [...prev.navGroups]
-      const links = [...navGroups[groupIndex].links, { label: "New link", href: "#" }]
-      navGroups[groupIndex] = { ...navGroups[groupIndex], links }
-      return { ...prev, navGroups }
-    })
-  }
-
-  function removeLink(groupIndex: number, linkIndex: number) {
-    setFooter((prev) => {
-      const navGroups = [...prev.navGroups]
-      const links = navGroups[groupIndex].links.filter((_, index) => index !== linkIndex)
-      navGroups[groupIndex] = { ...navGroups[groupIndex], links }
-      return { ...prev, navGroups }
-    })
-  }
-
-  function updateSocial(index: number, field: keyof FooterSocial, value: string) {
-    setFooter((prev) => {
-      const socials = [...prev.socials]
-      socials[index] = { ...socials[index], [field]: value } as FooterSocial
-      return { ...prev, socials }
-    })
-  }
-
-  function addSocial() {
-    setFooter((prev) => ({
-      ...prev,
-      socials: [...prev.socials, { label: "New social", href: "#", icon: "facebook" }],
-    }))
-  }
-
-  function removeSocial(index: number) {
-    setFooter((prev) => ({
-      ...prev,
-      socials: prev.socials.filter((_, i) => i !== index),
-    }))
-  }
-
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(footer))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-  }
-
-  function reset() {
-    setFooter(DEFAULT_FOOTER)
-    localStorage.removeItem(STORAGE_KEY)
+  if (isLoading) {
+    return (
+      <DashPage>
+        <DashHeader title="Footer" subtitle="Manage footer content" />
+        <DashLoading label="Loading footer..." />
+      </DashPage>
+    )
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Footer</h1>
-          <p className="text-sm text-muted-foreground">Edit footer content (frontend-only).</p>
-        </div>
-        <div className="flex gap-2">
+    <DashPage>
+      <DashHeader
+        title="Footer"
+        subtitle="Manage footer content"
+        actions={
           <button
-            onClick={reset}
-            className="h-11 rounded-xl border border-border bg-background px-5 text-sm font-semibold text-foreground"
+            onClick={handleSave}
+            disabled={updateMutation.isPending}
+            className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
           >
-            Reset
+            {updateMutation.isPending ? "Saving..." : "Save Changes"}
           </button>
-          <button
-            onClick={save}
-            className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-card"
-          >
-            {saved ? "Saved!" : "Save changes"}
-          </button>
-        </div>
-      </header>
+        }
+      />
 
-      <section className="grid gap-5 rounded-2xl border border-border/70 bg-card p-6 shadow-card md:grid-cols-2">
-        <Field label="Brand name">
-          <input value={footer.brandName} onChange={(e) => update("brandName", e.target.value)} className="input" />
-        </Field>
-        <Field label="Tagline" full>
-          <input value={footer.brandTagline} onChange={(e) => update("brandTagline", e.target.value)} className="input" />
-        </Field>
-        <Field label="Support email">
-          <input value={footer.supportEmail} onChange={(e) => update("supportEmail", e.target.value)} className="input" />
-        </Field>
-        <Field label="Support phone">
-          <input value={footer.supportPhone} onChange={(e) => update("supportPhone", e.target.value)} className="input" />
-        </Field>
-        <Field label="Support address" full>
-          <input value={footer.supportAddress} onChange={(e) => update("supportAddress", e.target.value)} className="input" />
-        </Field>
-      </section>
-
-      <section className="space-y-4 rounded-2xl border border-border/70 bg-card p-6 shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Navigation groups</h2>
-            <p className="text-sm text-muted-foreground">Edit footer link columns.</p>
-          </div>
-          <button
-            onClick={addGroup}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-semibold"
-          >
-            <Plus className="h-4 w-4" /> Add group
-          </button>
-        </div>
-
-        <div className="space-y-5">
-          {footer.navGroups.map((group, groupIndex) => (
-            <div key={`${group.title}-${groupIndex}`} className="rounded-xl border border-border/70 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="space-y-5">
+        {/* Brand + Contact Info */}
+        <DashPanel>
+          <h3 className="mb-4 text-sm font-bold text-foreground">Brand & Contact</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-foreground">Brand Name</label>
+              <input value={form.brandName} onChange={(e) => update({ brandName: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-foreground">Brand Tagline</label>
+              <input value={form.brandTagline} onChange={(e) => update({ brandTagline: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-foreground">Logo</label>
+              <div className="flex items-center gap-3">
                 <input
-                  value={group.title}
-                  onChange={(e) => updateGroupTitle(groupIndex, e.target.value)}
-                  className="input flex-1"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f) handleLogoUpload(f)
+                  }}
+                />
+                <input
+                  value={form.logoUrl}
+                  onChange={(e) => update({ logoUrl: e.target.value })}
+                  placeholder="/logo.png or upload"
+                  className="h-10 flex-1 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                 />
                 <button
-                  onClick={() => removeGroup(groupIndex)}
-                  className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 text-sm font-semibold text-primary transition hover:bg-primary/10 disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4" /> Remove
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                  Upload
                 </button>
+                {form.logoUrl && (
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border/40 bg-muted">
+                    <Image src={toAbsoluteUploadUrl(form.logoUrl) || form.logoUrl} alt="logo" fill className="object-contain p-1" unoptimized />
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
 
-              <div className="mt-4 space-y-3">
-                {group.links.map((link, linkIndex) => (
-                  <div key={`${groupIndex}-${linkIndex}`} className="flex flex-wrap gap-2">
-                    <input
-                      value={link.label}
-                      onChange={(e) => updateGroupLink(groupIndex, linkIndex, "label", e.target.value)}
-                      className="input flex-1"
-                      placeholder="Label"
-                    />
-                    <input
-                      value={link.href}
-                      onChange={(e) => updateGroupLink(groupIndex, linkIndex, "href", e.target.value)}
-                      className="input flex-1"
-                      placeholder="/path"
-                    />
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground"><Mail className="h-3.5 w-3.5 text-primary" /> Support Email</label>
+              <input value={form.supportEmail} onChange={(e) => update({ supportEmail: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
+            </div>
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground"><Phone className="h-3.5 w-3.5 text-primary" /> Support Phone</label>
+              <input value={form.supportPhone} onChange={(e) => update({ supportPhone: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
+            </div>
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground"><MapPin className="h-4 w-4 text-primary" /> Address</label>
+              <input value={form.supportAddress} onChange={(e) => update({ supportAddress: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
+            </div>
+          </div>
+        </DashPanel>
+
+        {/* Navigation Groups */}
+        <DashPanel>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-foreground">Navigation Groups</h3>
+            <button onClick={addNavGroup} className="inline-flex h-8 items-center gap-1 rounded-lg border border-border px-3 text-xs font-semibold text-foreground transition hover:bg-secondary"><Plus className="h-3.5 w-3.5" /> Add Group</button>
+          </div>
+          {form.navGroups.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">No navigation groups yet.</p>}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {form.navGroups.map((group, gi) => (
+              <div key={gi} className="rounded-lg border border-border/40 bg-muted/10 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <input value={group.title} onChange={(e) => updateNavGroup(gi, { title: e.target.value })} placeholder="Group title" className="h-9 flex-1 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
+                  <button onClick={() => removeNavGroup(gi)} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                </div>
+                <div className="space-y-2">
+                  {group.links.map((link, li) => (
+                    <div key={li} className="flex items-center gap-2">
+                      <input value={link.label} onChange={(e) => updateNavLink(gi, li, { label: e.target.value })} placeholder="Label" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                      <input value={link.href} onChange={(e) => updateNavLink(gi, li, { href: e.target.value })} placeholder="/path" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                      <button onClick={() => removeNavLink(gi, li)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ))}
+                  <button onClick={() => addNavLink(gi)} className="text-xs font-semibold text-primary hover:text-primary/80">+ Add Link</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DashPanel>
+
+        {/* Social Links */}
+        <DashPanel>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-foreground">Social Links</h3>
+            <button onClick={addSocial} className="inline-flex h-8 items-center gap-1 rounded-lg border border-border px-3 text-xs font-semibold text-foreground transition hover:bg-secondary"><Plus className="h-3.5 w-3.5" /> Add Social</button>
+          </div>
+          {form.socials.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">No social links yet.</p>}
+          <div className="space-y-2">
+            {form.socials.map((social, i) => {
+              const NamedIcon = social.icon && NAMED_ICONS[social.icon] ? NAMED_ICONS[social.icon] : null
+              const isUrlIcon = social.icon && isImageUrl(social.icon)
+              return (
+                <div key={i} className="flex items-center gap-2 rounded-lg border border-border/40 bg-muted/5 p-3">
+                  <div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 text-slate-600">
+                    {NamedIcon ? (
+                      <NamedIcon className="h-4 w-4" />
+                    ) : isUrlIcon ? (
+                      <Image src={toAbsoluteUploadUrl(social.icon!) || social.icon!} alt="" width={32} height={32} className="h-full w-full object-contain" />
+                    ) : (
+                      <span className="text-xs font-bold">{social.label?.trim()?.[0] || "S"}</span>
+                    )}
+                  </div>
+                  <input value={social.label} onChange={(e) => updateSocial(i, { label: e.target.value })} placeholder="Label" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                  <input value={social.href} onChange={(e) => updateSocial(i, { href: e.target.value })} placeholder="https://..." className="h-8 flex-[2] rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                  <input
+                    ref={socialFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f && socialUploadIdx !== null) {
+                        handleSocialIconUpload(f, socialUploadIdx)
+                        e.target.value = ""
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-1">
+                    <input value={social.icon || ""} onChange={(e) => updateSocial(i, { icon: e.target.value })} placeholder="name or URL" className="h-8 w-28 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
                     <button
-                      onClick={() => removeLink(groupIndex, linkIndex)}
-                      className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm"
+                      type="button"
+                      onClick={() => {
+                        setSocialUploadIdx(i)
+                        socialFileInputRef.current?.click()
+                      }}
+                      disabled={socialUploadIdx === i}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-primary/30 bg-primary/5 text-primary transition hover:bg-primary/10 disabled:opacity-50"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {socialUploadIdx === i ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
                     </button>
                   </div>
-                ))}
-              </div>
-
-              <button
-                onClick={() => addLink(groupIndex)}
-                className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm"
-              >
-                <Plus className="h-4 w-4" /> Add link
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4 rounded-2xl border border-border/70 bg-card p-6 shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Social links</h2>
-            <p className="text-sm text-muted-foreground">Manage footer social icons.</p>
+                  <button onClick={() => removeSocial(i)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>
+              )
+            })}
           </div>
-          <button
-            onClick={addSocial}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-semibold"
-          >
-            <Plus className="h-4 w-4" /> Add social
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {footer.socials.map((social, index) => (
-            <div key={`${social.label}-${index}`} className="flex flex-wrap gap-2">
-              <input
-                value={social.label}
-                onChange={(e) => updateSocial(index, "label", e.target.value)}
-                className="input flex-1"
-                placeholder="Label"
-              />
-              <input
-                value={social.href}
-                onChange={(e) => updateSocial(index, "href", e.target.value)}
-                className="input flex-1"
-                placeholder="https://..."
-              />
-              <select
-                value={social.icon}
-                onChange={(e) => updateSocial(index, "icon", e.target.value)}
-                className="input w-40"
-              >
-                {ICON_OPTIONS.map((icon) => (
-                  <option key={icon || "none"} value={icon}>
-                    {icon || "none"}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => removeSocial(index)}
-                className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <style jsx>{`
-        :global(.input) {
-          height: 2.75rem;
-          width: 100%;
-          border-radius: 0.75rem;
-          border: 1px solid hsl(var(--border));
-          background: hsl(var(--background));
-          padding: 0 0.875rem;
-          font-size: 0.875rem;
-          color: hsl(var(--foreground));
-        }
-      `}</style>
-    </div>
-  )
-}
-
-function Field({ label, full = false, children }: { label: string; full?: boolean; children: React.ReactNode }) {
-  return (
-    <label className={`flex flex-col gap-1.5 ${full ? "md:col-span-2" : ""}`}>
-      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
-      {children}
-    </label>
+        </DashPanel>
+      </div>
+    </DashPage>
   )
 }

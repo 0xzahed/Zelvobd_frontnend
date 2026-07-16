@@ -44,11 +44,27 @@ export default function HeroTab({ register, control }: { register: any, control:
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Regular Price (e.g. "8500")</Label>
-            <Input {...register('heroSection.regularPrice')} placeholder="8500" />
+            <Input 
+              {...register('heroSection.regularPrice', {
+                onChange: (e: any) => {
+                  e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                }
+              })} 
+              placeholder="8500" 
+              inputMode="numeric"
+            />
           </div>
           <div>
             <Label>Offer Price (e.g. "6400")</Label>
-            <Input {...register('heroSection.offerPrice')} placeholder="6400" />
+            <Input 
+              {...register('heroSection.offerPrice', {
+                onChange: (e: any) => {
+                  e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                }
+              })} 
+              placeholder="6400" 
+              inputMode="numeric"
+            />
           </div>
         </div>
 

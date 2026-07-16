@@ -1,27 +1,48 @@
-"use client"
+'use client';
 
-import { useSliders } from "@/lib/use-store-data"
-import { useHomePageBanners } from "@/src/hooks/api/useBanners"
-import { AppShell } from "@/components/layout/app-shell"
-import { SliderBanner } from "@/components/ui/slider-banner"
-import { SliderBannerSkeleton } from "@/components/ui/skeletons/slider-banner-skeleton"
-import { CategoriesSection } from "@/components/home/categories-section"
-// import { FlashSaleSection } from "@/components/home/flash-sale-section"
-import { FreeDeliveryBanner } from "@/components/home/free-delivery-banner"
-import { TrendingSection } from "@/components/home/trending-section"
-import { NewProductsSection } from "@/components/home/new-products-section"
-import { CategoryProductsSections } from "@/components/home/category-products-sections"
-import { YoutubeVideoSection } from "@/components/home/youtube-video-section"
-import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
+import { CategoriesSection } from '@/components/home/categories-section';
+import { FreeDeliveryBanner } from '@/components/home/free-delivery-banner';
+import { NewProductsSection } from '@/components/home/new-products-section';
+import { AppShell } from '@/components/layout/app-shell';
+import { SliderBannerSkeleton } from '@/components/ui/skeletons/slider-banner-skeleton';
+import { useSliders } from '@/lib/use-store-data';
+import { useHomePageBanners } from '@/src/hooks/api/useBanners';
+import dynamic from 'next/dynamic';
+
+const SliderBanner = dynamic(
+  () => import('@/components/ui/slider-banner').then((m) => ({ default: m.SliderBanner })),
+  { ssr: false, loading: SliderBannerSkeleton },
+);
+const CategoryProductsSections = dynamic(
+  () =>
+    import('@/components/home/category-products-sections').then((m) => ({
+      default: m.CategoryProductsSections,
+    })),
+  { ssr: false },
+);
+const YoutubeVideoSection = dynamic(
+  () =>
+    import('@/components/home/youtube-video-section').then((m) => ({
+      default: m.YoutubeVideoSection,
+    })),
+  { ssr: false },
+);
+const FloatingRotatingIcon = dynamic(
+  () =>
+    import('@/components/home/floating-rotating-icon').then((m) => ({
+      default: m.FloatingRotatingIcon,
+    })),
+  { ssr: false },
+);
 
 export default function HomePage() {
-  const { data: sliders, isLoading: isSlidersLoading } = useHomePageBanners()
-  const { loaded } = useSliders() // keeping temporarily for other dependencies if any
+  const { data: sliders } = useHomePageBanners();
+  const { loaded } = useSliders(); // keeping temporarily for other dependencies if any
 
   return (
     <AppShell>
-      <div className="space-y-5 py-4 md:space-y-8 md:py-4">
-        {isSlidersLoading ? <SliderBannerSkeleton /> : <SliderBanner slides={sliders || []} />}
+      <div className='space-y-5 py-4 md:space-y-8 md:py-4'>
+        <SliderBanner slides={sliders || []} />
         <CategoriesSection />
         {/* <FlashSaleSection /> */}
         <FreeDeliveryBanner />
@@ -32,5 +53,5 @@ export default function HomePage() {
       </div>
       <FloatingRotatingIcon />
     </AppShell>
-  )
+  );
 }

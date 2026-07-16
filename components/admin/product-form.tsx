@@ -5,7 +5,6 @@ import { ImagePlus, Plus, Trash2, UploadCloud, X } from "lucide-react"
 import type { Product, ProductVariant } from "@/lib/types"
 import dynamic from "next/dynamic"
 import { useCategories, useSubCategories } from "@/src/hooks/api/useCategories"
-import { AdminSelect } from "@/components/admin/admin-select"
 
 const QuillEditor = dynamic(
   () => import("@/components/ui/quill-editor").then((mod) => mod.QuillEditor),
@@ -94,7 +93,7 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
   // Auto-select first subcategory when category changes
   useEffect(() => {
     if (subs.length > 0) {
-      const hasCurrent = subs.some(s => s.id === subCategoryId)
+      const hasCurrent = subs.some((s: any) => s.id === subCategoryId)
       if (!hasCurrent) {
         setSubCategoryId(subs[0].id)
       }
@@ -211,35 +210,35 @@ export function ProductForm({ initial, onSave, onCancel, isSaving, variant = "ca
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-foreground">Category</label>
-            <AdminSelect
+            <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               disabled={categories.length === 0}
-              className="h-11 px-4"
+              className="h-11 w-full rounded-md border border-border/80 bg-background px-4 text-sm outline-none focus:border-primary/60 disabled:opacity-50"
             >
               <option value="">Select Category...</option>
-              {categories.map((c) => (
+              {categories.map((c: any) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
-            </AdminSelect>
+            </select>
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-foreground">Sub Category</label>
-            <AdminSelect
+            <select
               value={subCategoryId}
               onChange={(e) => setSubCategoryId(e.target.value)}
               disabled={subs.length === 0}
-              className="h-11 px-4"
+              className="h-11 w-full rounded-md border border-border/80 bg-background px-4 text-sm outline-none focus:border-primary/60 disabled:opacity-50"
             >
               <option value="">Select Sub-category...</option>
-              {subs.map((s) => (
+              {subs.map((s: any) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
               ))}
-            </AdminSelect>
+            </select>
           </div>
         </div>
 

@@ -272,7 +272,7 @@ export function ProductInfo({
           >
             {tab === 'specification' && 'Specification'}
             {tab === 'description' && 'Description'}
-            {tab === 'warranty' && 'Warentee'}
+            {tab === 'warranty' && 'Warranty'}
           </button>
         ))}
       </div>
@@ -352,7 +352,7 @@ export function ProductInfo({
         {/* Warranty Tab */}
         {activeTab === 'warranty' && (
           <div className='animate-in fade-in duration-300'>
-            <h3 className='mb-4 text-2xl font-semibold text-gray-900'>Warentee</h3>
+            <h3 className='mb-4 text-2xl font-semibold text-gray-900'>warranty</h3>
             {product.extraDescription ? (
               <QuillEditor
                 readOnly

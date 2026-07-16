@@ -5,6 +5,7 @@ import { useProducts } from "@/lib/use-store-data"
 import { AppShell } from "@/components/layout/app-shell"
 import { BackHeader } from "@/components/layout/back-header"
 import { ProductCard } from "@/components/ui/product-card"
+import { ProductGridSkeleton } from "@/components/ui/skeletons/product-grid-skeleton"
 
 export default function FreeDeliveryPage() {
   const { products, loaded } = useProducts()
@@ -12,8 +13,8 @@ export default function FreeDeliveryPage() {
   if (!loaded) {
     return (
       <AppShell>
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="py-4 md:py-6">
+          <ProductGridSkeleton />
         </div>
       </AppShell>
     )

@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError } from "@/lib/api-utils"
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { getOrders, getOrderById, updateOrderStatus, updateOrder, deleteOrder } from "@/src/api/orderApi"
 
 export const ORDER_KEYS = {
   all: ["orders"] as const,
@@ -61,59 +60,12 @@ export type GetOrdersParams = {
   status?: OrderStatus | ""
 }
 
-const getOrders = async (params: GetOrdersParams) => {
-  const url = new URL(`${BASE_URL}/orders`)
-  if (params.page) url.searchParams.append("page", params.page.toString())
-  if (params.limit) url.searchParams.append("limit", params.limit.toString())
-  if (params.search) url.searchParams.append("search", params.search)
-  if (params.status) url.searchParams.append("status", params.status)
-
-  const response = await adminFetch(url.toString(), {
-    method: "GET",
-    headers: { ...authHeaders() },
+export function useOrderById(id: string) {
+  return useQuery({
+    queryKey: ORDER_KEYS.details(id),
+    queryFn: () => getOrderById(id),
+    enabled: !!id,
   })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload.data as {
-    meta: { page: number; limit: number; total: number; totalPage: number }
-    orders: Order[]
-  }
-}
-
-const updateOrderStatus = async (id: string, status: OrderStatus) => {
-  const response = await adminFetch(`${BASE_URL}/orders/${id}/status`, {
-    method: "PATCH",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload.data as Order
-}
-
-const deleteOrder = async (id: string) => {
-  const response = await adminFetch(`${BASE_URL}/orders/${id}`, {
-    method: "DELETE",
-    headers: { ...authHeaders() },
-  })
-
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok || payload?.status === false) {
-    throw payload || { message: "Request failed", statusCode: response.status }
-  }
-
-  return payload
 }
 
 export function useOrders(params: GetOrdersParams) {
@@ -130,6 +82,19 @@ export function useUpdateOrderStatus() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
       notify.success({ title: "Status Updated", message: `Order ${data.code} marked as ${data.status}.` })
+    },
+    onError: (error) => handleApiError(error),
+  })
+}
+
+export function useUpdateOrder() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: import("@/src/api/orderApi").UpdateOrderPayload }) => updateOrder(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.details(data.id) })
+      notify.success({ title: "Order Updated", message: `Order ${data.code} has been updated.` })
     },
     onError: (error) => handleApiError(error),
   })

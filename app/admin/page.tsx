@@ -1,77 +1,142 @@
-"use client"
+'use client';
 
-import { useMemo } from "react"
-import Link from "next/link"
+import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
+import Link from 'next/link';
 import {
   Package,
   ShoppingBag,
   TrendingUp,
   Clock,
   ArrowUpRight,
-  ArrowDownRight,
-  Users,
-  Ban,
-  Truck,
   CheckCircle2,
-  AlertCircle,
   Eye,
-} from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import { useProducts } from "@/src/hooks/api/useProducts"
-import { useOrders, type Order } from "@/src/hooks/api/useOrders"
-import { formatBDT, formatRelativeTime } from "@/lib/format"
+  Sparkles,
+  Gauge,
+  CircleDollarSign,
+  FolderTree,
+  Users,
+  Zap,
+  CreditCard,
+  Wallet,
+  Banknote,
+  XCircle,
+  Archive,
+  Truck,
+  Trash2,
+  Tags,
+} from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
+import { useProducts } from '@/src/hooks/api/useProducts';
+import { useOrders, type Order } from '@/src/hooks/api/useOrders';
+import { formatBDT, formatRelativeTime } from '@/lib/format';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts"
+  DashPage,
+  DashGradientCard,
+  DashMetricCard,
+  DashPanel,
+  DashSectionTitle,
+  DashStatusBadge,
+  DashLoading,
+} from '@/dashboard/components/dash-ui';
+
+const WeeklySalesChart = dynamic(
+  () => import('@/app/admin/charts').then((m) => ({ default: m.WeeklySalesChart })),
+  { ssr: false },
+);
+const BestSellingPie = dynamic(
+  () => import('@/app/admin/charts').then((m) => ({ default: m.BestSellingPie })),
+  { ssr: false },
+);
+const OrderStatusChart = dynamic(
+  () => import('@/app/admin/charts').then((m) => ({ default: m.OrderStatusChart })),
+  { ssr: false },
+);
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: "#F59E0B",
-  PROCESSING: "#3B82F6",
-  HOLD: "#8B5CF6",
-  PICKUP: "#06B6D4",
-  DELIVERED: "#10B981",
-  CUSTOMER_CANCELLED: "#EF4444",
-  CANCELLED: "#6B7280",
-  TRASH: "#1F2937",
-}
+  PENDING: '#F59E0B',
+  PROCESSING: '#3B82F6',
+  HOLD: '#8B5CF6',
+  PICKUP: '#06B6D4',
+  DELIVERED: '#10B981',
+  CUSTOMER_CANCELLED: '#EF4444',
+  CANCELLED: '#6B7280',
+  TRASH: '#1F2937',
+};
 
 const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Pending",
-  PROCESSING: "Processing",
-  HOLD: "Hold",
-  PICKUP: "Pickup",
-  DELIVERED: "Delivered",
-  CUSTOMER_CANCELLED: "Cancelled",
-  CANCELLED: "Cancelled",
-  TRASH: "Trash",
-}
+  PENDING: 'Pending',
+  PROCESSING: 'Processing',
+  HOLD: 'Hold',
+  PICKUP: 'Pickup',
+  DELIVERED: 'Delivered',
+  CUSTOMER_CANCELLED: 'Cancelled',
+  CANCELLED: 'Cancelled',
+  TRASH: 'Trash',
+};
 
-export default function AdminOverview() {
-  const { admin } = useAuth()
+const PIE_COLORS = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
 
-  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 })
-  const { data: ordersData, isLoading: ordersLoading } = useOrders({ limit: 1000 })
+const QUICK_LINKS = [
+  { href: '/admin/products', label: 'Products', icon: Package, color: 'bg-blue-500' },
+  { href: '/admin/orders/pending', label: 'Orders', icon: ShoppingBag, color: 'bg-violet-500' },
+  { href: '/admin/categories', label: 'Categories', icon: FolderTree, color: 'bg-emerald-500' },
+  { href: '/admin/flash-sale', label: 'Flash Sale', icon: Gauge, color: 'bg-rose-500' },
+  { href: '/admin/promos', label: 'Promos', icon: CircleDollarSign, color: 'bg-amber-500' },
+  { href: '/admin/sliders', label: 'Sliders', icon: Sparkles, color: 'bg-cyan-500' },
+  { href: '/admin/customers', label: 'Customers', icon: Users, color: 'bg-indigo-500' },
+  { href: '/admin/trending', label: 'Trending', icon: TrendingUp, color: 'bg-teal-500' },
+];
 
-  const products = (productsData as any)?.products || productsData || []
-  const ordersMeta = (ordersData as any)?.meta
-  const orders = (ordersData as any)?.orders || []
+export default function DashboardOverview() {
+  const { admin } = useAuth();
+  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 });
+  const { data: ordersData, isLoading: ordersLoading } = useOrders({});
+
+  const products = (productsData as any)?.products || productsData || [];
+  const ordersMeta = (ordersData as any)?.meta;
+  const orders = (ordersData as any)?.orders || [];
 
   const stats = useMemo(() => {
-    const totalProducts = Array.isArray(products) ? products.length : 0
-    const totalOrders = ordersMeta?.total || orders.length
-    const totalRevenue = (orders as Order[]).reduce((sum, o) => sum + (o.total || 0), 0)
-    const pendingOrders = (orders as Order[]).filter((o) => o.status === "PENDING").length
-    const deliveredOrders = (orders as Order[]).filter((o) => o.status === "DELIVERED").length
+    const totalProducts = Array.isArray(products) ? products.length : 0;
+    const totalOrders = ordersMeta?.total || orders.length;
+    const delivered = (orders as Order[]).filter((o) => o.status === 'DELIVERED');
+    const pendingOrders = (orders as Order[]).filter((o) => o.status === 'PENDING').length;
+    const deliveredOrders = delivered.length;
+    const processingOrders = (orders as Order[]).filter((o) => o.status === 'PROCESSING').length;
     const cancelledOrders = (orders as Order[]).filter(
-      (o) => o.status === "CANCELLED" || o.status === "CUSTOMER_CANCELLED"
-    ).length
+      (o) => o.status === 'CANCELLED' || o.status === 'CUSTOMER_CANCELLED',
+    ).length;
+    const holdOrders = (orders as Order[]).filter((o) => o.status === 'HOLD').length;
+    const pickupOrders = (orders as Order[]).filter((o) => o.status === 'PICKUP').length;
+    const trashOrders = (orders as Order[]).filter((o) => o.status === 'TRASH').length;
+    const totalRevenue = delivered.reduce((sum, o) => sum + Number(o.total || 0), 0);
+
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const yesterdayStart = new Date(todayStart.getTime() - 86400000);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+    const todayRevenue = delivered
+      .filter((o) => new Date(o.createdAt) >= todayStart)
+      .reduce((sum, o) => sum + Number(o.total || 0), 0);
+    const yesterdayRevenue = delivered
+      .filter((o) => {
+        const d = new Date(o.createdAt);
+        return d >= yesterdayStart && d < todayStart;
+      })
+      .reduce((sum, o) => sum + Number(o.total || 0), 0);
+    const thisMonthRevenue = delivered
+      .filter((o) => new Date(o.createdAt) >= monthStart)
+      .reduce((sum, o) => sum + Number(o.total || 0), 0);
+    const lastMonthRevenue = delivered
+      .filter((o) => {
+        const d = new Date(o.createdAt);
+        return d >= lastMonthStart && d <= lastMonthEnd;
+      })
+      .reduce((sum, o) => sum + Number(o.total || 0), 0);
 
     return {
       totalProducts,
@@ -79,9 +144,17 @@ export default function AdminOverview() {
       totalRevenue,
       pendingOrders,
       deliveredOrders,
+      processingOrders,
       cancelledOrders,
-    }
-  }, [products, orders, ordersMeta])
+      todayRevenue,
+      yesterdayRevenue,
+      thisMonthRevenue,
+      lastMonthRevenue,
+      holdOrders,
+      pickupOrders,
+      trashOrders,
+    };
+  }, [products, orders, ordersMeta]);
 
   const statusChartData = useMemo(() => {
     const counts: Record<string, number> = {
@@ -93,272 +166,256 @@ export default function AdminOverview() {
       CUSTOMER_CANCELLED: 0,
       CANCELLED: 0,
       TRASH: 0,
-    }
-    ;(orders as Order[]).forEach((o) => {
-      if (counts[o.status] !== undefined) counts[o.status]++
-    })
+    };
+    (orders as Order[]).forEach((o) => {
+      if (counts[o.status] !== undefined) counts[o.status]++;
+    });
     return Object.entries(counts)
       .filter(([, v]) => v > 0)
       .map(([key, value]) => ({
         name: STATUS_LABELS[key] || key,
         value,
-        color: STATUS_COLORS[key] || "#6B7280",
-      }))
-  }, [orders])
+        color: STATUS_COLORS[key] || '#6B7280',
+      }));
+  }, [orders]);
+
+  const weeklyChartData = useMemo(() => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
+    const dayTotals: Record<string, number> = {};
+    const dayCounts: Record<string, number> = {};
+    days.forEach((d) => {
+      dayTotals[d] = 0;
+      dayCounts[d] = 0;
+    });
+    (orders as Order[]).forEach((o) => {
+      const d = new Date(o.createdAt);
+      const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+      if (diffDays < 7) {
+        const dayName = days[d.getDay()];
+        dayTotals[dayName] += Number(o.total || 0);
+        dayCounts[dayName]++;
+      }
+    });
+
+    return days.map((day) => ({
+      day,
+      sales: dayTotals[day],
+      orders: dayCounts[day],
+    }));
+  }, [orders]);
+
+  const bestSellingData = useMemo(() => {
+    if (!Array.isArray(products) || products.length === 0) return [];
+    return products.slice(0, 5).map((p: any, i: number) => ({
+      name: p.name.length > 12 ? p.name.slice(0, 12) + '...' : p.name,
+      value: p.soldCount || p.price || 1,
+      color: PIE_COLORS[i % PIE_COLORS.length],
+    }));
+  }, [products]);
 
   const recentOrders = useMemo(() => {
     return [...(orders as Order[])]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5)
-  }, [orders])
+      .slice(0, 7);
+  }, [orders]);
 
   const lowStockProducts = useMemo(() => {
-    if (!Array.isArray(products)) return []
-    return products.filter((p: any) => p.stock === false || p.availability === false).slice(0, 5)
-  }, [products])
+    if (!Array.isArray(products)) return [];
+    return products.filter((p: any) => p.stock === false || p.availability === false).slice(0, 5);
+  }, [products]);
 
-  const isLoading = productsLoading || ordersLoading
+  const isLoading = productsLoading || ordersLoading;
 
-  const StatCard = ({
-    label,
-    value,
-    icon: Icon,
-    color,
-    href,
-  }: {
-    label: string
-    value: string | number
-    icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
-    color: string
-    href?: string
-  }) => (
-    <Link
-      href={href || "#"}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-card transition hover:shadow-lg"
-    >
-      <div className="flex items-start justify-between">
+  if (isLoading) {
+    return (
+      <DashPage>
         <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
+          <h2 className='text-xl font-bold text-foreground md:text-2xl'>
+            Welcome back, {admin?.email?.split('@')[0] || 'Admin'}
+          </h2>
+          <p className='mt-0.5 text-sm text-muted-foreground'>Loading your dashboard...</p>
         </div>
-        <div
-          className="grid h-10 w-10 place-items-center rounded-lg"
-          style={{ backgroundColor: `${color}15` }}
-        >
-          <Icon className="h-5 w-5" style={{ color }} />
-        </div>
-      </div>
-      <ArrowUpRight className="absolute right-3 top-3 h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
-    </Link>
-  )
+        <DashLoading label='Fetching latest data...' />
+      </DashPage>
+    );
+  }
 
   return (
-    <div className="admin-page space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-foreground md:text-2xl">
-          Welcome back, {admin?.email?.split("@")[0] || "Admin"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Here is what is happening with your store today.
-        </p>
-      </div>
-
-      {isLoading && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4 animate-spin" />
-          Loading dashboard data...
-        </div>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Total Products"
+    <DashPage>
+      {/* Main Overview Metrics */}
+      <div className='grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
+        <DashMetricCard
+          label='Total Products'
           value={stats.totalProducts}
-          icon={Package}
-          color="#3B82F6"
-          href="/admin/products"
+          subLabel='All store items'
         />
-        <StatCard
-          label="Total Orders"
-          value={stats.totalOrders}
-          icon={ShoppingBag}
-          color="#8B5CF6"
-          href="/admin/orders/new"
+        <DashMetricCard
+          label='Total Sells'
+          value={stats.deliveredOrders}
+          subLabel='From delivered orders'
         />
-        <StatCard
-          label="Total Revenue"
+        <DashMetricCard
+          label='Total Income'
           value={formatBDT(stats.totalRevenue)}
-          icon={TrendingUp}
-          color="#10B981"
-          href="/admin/orders/delivered"
+          subLabel='Overall revenue'
         />
-        <StatCard
-          label="Pending Orders"
+        <DashMetricCard
+          label='Total Orders'
+          value={stats.totalOrders}
+          subLabel='All status included'
+        />
+        <DashMetricCard
+          label='Pending Orders'
           value={stats.pendingOrders}
-          icon={Clock}
-          color="#F59E0B"
-          href="/admin/orders/pending"
+          subLabel='Awaiting confirmation'
         />
+        <DashMetricCard
+          label='Processing'
+          value={stats.processingOrders}
+          subLabel='Being processed'
+        />
+        <DashMetricCard label='Hold Orders' value={stats.holdOrders} subLabel='On hold status' />
+        <DashMetricCard
+          label='Pickup Orders'
+          value={stats.pickupOrders}
+          subLabel='Ready for pickup'
+        />
+        <DashMetricCard
+          label='Delivered'
+          value={stats.deliveredOrders}
+          subLabel='Successfully delivered'
+        />
+        <DashMetricCard
+          label='Cancel Orders'
+          value={stats.cancelledOrders}
+          subLabel='User & Admin cancelled'
+        />
+        <DashMetricCard label='Trash' value={stats.trashOrders} subLabel='Deleted orders' />
       </div>
 
-      {/* Middle Row */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Order Status Chart */}
-        <div className="rounded-xl border border-border bg-card p-5 shadow-card lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground">Order Status Overview</h2>
-            <Link href="/admin/orders/new" className="text-xs text-primary hover:underline">
-              View all
-            </Link>
-          </div>
-          {statusChartData.length === 0 ? (
-            <div className="flex h-48 items-center justify-center text-sm text-muted-foreground">
-              No orders yet
-            </div>
+      {/* Charts row */}
+      <div className='grid gap-4 lg:grid-cols-2'>
+        <WeeklySalesChart data={weeklyChartData} />
+        <BestSellingPie data={bestSellingData} />
+      </div>
+
+      {/* Order status + low stock alerts */}
+      <div className='grid gap-4 lg:grid-cols-3'>
+        <OrderStatusChart data={statusChartData} />
+
+        {/* <DashPanel>
+          <DashSectionTitle title="Low Stock Alert" />
+          {lowStockProducts.length === 0 ? (
+            <div className="flex h-48 items-center justify-center text-sm text-muted-foreground">All stocked up</div>
           ) : (
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={statusChartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip
-                    cursor={{ fill: "#F3F4F6" }}
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: "1px solid #E5E7EB",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                      fontSize: 13,
-                    }}
-                  />
-                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                    {statusChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ul className="space-y-2">
+              {lowStockProducts.map((p: any) => (
+                <li key={p.id} className="flex items-center justify-between rounded-lg bg-surface/50 p-3 text-sm">
+                  <span className="truncate text-foreground">{p.name}</span>
+                  <span className="shrink-0 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600">
+                    Out of stock
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
-        </div>
-
-        {/* Quick Stats */}
-        <div className="space-y-4">
-          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">Order Summary</h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span className="text-sm text-muted-foreground">Delivered</span>
-                </div>
-                <span className="text-sm font-semibold text-foreground">{stats.deliveredOrders}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm text-muted-foreground">Pending</span>
-                </div>
-                <span className="text-sm font-semibold text-foreground">{stats.pendingOrders}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Ban className="h-4 w-4 text-red-500" />
-                  <span className="text-sm text-muted-foreground">Cancelled</span>
-                </div>
-                <span className="text-sm font-semibold text-foreground">{stats.cancelledOrders}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-cyan-500" />
-                  <span className="text-sm text-muted-foreground">Pickup</span>
-                </div>
-                <span className="text-sm font-semibold text-foreground">
-                  {(orders as Order[]).filter((o) => o.status === "PICKUP").length}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {lowStockProducts.length > 0 && (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/40 dark:bg-red-950/20">
-              <div className="mb-2 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <h3 className="text-sm font-semibold text-red-700 dark:text-red-400">
-                  Low Stock Alert
-                </h3>
-              </div>
-              <ul className="space-y-1">
-                {lowStockProducts.map((p: any) => (
-                  <li key={p.id} className="flex items-center justify-between text-xs">
-                    <span className="truncate text-foreground">{p.name}</span>
-                    <span className="shrink-0 rounded bg-red-100 px-1.5 py-0.5 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                      Out of stock
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        </DashPanel> */}
       </div>
 
-      {/* Recent Orders */}
-      <div className="rounded-xl border border-border bg-card shadow-card">
-        <div className="flex items-center justify-between border-b border-border/60 p-5">
-          <h2 className="text-sm font-semibold text-foreground">Recent Orders</h2>
-          <Link href="/admin/orders/new" className="text-xs text-primary hover:underline">
-            View all orders
+      {/* Quick access */}
+      <DashPanel>
+        <DashSectionTitle title='Quick Access' />
+        <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
+          {QUICK_LINKS.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className='group flex items-center gap-3 rounded-xl border border-border/40 bg-surface/50 p-3 transition-all duration-200 hover:border-primary/20 hover:bg-secondary/40 hover:shadow-sm'
+              >
+                <div
+                  className={`grid h-9 w-9 place-items-center rounded-lg ${link.color} shadow-sm`}
+                >
+                  <Icon className='h-4 w-4 text-white' />
+                </div>
+                <span className='text-[13px] font-medium text-foreground'>{link.label}</span>
+                <ArrowUpRight className='ml-auto h-3.5 w-3.5 text-muted-foreground opacity-0 transition group-hover:opacity-100' />
+              </Link>
+            );
+          })}
+        </div>
+      </DashPanel>
+
+      {/* Recent orders table */}
+      <DashPanel noPadding>
+        <div className='flex items-center justify-between border-b border-border/40 p-5'>
+          <h3 className='text-sm font-bold text-foreground'>Recent Order</h3>
+          <Link
+            href='/admin/orders/pending'
+            className='text-xs font-medium text-primary hover:underline'
+          >
+            View all →
           </Link>
         </div>
         {recentOrders.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">No orders yet</div>
+          <div className='p-10 text-center text-sm text-muted-foreground'>No orders yet</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className='overflow-x-auto'>
+            <table className='w-full text-left text-sm'>
               <thead>
-                <tr className="border-b border-border/60 bg-muted/40 text-muted-foreground">
-                  <th className="px-5 py-3 font-medium">Order ID</th>
-                  <th className="px-5 py-3 font-medium">Customer</th>
-                  <th className="px-5 py-3 font-medium">Amount</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                  <th className="px-5 py-3 font-medium">Date</th>
-                  <th className="px-5 py-3 font-medium"></th>
+                <tr className='border-b border-border/40 bg-surface/30 text-muted-foreground'>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Invoice No
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Order Time
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Customer Name
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Method
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Amount
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Status
+                  </th>
+                  <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide'>
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {recentOrders.map((order) => (
                   <tr
                     key={order.id}
-                    className="border-b border-border/40 transition hover:bg-muted/30"
+                    className='border-b border-border/30 transition hover:bg-secondary/20'
                   >
-                    <td className="px-5 py-3 font-medium text-foreground">#{order.code}</td>
-                    <td className="px-5 py-3 text-foreground">{order.customerName}</td>
-                    <td className="px-5 py-3 font-medium text-foreground">
-                      {formatBDT(order.total)}
-                    </td>
-                    <td className="px-5 py-3">
-                      <span
-                        className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                        style={{
-                          backgroundColor: `${STATUS_COLORS[order.status]}15`,
-                          color: STATUS_COLORS[order.status],
-                        }}
-                      >
-                        {STATUS_LABELS[order.status] || order.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-muted-foreground">
+                    <td className='px-5 py-3.5 font-semibold text-foreground'>#{order.code}</td>
+                    <td className='px-5 py-3.5 text-muted-foreground'>
                       {formatRelativeTime(order.createdAt)}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className='px-5 py-3.5 text-foreground'>{order.customerName}</td>
+                    <td className='px-5 py-3.5 text-muted-foreground'>Cash on Delivery</td>
+                    <td className='px-5 py-3.5 font-medium text-foreground'>
+                      {formatBDT(order.total)}
+                    </td>
+                    <td className='px-5 py-3.5'>
+                      <DashStatusBadge
+                        status={order.status}
+                        label={STATUS_LABELS[order.status] || order.status}
+                      />
+                    </td>
+                    <td className='px-5 py-3.5'>
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                        className='inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline'
                       >
-                        <Eye className="h-3.5 w-3.5" />
+                        <Eye className='h-3.5 w-3.5' />
                         View
                       </Link>
                     </td>
@@ -368,8 +425,7 @@ export default function AdminOverview() {
             </table>
           </div>
         )}
-      </div>
-    </div>
-  )
+      </DashPanel>
+    </DashPage>
+  );
 }
-

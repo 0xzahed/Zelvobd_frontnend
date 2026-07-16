@@ -2,10 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { UploadCloud, X, Loader2 } from 'lucide-react';
-import { adminFetch } from '@/src/api/_shared/adminFetch';
-import { BASE_URL } from '@/src/api/_shared/client';
+import { adminFetch, BASE_URL, toAbsoluteUploadUrl } from '@/src/api/mainApi';
 import { notify } from '@/lib/notify';
-import { toAbsoluteUploadUrl } from '@/src/api/_shared/mappers';
 
 export function ImageUpload({ 
   value, 

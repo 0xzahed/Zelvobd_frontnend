@@ -1,5 +1,4 @@
-import { adminFetch } from "@/src/api/_shared/adminFetch"
-import { BASE_URL, authHeaders } from "@/src/api/_shared/client"
+import { adminFetch, BASE_URL, authHeaders } from "@/src/api/mainApi"
 
 const parseJsonSafe = async (response: Response) => {
   try {

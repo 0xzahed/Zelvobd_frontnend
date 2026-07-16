@@ -1,13 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notify } from "@/lib/notify"
 import { handleApiError, fileFromUrl } from "@/lib/api-utils"
-import { getProducts } from "@/src/api/products/getProducts"
-import { getProductDetails } from "@/src/api/products/getProductDetails"
-import { createProduct } from "@/src/api/products/createProduct"
-import { updateProduct } from "@/src/api/products/updateProduct"
-import { deleteProduct } from "@/src/api/products/deleteProduct"
-import { copyProduct } from "@/src/api/products/copyProduct"
-import { mapProduct } from "@/src/api/_shared/mappers"
+import { getProducts, getProductDetails, createProduct, updateProduct, deleteProduct, copyProduct } from "@/src/api/productApi"
+import { mapProduct } from "@/src/api/mainApi"
 import type { Product, ProductVariant } from "@/lib/types"
 
 export const PRODUCT_KEYS = {

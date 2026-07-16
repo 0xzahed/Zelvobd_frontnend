@@ -1,13 +1,5 @@
-import { OrderList } from "@/components/admin/order-list"
+import { OrderList } from "@/dashboard/components/order-list"
 
 export default function PendingOrdersPage() {
-  return (
-    <OrderList
-      title="Pending Orders"
-      description="Orders awaiting confirmation"
-      defaultStatus="PENDING"
-      lockStatus
-      showSteadfast
-    />
-  )
+  return <OrderList status="PENDING" title="Pending Orders" subtitle="Orders awaiting confirmation" />
 }
