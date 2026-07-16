@@ -670,6 +670,14 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
 
+  const firePurchaseOnce = (orderId: string, value: number) => {
+    const key = `pixel_purchase_${orderId}`
+    if (typeof window !== "undefined" && !localStorage.getItem(key)) {
+      purchase({ value, orderId })
+      localStorage.setItem(key, "true")
+    }
+  }
+
   const handleStatusChange = (id: string, newStatus: OrderStatus) => {
     updateStatus.mutate(
       { id, status: newStatus },
@@ -678,7 +686,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
           if (newStatus === "PROCESSING") {
             const order = orders.find((o) => o.id === id)
             if (order) {
-              purchase({ value: Number(order.subtotal || order.total || 0), orderId: order.code })
+              firePurchaseOnce(order.code, Number(order.subtotal || order.total || 0))
             }
           }
         },
@@ -702,7 +710,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
       onSuccess: () => {
         const order = orders.find((o) => o.id === orderId)
         if (order) {
-          purchase({ value: Number(order.subtotal || order.total || 0), orderId: order.code })
+          firePurchaseOnce(order.code, Number(order.subtotal || order.total || 0))
         }
       },
     })
@@ -740,7 +748,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
                   syncMutation.mutate(orderIds, {
                     onSuccess: () => {
                       filtered.forEach((o) => {
-                        purchase({ value: Number(o.subtotal || o.total || 0), orderId: o.code })
+                        firePurchaseOnce(o.code, Number(o.subtotal || o.total || 0))
                       })
                     },
                   })
