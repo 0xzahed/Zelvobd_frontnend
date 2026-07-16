@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/cart-context';
-import { viewContent } from '@/lib/pixel';
+import { viewContent, initiateCheckout } from '@/lib/pixel';
 
 export function ProductCard({
   product,
@@ -34,6 +34,11 @@ export function ProductCard({
       quantity: 1,
       color: selectedColor,
       storage: selectedSize,
+    });
+
+    initiateCheckout({
+      value: product.price,
+      numItems: 1,
     });
 
     router.push('/cart');
