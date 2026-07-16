@@ -2,14 +2,8 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-<<<<<<< HEAD
 import { Search, Truck, ShieldAlert, Trash2, RotateCcw, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
 import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, useMoveOrderToTrash, useRestoreOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
-=======
-import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
-import { purchase } from "@/lib/pixel"
-import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
->>>>>>> da4a4effec2e54bc4d9f55677458c465890c9df8
 import { useProducts } from "@/src/hooks/api/useProducts"
 import type { Product, ProductVariant } from "@/lib/types"
 import { useFraudCheck, useSteadfastDeliveryStatus, useSyncOrders } from "@/src/hooks/api/useSteadfast"
