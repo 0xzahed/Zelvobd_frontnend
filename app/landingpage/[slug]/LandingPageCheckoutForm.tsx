@@ -79,8 +79,14 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       }
 
       // Manually fire the purchase event only on success
-      purchase({ value: subtotal });
-      setSubmitted(true);
+      purchase({ value: subtotal, orderId: payload.data?.code });
+      
+      const orderCode = payload.data?.code;
+      if (orderCode) {
+        router.push(`/landingpage/${landingPage.slug}/success?code=${orderCode}`);
+      } else {
+        router.push(`/landingpage/${landingPage.slug}/success`);
+      }
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
