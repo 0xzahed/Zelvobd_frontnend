@@ -18,9 +18,7 @@ function PixelPageviewTracker() {
       return;
     }
 
-    if (!pathname.startsWith('/admin')) {
-      pageview();
-    }
+    pageview();
   }, [pathname, searchParams]);
 
   return null;
@@ -30,7 +28,6 @@ export function FacebookPixel() {
   const pathname = usePathname();
 
   if (!FB_PIXEL_ID) return null;
-  if (pathname.startsWith('/admin')) return null;
 
   return (
     <>
