@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/cart-context';
+import { viewContent, initiateCheckout } from '@/lib/pixel';
 
 export function ProductCard({
   product,
@@ -33,6 +34,11 @@ export function ProductCard({
       quantity: 1,
       color: selectedColor,
       storage: selectedSize,
+    });
+
+    initiateCheckout({
+      value: product.price,
+      numItems: 1,
     });
 
     router.push('/cart');
@@ -63,6 +69,13 @@ export function ProductCard({
             ? 'w-full p-3 md:h-96 md:max-w-225'
             : 'w-full md:max-w-225',
       )}
+      onClick={() => {
+        viewContent({
+          productId: product.id,
+          productName: product.name,
+          value: product.price,
+        });
+      }}
     >
       {/* Discount badge */}
       {discountPercent > 0 && (

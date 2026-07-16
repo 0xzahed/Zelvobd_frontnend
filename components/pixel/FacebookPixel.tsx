@@ -2,14 +2,22 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import { FB_PIXEL_ID, pageview } from '@/lib/pixel';
 
 function PixelPageviewTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
+    // The initial page load is handled directly by the script tag
+    // We only want to fire manual pageviews on client-side route changes
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      return;
+    }
+
     if (!pathname.startsWith('/admin')) {
       pageview();
     }
@@ -40,6 +48,7 @@ export function FacebookPixel() {
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${FB_PIXEL_ID}');
+            fbq('track', 'PageView');
           `,
         }}
       />

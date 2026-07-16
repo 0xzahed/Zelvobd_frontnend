@@ -49,6 +49,7 @@ export const viewContent = (params: {
   productName?: string
   value?: number
   currency?: string
+  contentType?: string
 }) => {
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("track", "ViewContent", {
@@ -56,7 +57,7 @@ export const viewContent = (params: {
       content_name: params.productName,
       value: params.value,
       currency: params.currency ?? "BDT",
-      content_type: "product",
+      content_type: params.contentType ?? "product",
     })
   }
 }
