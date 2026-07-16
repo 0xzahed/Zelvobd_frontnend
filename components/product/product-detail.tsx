@@ -270,16 +270,18 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
           {/* Desktop buttons */}
           <div className="hidden gap-3 mt-8 md:flex">
             <button
-              onClick={handleBuy}
-              className="relative overflow-hidden shiny-button h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary hover:bg-primary/5"
+              onClick={() => handleAdd()}
+              disabled={!product.stock}
+              className="relative overflow-hidden shiny-button h-11 flex-1 rounded-full border border-primary bg-transparent text-sm font-medium text-primary hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-40 disabled:blur-[1px]"
             >
-              Buy Now
+              {product.stock ? "Add to Cart" : "Out of Stock"}
             </button>
             <button
-              onClick={() => handleAdd()}
-              className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white hover:bg-primary/90"
+              onClick={handleBuy}
+              disabled={!product.stock}
+              className="h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40 disabled:blur-[1px]"
             >
-              Add to Cart
+              {product.stock ? "Buy Now" : "Out of Stock"}
             </button>
           </div>
         </div>
@@ -290,16 +292,18 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
         <button
           type="button"
           onClick={() => handleAdd()}
-          className="relative z-10 h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md"
+          disabled={!product.stock}
+          className="relative z-10 h-11 flex-1 rounded-full border border-primary bg-white text-sm font-medium text-primary shadow-md disabled:cursor-not-allowed disabled:opacity-40 disabled:blur-[1px]"
         >
-          Add to Cart
+          {product.stock ? "Add to Cart" : "Out of Stock"}
         </button>
         <button
           type="button"
           onClick={handleBuy}
-          className="relative overflow-hidden shiny-button z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md"
+          disabled={!product.stock}
+          className="relative overflow-hidden shiny-button z-10 h-11 flex-1 rounded-full bg-primary text-sm font-medium text-white shadow-md disabled:cursor-not-allowed disabled:opacity-40 disabled:blur-[1px]"
         >
-          Buy Now
+          {product.stock ? "Buy Now" : "Out of Stock"}
         </button>
       </div>
 

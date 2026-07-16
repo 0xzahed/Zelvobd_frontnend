@@ -169,6 +169,7 @@ export default function DashboardProductsPage() {
                   <th className='px-5 py-3'>Brand</th>
                   <th className='px-5 py-3'>Price</th>
                   <th className='px-5 py-3'>Stock</th>
+                  <th className='px-5 py-3'>Available</th>
                   <th className='px-5 py-3'>Created At</th>
                   <th className='px-5 py-3'></th>
                 </tr>
@@ -177,7 +178,7 @@ export default function DashboardProductsPage() {
                 {paginated.length === 0 && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className='px-5 py-12 text-center text-sm text-muted-foreground'
                     >
                       No products found.
@@ -219,6 +220,25 @@ export default function DashboardProductsPage() {
                       >
                         {p.stock ? 'In Stock' : 'Out of Stock'}
                       </span>
+                    </td>
+                    <td className='px-5 py-3.5'>
+                      <button
+                        type='button'
+                        onClick={() => handleToggle(p.id, 'availability', !p.availability)}
+                        disabled={toggleMutation.isPending}
+                        className={cx(
+                          'inline-flex h-6 w-11 items-center rounded-full transition disabled:opacity-50',
+                          p.availability ? 'bg-emerald-500' : 'bg-muted-foreground/30',
+                        )}
+                        title={p.availability ? 'Available for purchase' : 'Hidden from storefront'}
+                      >
+                        <span
+                          className={cx(
+                            'inline-block h-5 w-5 transform rounded-full bg-white shadow transition',
+                            p.availability ? 'translate-x-5' : 'translate-x-0.5',
+                          )}
+                        />
+                      </button>
                     </td>
                     <td className='px-5 py-3.5 text-muted-foreground'>
                       {p.createdAt
@@ -328,7 +348,7 @@ export default function DashboardProductsPage() {
                     className='object-contain p-3 transition group-hover:scale-105'
                     unoptimized
                   />
-                  <div className='absolute right-2 top-2 flex gap-1.5'>
+                  <div className='absolute right-2 top-2 flex flex-col items-end gap-1.5'>
                     {p.stock ? (
                       <span className='rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 shadow-sm'>
                         In Stock
@@ -336,6 +356,11 @@ export default function DashboardProductsPage() {
                     ) : (
                       <span className='rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-600 shadow-sm'>
                         Out of Stock
+                      </span>
+                    )}
+                    {!p.availability && (
+                      <span className='rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-600 shadow-sm'>
+                        Hidden
                       </span>
                     )}
                   </div>
@@ -355,6 +380,26 @@ export default function DashboardProductsPage() {
                         -{p.discount}%
                       </span>
                     )}
+                  </div>
+                  <div className='mt-3 flex items-center justify-between rounded-lg border border-border/40 px-2.5 py-1.5'>
+                    <span className='text-[11px] font-medium text-muted-foreground'>Available</span>
+                    <button
+                      type='button'
+                      onClick={() => handleToggle(p.id, 'availability', !p.availability)}
+                      disabled={toggleMutation.isPending}
+                      className={cx(
+                        'inline-flex h-5 w-9 items-center rounded-full transition disabled:opacity-50',
+                        p.availability ? 'bg-emerald-500' : 'bg-muted-foreground/30',
+                      )}
+                      title={p.availability ? 'Available for purchase' : 'Hidden from storefront'}
+                    >
+                      <span
+                        className={cx(
+                          'inline-block h-4 w-4 transform rounded-full bg-white shadow transition',
+                          p.availability ? 'translate-x-4' : 'translate-x-0.5',
+                        )}
+                      />
+                    </button>
                   </div>
                   <div className='mt-3 grid grid-cols-2 gap-2'>
                     <button
