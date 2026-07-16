@@ -11,6 +11,7 @@ import { getProducts } from "@/src/api/productApi"
 import { getTrending } from "@/src/api/trendingApi"
 import { mapProduct } from "@/src/api/mainApi"
 import { notify } from "@/lib/notify"
+import { addToCart, initiateCheckout } from "@/lib/pixel"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
@@ -134,6 +135,10 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
     }
   }
 
+  const currentPrice = product.isFlashSale && activeVariant?.flashSalePrice != null
+    ? activeVariant.flashSalePrice
+    : activeVariant?.discountedPrice || product.price;
+
   const handleAdd = (silent = false) => {
     addItem({
       productId: product.id,
@@ -141,11 +146,24 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
       color: selectedColor,
       storage: selectedSize
     })
+    
+    addToCart({
+      productId: product.id,
+      productName: product.name,
+      value: currentPrice * qty,
+    });
+
     if (!silent) notify.success("Added to cart")
   }
 
   const handleBuy = () => {
     handleAdd(true)
+    
+    initiateCheckout({
+      value: currentPrice * qty,
+      numItems: qty,
+    });
+
     router.push("/cart")
   }
 
