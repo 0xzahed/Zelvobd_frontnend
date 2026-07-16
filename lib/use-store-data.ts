@@ -18,6 +18,17 @@ let productsInFlight: Promise<Product[]> | null = null;
 let slidersInFlight: Promise<Slider[]> | null = null;
 let youtubeVideosInFlight: Promise<any[]> | null = null;
 
+/**
+ * Invalidate the module-level storefront caches so the next mount/refetch
+ * pulls fresh data from the API (e.g. after an admin toggles availability).
+ */
+export function invalidateStorefrontCache() {
+  productsCache = null;
+  categoriesCache = null;
+  slidersCache = null;
+  youtubeVideosCache = null;
+}
+
 import { BASE_URL } from '@/src/api/mainApi';
 
 export function useCategories() {
@@ -103,7 +114,9 @@ export function useProducts(options?: { enabled?: boolean }) {
         if (!productsInFlight) {
           productsInFlight = (async () => {
             const res = await getProducts({ limit: 100 });
-            const mapped = (res?.data?.products || []).map(mapProduct);
+            const mapped = (res?.data?.products || [])
+              .map(mapProduct)
+              .filter((p: Product) => p.availability !== false);
             productsCache = mapped;
             return mapped;
           })().finally(() => {
@@ -122,8 +135,21 @@ export function useProducts(options?: { enabled?: boolean }) {
 
     void load();
 
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Drop the cache so the next focus pulls fresh data from the API.
+        productsCache = null;
+        cancelled = false;
+        setLoaded(false);
+        void load();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     return () => {
       cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [pathname, enabled]);
 

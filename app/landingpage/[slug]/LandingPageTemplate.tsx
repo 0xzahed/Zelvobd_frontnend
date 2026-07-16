@@ -244,8 +244,8 @@ function getYouTubeEmbedUrl(url: string) {
     } else if (url.includes('youtube.com/shorts/')) {
       videoId = url.split('youtube.com/shorts/')[1]?.split('?')[0];
     }
-  } catch (e) {}
-  
+  } catch (e) { }
+
   if (videoId) {
     return `https://www.youtube.com/embed/${videoId}`;
   }
@@ -364,7 +364,19 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           </div>
         </div>
       </section>
-
+      {/* Banner Slider */}
+      {data.sliderSection?.images && data.sliderSection.images.length > 0 && data.sliderSection.images[0]?.url && (
+        <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
+          <div className='mx-auto max-w-5xl px-4'>
+            <SliderBanner slides={data.sliderSection.images.map((img: any, i: number) => ({
+              id: String(i),
+              image: toAbsoluteUploadUrl(img.url),
+              link: '#',
+              title: `Banner ${i}`
+            }))} />
+          </div>
+        </section>
+      )}
       {/* Table Section */}
       {table.tableData && table.tableData.length > 0 && table.tableData[0]?.key && (
         <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
@@ -460,25 +472,12 @@ export default function LandingPageTemplate({ data }: { data: any }) {
         </div>
       </section>
 
-      {/* Banner Slider */}
-      {data.sliderSection?.images && data.sliderSection.images.length > 0 && data.sliderSection.images[0]?.url && (
-        <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
-          <div className='mx-auto max-w-5xl px-4'>
-            <SliderBanner slides={data.sliderSection.images.map((img: any, i: number) => ({
-              id: String(i),
-              image: toAbsoluteUploadUrl(img.url),
-              link: '#',
-              title: `Banner ${i}`
-            }))} />
-          </div>
-        </section>
-      )}
 
       {/* Video Section */}
       {(video.videoLink || video.cards?.length > 0) && (
         <section className='py-3' style={{ backgroundColor: 'var(--lp-background)' }}>
           <div className='mx-auto max-w-6xl px-4'>
-            
+
             {/* Caption */}
             {video.caption && (
               <div className='text-center mb-5 sm:mb-8'>
@@ -496,7 +495,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                   style={{ aspectRatio: '16 / 9', boxShadow: 'var(--lp-shadow-card)' }}
                 >
                   {video.customThumbnail && !isVideoPlaying ? (
-                    <div 
+                    <div
                       className="absolute inset-0 w-full h-full cursor-pointer group flex items-center justify-center"
                       onClick={() => setIsVideoPlaying(true)}
                     >
@@ -511,8 +510,8 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                       className='absolute inset-0 h-full w-full'
                       src={(() => {
                         const embedUrl = getYouTubeEmbedUrl(video.videoLink);
-                        return video.customThumbnail 
-                          ? (embedUrl.includes('?') ? `${embedUrl}&autoplay=1` : `${embedUrl}?autoplay=1`) 
+                        return video.customThumbnail
+                          ? (embedUrl.includes('?') ? `${embedUrl}&autoplay=1` : `${embedUrl}?autoplay=1`)
                           : embedUrl;
                       })()}
                       title='Video'
@@ -559,17 +558,17 @@ export default function LandingPageTemplate({ data }: { data: any }) {
       {bullets.points && bullets.points.length > 0 && bullets.points[0]?.value && (
         <section className='py-3'>
           <div className='mx-auto max-w-3xl px-4 text-center flex flex-col items-center'>
-            
+
             {/* The Image */}
             {bullets.image && (
               <div className='rounded-2xl overflow-hidden bg-white w-full max-w-xl' style={{ boxShadow: 'var(--lp-shadow-card)' }}>
-                <img 
-                  src={toAbsoluteUploadUrl(bullets.image)} 
-                  alt={bullets.title || 'Feature Image'} 
-                  width={1024} 
-                  height={1024} 
-                  loading="lazy" 
-                  className="w-full h-auto object-cover" 
+                <img
+                  src={toAbsoluteUploadUrl(bullets.image)}
+                  alt={bullets.title || 'Feature Image'}
+                  width={1024}
+                  height={1024}
+                  loading="lazy"
+                  className="w-full h-auto object-cover"
                 />
               </div>
             )}
@@ -577,7 +576,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
             {/* The Text Block */}
             <div className={`${bullets.image ? 'mt-5' : ''} flex flex-col items-center`}>
               {bullets.caption && <Pill>{bullets.caption}</Pill>}
-              
+
               {bullets.title && (
                 <h2
                   className='mt-2 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight'
@@ -586,7 +585,7 @@ export default function LandingPageTemplate({ data }: { data: any }) {
                   {bullets.title}
                 </h2>
               )}
-              
+
               {bullets.subtitle && (
                 <p className='mt-2 text-sm sm:text-base opacity-80 max-w-2xl'>
                   {bullets.subtitle}

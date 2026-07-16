@@ -91,6 +91,7 @@ const MENU: Section[] = [
           { href: '/admin/orders/pickup', label: 'Pickup' },
           { href: '/admin/orders/delivered', label: 'Delivered' },
           { href: '/admin/orders/cancelled', label: 'Cancelled' },
+          { href: '/admin/orders/trash', label: 'Trash' },
         ],
       },
       { label: 'Customers', icon: Users, href: '/admin/customers' },

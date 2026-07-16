@@ -182,12 +182,12 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
         const related = (relatedRes?.data?.products || [])
           .map(mapProduct)
-          .filter((p: Product) => p.id !== product.id)
+          .filter((p: Product) => p.id !== product.id && p.availability !== false)
           .slice(0, 10)
 
         const trending = (trendingRes?.data?.products || [])
           .map((p: any) => ({ ...mapProduct(p), isTrending: true }))
-          .filter((p: Product) => p.id !== product.id)
+          .filter((p: Product) => p.id !== product.id && p.availability !== false)
           .slice(0, 10)
 
         if (!cancelled) {

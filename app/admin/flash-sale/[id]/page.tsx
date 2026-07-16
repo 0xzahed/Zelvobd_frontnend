@@ -28,12 +28,15 @@ export default function DashboardFlashSaleDetailsPage() {
   const { data: subCategories = [], isLoading: isSubCategoriesLoading } = useSubCategories(selectedCategory, {
     enabled: !!selectedCategory && selectedCategory !== "all",
   })
-  const { data: availableProducts = [], isLoading: isProductsLoading } = useProducts({
-    categoryId: selectedCategory !== "all" ? selectedCategory : undefined,
-    subCategoryId: selectedSubCategory !== "all" ? selectedSubCategory : undefined,
-    search: searchQuery,
-    limit: 100,
-  })
+  const { data: availableProducts = [], isLoading: isProductsLoading } = useProducts(
+    {
+      categoryId: selectedCategory !== "all" ? selectedCategory : undefined,
+      subCategoryId: selectedSubCategory !== "all" ? selectedSubCategory : undefined,
+      search: searchQuery,
+      limit: 100,
+    },
+    { includeUnavailable: true }
+  )
 
   useEffect(() => {
     if (campaign?.products) {

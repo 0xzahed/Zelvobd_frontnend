@@ -160,12 +160,18 @@ const buildProductFormData = async (
 
 // -- Queries --
 
-export function useProducts(query?: Record<string, unknown>) {
+export function useProducts(
+  query?: Record<string, unknown>,
+  options?: { includeUnavailable?: boolean }
+) {
   return useQuery({
-    queryKey: [...PRODUCT_KEYS.all, query],
+    queryKey: [...PRODUCT_KEYS.all, query, options],
     queryFn: async () => {
       const res = await getProducts(query || { limit: 100 })
-      return (res?.data?.products || []).map(mapProduct)
+      const mapped = (res?.data?.products || []).map(mapProduct)
+      return options?.includeUnavailable
+        ? mapped
+        : mapped.filter((p: Product) => p.availability !== false)
     },
   })
 }
@@ -293,7 +299,9 @@ export function useNewProducts() {
     queryKey: NEW_PRODUCT_KEYS.all,
     queryFn: async () => {
       const res = await getProducts({ limit: 9, sortBy: "createdAt", sortOrder: "desc" })
-      return (res?.data?.products || []).map(mapProduct) as Product[]
+      return (res?.data?.products || [])
+        .map(mapProduct)
+        .filter((p: Product) => p.availability !== false) as Product[]
     },
   })
 }

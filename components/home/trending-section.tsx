@@ -48,10 +48,12 @@ export function TrendingSection() {
         if (!trendingInFlight) {
           trendingInFlight = getTrending({ limit: 9 })
             .then((res) =>
-              (res?.data?.products || []).map((product: any) => ({
-                ...mapProduct(product),
-                isTrending: true,
-              })),
+              (res?.data?.products || [])
+                .map((product: any) => ({
+                  ...mapProduct(product),
+                  isTrending: true,
+                }))
+                .filter((p: Product) => p.availability !== false),
             )
             .finally(() => {
               trendingInFlight = null
@@ -65,8 +67,19 @@ export function TrendingSection() {
       }
     }
     void load()
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        trendingCache = null
+        cancelled = false
+        void load()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
     return () => {
       cancelled = true
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [])
 

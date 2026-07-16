@@ -20,7 +20,7 @@ import { useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardProductsPage() {
-  const { data: products = [], isLoading } = useProducts({ limit: 1000 });
+  const { data: products = [], isLoading } = useProducts({ limit: 1000 }, { includeUnavailable: true });
   const { data: categories = [] } = useCategories();
   const deleteMutation = useDeleteProduct();
   const copyMutation = useCopyProduct();

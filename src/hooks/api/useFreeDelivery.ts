@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getFreeDelivery, getFreeDeliveryAdmin, updateFreeDeliveryCampaign, updateFreeDeliveryProducts } from "@/src/api/freeDeliveryApi"
 import { mapProduct } from "@/src/api/mainApi"
 import { notify } from "@/lib/notify"
+import type { Product } from "@/lib/types"
 
 export type FreeDeliveryAdminResponse = {
   id: string
@@ -87,10 +88,12 @@ export function useStorefrontFreeDelivery() {
     queryKey: FREE_DELIVERY_KEYS.storefront,
     queryFn: async () => {
       const res = await getFreeDelivery({ limit: 9 })
-      return (res?.data?.products || []).map((product: any) => ({
-        ...mapProduct(product),
-        isFreeDelivery: true,
-      }))
+      return (res?.data?.products || [])
+        .map((product: any) => ({
+          ...mapProduct(product),
+          isFreeDelivery: true,
+        }))
+        .filter((p: Product) => p.availability !== false)
     },
   })
 }

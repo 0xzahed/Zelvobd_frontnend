@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
-import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
-import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
+import { Search, Truck, ShieldAlert, Trash2, RotateCcw, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
+import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, useMoveOrderToTrash, useRestoreOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
 import { useProducts } from "@/src/hooks/api/useProducts"
 import type { Product, ProductVariant } from "@/lib/types"
 import { useFraudCheck, useSteadfastDeliveryStatus, useSyncOrders } from "@/src/hooks/api/useSteadfast"
@@ -48,7 +48,10 @@ function OrderCard({
   onFraudCheck,
   onStatusChange,
   onSyncSteadfast,
+  onRestore,
+  onPermanentDelete,
   isSyncing,
+  isTrashMode,
 }: {
   order: Order
   onDelete: (o: Order) => void
@@ -56,7 +59,10 @@ function OrderCard({
   onFraudCheck: (phone: string) => void
   onStatusChange?: (id: string, status: OrderStatus) => void
   onSyncSteadfast?: (id: string) => void
+  onRestore?: (o: Order) => void
+  onPermanentDelete?: (o: Order) => void
   isSyncing?: boolean
+  isTrashMode?: boolean
 }) {
   const { data: steadfastStatus, isLoading: statusLoading } = useSteadfastDeliveryStatus(
     order.consignmentId ? order.code : null
@@ -200,35 +206,57 @@ function OrderCard({
             <FileText className="h-3.5 w-3.5" />
             Invoice
           </Link>
-          {onSyncSteadfast && !order.consignmentId && (
-            <button
-              onClick={() => onSyncSteadfast(order.id)}
-              disabled={isSyncing}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/20 disabled:opacity-50"
-            >
-              <Truck className="h-3.5 w-3.5" />
-              Send to Steadfast
-            </button>
+          {isTrashMode ? (
+            <>
+              <button
+                onClick={() => onRestore?.(order)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-600 transition hover:bg-emerald-100"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Restore
+              </button>
+              <button
+                onClick={() => onPermanentDelete?.(order)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-500 transition hover:bg-red-100"
+                aria-label="Delete permanently"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
+          ) : (
+            <>
+              {onSyncSteadfast && !order.consignmentId && (
+                <button
+                  onClick={() => onSyncSteadfast(order.id)}
+                  disabled={isSyncing}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/20 disabled:opacity-50"
+                >
+                  <Truck className="h-3.5 w-3.5" />
+                  Send to Steadfast
+                </button>
+              )}
+              <button
+                onClick={() => onFraudCheck(order.customerPhone)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-600 transition hover:bg-orange-100"
+              >
+                <ShieldAlert className="h-3.5 w-3.5" />
+                Fraud Check
+              </button>
+              <button
+                onClick={() => onEdit(order)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-foreground transition hover:bg-secondary"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onDelete(order)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-500 transition hover:bg-red-100"
+                aria-label="Move to trash"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
           )}
-          <button
-            onClick={() => onFraudCheck(order.customerPhone)}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-600 transition hover:bg-orange-100"
-          >
-            <ShieldAlert className="h-3.5 w-3.5" />
-            Fraud Check
-          </button>
-          <button
-            onClick={() => onEdit(order)}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-foreground transition hover:bg-secondary"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(order)}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-red-200 bg-red-50 text-red-500 transition hover:bg-red-100"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </div>
@@ -639,12 +667,16 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
   const { data: ordersData, isLoading } = useOrders({})
   const updateStatus = useUpdateOrderStatus()
   const deleteMutation = useDeleteOrder()
+  const moveToTrashMutation = useMoveOrderToTrash()
+  const restoreMutation = useRestoreOrder()
   const syncMutation = useSyncOrders()
   const confirm = useConfirm()
   const [q, setQ] = useState("")
   const [page, setPage] = useState(1)
   const [fraudPhone, setFraudPhone] = useState<string | null>(null)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
+
+  const isTrashMode = status === "TRASH"
 
   const orders: Order[] = useMemo(() => {
     const list = (ordersData as any)?.orders || []
@@ -673,11 +705,36 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
     updateStatus.mutate({ id, status: newStatus })
   }
 
+  // On active order pages, the trash button soft-deletes (moves to Trash) so the
+  // order is preserved and can be restored later. Permanent delete lives on the
+  // Trash page only.
   const handleDelete = async (order: Order) => {
     const ok = await confirm({
-      title: "Delete Order",
-      message: `Are you sure you want to delete order #${order.code}?`,
-      confirmText: "Delete",
+      title: "Move to Trash",
+      message: `Move order #${order.code} to Trash? You can restore it anytime from the Trash page.`,
+      confirmText: "Move to Trash",
+      cancelText: "Cancel",
+      variant: "danger",
+    })
+    if (ok) moveToTrashMutation.mutate(order.id)
+  }
+
+  const handleRestore = async (order: Order) => {
+    const ok = await confirm({
+      title: "Restore Order",
+      message: `Restore order #${order.code} from Trash? It will be moved back to Pending.`,
+      confirmText: "Restore",
+      cancelText: "Cancel",
+      variant: "default",
+    })
+    if (ok) restoreMutation.mutate(order.id)
+  }
+
+  const handlePermanentDelete = async (order: Order) => {
+    const ok = await confirm({
+      title: "Delete Permanently",
+      message: `Permanently delete order #${order.code}? This cannot be undone.`,
+      confirmText: "Delete Permanently",
       cancelText: "Cancel",
       variant: "danger",
     })
@@ -743,9 +800,12 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
                 onDelete={handleDelete}
                 onEdit={setEditingOrder}
                 onFraudCheck={setFraudPhone}
-                onStatusChange={handleStatusChange}
-                onSyncSteadfast={handleSyncOrder}
+                onStatusChange={isTrashMode ? undefined : handleStatusChange}
+                onSyncSteadfast={isTrashMode ? undefined : handleSyncOrder}
+                onRestore={isTrashMode ? handleRestore : undefined}
+                onPermanentDelete={isTrashMode ? handlePermanentDelete : undefined}
                 isSyncing={syncMutation.isPending}
+                isTrashMode={isTrashMode}
               />
             ))}
           </div>

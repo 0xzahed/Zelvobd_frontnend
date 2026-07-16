@@ -87,6 +87,33 @@ export function useUpdateOrderStatus() {
   })
 }
 
+// Soft-delete: move an order to Trash (status = TRASH). The order stays in the
+// database and can be restored from the Trash page at any time, indefinitely.
+export function useMoveOrderToTrash() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => updateOrderStatus(id, "TRASH"),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      notify.success({ title: "Moved to Trash", message: `Order ${data.code} moved to Trash. You can restore it anytime.` })
+    },
+    onError: (error) => handleApiError(error),
+  })
+}
+
+// Restore an order from Trash back to Pending so it reappears in the active lists.
+export function useRestoreOrder() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => updateOrderStatus(id, "PENDING"),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_KEYS.all })
+      notify.success({ title: "Restored", message: `Order ${data.code} restored from Trash.` })
+    },
+    onError: (error) => handleApiError(error),
+  })
+}
+
 export function useUpdateOrder() {
   const queryClient = useQueryClient()
   return useMutation({
