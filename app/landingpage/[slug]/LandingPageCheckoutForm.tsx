@@ -5,7 +5,7 @@ import { BadgeCheck, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BASE_URL } from '@/src/api/mainApi';
 import { bnDigits } from './LandingPageTemplate';
-import { purchase } from '@/lib/pixel';
+import { lead } from '@/lib/pixel';
 
 const convertToEnglishDigits = (str: string) => {
   const map: Record<string, string> = {
@@ -78,8 +78,8 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
         throw new Error(payload.message || 'Failed to place order');
       }
 
-      // Manually fire the purchase event only on success
-      purchase({ value: subtotal, orderId: payload.data?.code });
+      // Manually fire the Lead event only on success
+      lead({ value: subtotal, orderId: payload.data?.code });
       
       const orderCode = payload.data?.code;
       if (orderCode) {

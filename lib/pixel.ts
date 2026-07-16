@@ -71,3 +71,13 @@ export const initiateCheckout = (params: { value: number; numItems: number }) =>
     })
   }
 }
+
+export const lead = (params?: { value?: number; currency?: string; orderId?: string }) => {
+  if (typeof window !== "undefined" && window.fbq) {
+    window.fbq("track", "Lead", {
+      value: params?.value,
+      currency: params?.currency ?? "BDT",
+      order_id: params?.orderId,
+    })
+  }
+}

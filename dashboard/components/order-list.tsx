@@ -2,8 +2,14 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
+<<<<<<< HEAD
 import { Search, Truck, ShieldAlert, Trash2, RotateCcw, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
 import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, useMoveOrderToTrash, useRestoreOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
+=======
+import { Search, Truck, ShieldAlert, Trash2, Package, Phone, MapPin, ChevronLeft, ChevronRight, Loader2, FileText, Pencil, X, Plus, Save } from "lucide-react"
+import { purchase } from "@/lib/pixel"
+import { useOrders, useUpdateOrderStatus, useUpdateOrder, useDeleteOrder, type Order, type OrderStatus, type OrderItem } from "@/src/hooks/api/useOrders"
+>>>>>>> da4a4effec2e54bc4d9f55677458c465890c9df8
 import { useProducts } from "@/src/hooks/api/useProducts"
 import type { Product, ProductVariant } from "@/lib/types"
 import { useFraudCheck, useSteadfastDeliveryStatus, useSyncOrders } from "@/src/hooks/api/useSteadfast"
@@ -701,8 +707,28 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
 
+  const firePurchaseOnce = (orderId: string, value: number) => {
+    const key = `pixel_purchase_${orderId}`
+    if (typeof window !== "undefined" && !localStorage.getItem(key)) {
+      purchase({ value, orderId })
+      localStorage.setItem(key, "true")
+    }
+  }
+
   const handleStatusChange = (id: string, newStatus: OrderStatus) => {
-    updateStatus.mutate({ id, status: newStatus })
+    updateStatus.mutate(
+      { id, status: newStatus },
+      {
+        onSuccess: () => {
+          if (newStatus === "PROCESSING") {
+            const order = orders.find((o) => o.id === id)
+            if (order) {
+              firePurchaseOnce(order.code, Number(order.subtotal || order.total || 0))
+            }
+          }
+        },
+      }
+    )
   }
 
   // On active order pages, the trash button soft-deletes (moves to Trash) so the
@@ -742,7 +768,14 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
   }
 
   const handleSyncOrder = (orderId: string) => {
-    syncMutation.mutate([orderId])
+    syncMutation.mutate([orderId], {
+      onSuccess: () => {
+        const order = orders.find((o) => o.id === orderId)
+        if (order) {
+          firePurchaseOnce(order.code, Number(order.subtotal || order.total || 0))
+        }
+      },
+    })
   }
 
   if (isLoading) {
@@ -773,7 +806,15 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
             <button
               onClick={() => {
                 const orderIds = filtered.map((o) => o.id)
-                if (orderIds.length > 0) syncMutation.mutate(orderIds)
+                if (orderIds.length > 0) {
+                  syncMutation.mutate(orderIds, {
+                    onSuccess: () => {
+                      filtered.forEach((o) => {
+                        firePurchaseOnce(o.code, Number(o.subtotal || o.total || 0))
+                      })
+                    },
+                  })
+                }
               }}
               disabled={syncMutation.isPending || filtered.length === 0}
               className="inline-flex h-10 items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 text-sm font-semibold text-primary transition hover:bg-primary/10 disabled:opacity-50"
@@ -827,7 +868,7 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`h-8 min-w-[32px] rounded-lg text-sm font-medium transition ${
+                    className={`h-8 min-w-8 rounded-lg text-sm font-medium transition ${
                       page === p ? "bg-primary text-white" : "text-muted-foreground hover:bg-secondary"
                     }`}
                   >
