@@ -7,7 +7,7 @@ import { CartSkeleton } from '@/components/ui/skeletons/cart-skeleton';
 import { useCart } from '@/contexts/cart-context';
 import { formatBDT } from '@/lib/format';
 import { notify } from '@/lib/notify';
-import { initiateCheckout, purchase } from '@/lib/pixel';
+import { lead } from '@/lib/pixel';
 import type { Product } from '@/lib/types';
 import { mapProduct } from '@/src/api/mainApi';
 import { placeOrderAPI } from '@/src/api/orderApi';
@@ -385,8 +385,6 @@ export default function CartPage() {
     try {
       setIsSubmitting(true);
 
-      initiateCheckout({ value: total, numItems: items.length });
-
       const payload = {
         customerName: form.name,
         customerPhone: form.phone,
@@ -408,6 +406,9 @@ export default function CartPage() {
       };
 
       const orderData = await placeOrderAPI(payload);
+
+      // Fire Lead event only upon successful API response!
+      lead({ value: subtotal, orderId: orderData.code });
 
       clearCart();
       router.push(`/place-order?orderId=${orderData.code}&value=${total}`);

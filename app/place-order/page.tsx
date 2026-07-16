@@ -2,28 +2,7 @@
 
 import { FloatingRotatingIcon } from '@/components/home/floating-rotating-icon';
 import { AppShell } from '@/components/layout/app-shell';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, Suspense } from 'react';
-import { purchase } from '@/lib/pixel';
-
-function OrderTracker() {
-  const searchParams = useSearchParams();
-  const hasTracked = useRef(false);
-
-  const orderId = searchParams.get('orderId');
-  const value = searchParams.get('value');
-
-  useEffect(() => {
-    if (hasTracked.current) return;
-    hasTracked.current = true;
-
-    if (orderId && value) {
-      purchase({ value: Number(value), orderId });
-    }
-  }, [orderId, value]);
-
-  return null;
-}
+import { useRouter } from 'next/navigation';
 
 export default function PlaceOrderPage() {
   const router = useRouter();
@@ -47,9 +26,6 @@ export default function PlaceOrderPage() {
           <p className='text-sm text-muted-foreground'>
             অনুগ্রহ করে অপেক্ষা করুন, আমাদের প্রতিনিধি আপনার সাথে খুব দ্রুত যোগাযোগ করবেন।
           </p>
-          <Suspense fallback={null}>
-            <OrderTracker />
-          </Suspense>
         </div>
         <button
           onClick={() => router.push('/')}
