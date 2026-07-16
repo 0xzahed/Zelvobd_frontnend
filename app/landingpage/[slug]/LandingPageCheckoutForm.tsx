@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { BadgeCheck, ArrowRight } from 'lucide-react';
 import { BASE_URL } from '@/src/api/_shared/client';
 import { bnDigits } from './LandingPageTemplate';
+import { purchase } from '@/lib/pixel';
 
 const convertToEnglishDigits = (str: string) => {
   const map: Record<string, string> = {
@@ -74,6 +75,9 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       if (!res.ok || payload?.status === false) {
         throw new Error(payload.message || 'Failed to place order');
       }
+
+      // Manually fire the purchase event only on success
+      purchase({ value: subtotal });
 
       setSubmitted(true);
     } catch (err: any) {
