@@ -3,18 +3,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import type { Category } from "@/lib/types"
-import { viewContent } from "@/lib/pixel"
 
 export function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
       href={`/category/${category.slug}`}
       className="group flex w-full flex-col items-center gap-1.5"
-      onClick={() => viewContent({
-        productId: category.id,
-        productName: category.name,
-        contentType: 'product_group'
-      })}
     >
       <div className="flex h-17 w-17 items-center justify-center rounded-full bg-[#F3F4F6] transition-all duration-200 group-hover:-translate-y-1 group-hover:bg-[#E8EAF0] sm:h-19 sm:w-19">
         <div className="relative h-12 w-12 sm:h-13.5 sm:w-13.5">
@@ -39,11 +33,6 @@ export function SubCategoryCard({ subCategory, categorySlug }: { subCategory: an
     <Link
       href={`/category/${categorySlug}/${subCategory.slug}`}
       className="group flex w-full flex-col items-center gap-2"
-      onClick={() => viewContent({
-        productId: subCategory.id,
-        productName: subCategory.name,
-        contentType: 'product_group'
-      })}
     >
       <div className="flex h-17 w-17 items-center justify-center rounded-full bg-[#f5f5f7] transition-transform duration-200 group-active:scale-95 sm:h-19 sm:w-19">
         <div className="relative h-11.5 w-11.5 sm:h-13 sm:w-13">

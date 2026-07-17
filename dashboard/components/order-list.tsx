@@ -11,6 +11,7 @@ import { formatBDT, formatRelativeTime } from "@/lib/format"
 import { useConfirm } from "@/components/ui/confirm-dialog"
 import { DashPage, DashHeader, DashPanel, DashStatusBadge, DashLoading, DashEmptyState } from "./dash-ui"
 import { notify } from "@/lib/notify"
+import { purchase } from "@/lib/pixel"
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "Pending",

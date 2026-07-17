@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/ui/product-card"
 import { ProductGridSkeleton } from "@/components/ui/skeletons/product-grid-skeleton"
 import { useCategories, useProducts } from "@/lib/use-store-data"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
+import { viewContent } from "@/lib/pixel"
 
 export default function SubCategoryPage({ params }: { params: any }) {
   const [slug, setSlug] = useState("")
@@ -27,6 +28,19 @@ export default function SubCategoryPage({ params }: { params: any }) {
 
   const { categories, loaded: catsLoaded } = useCategories()
   const { products, loaded: prodsLoaded } = useProducts()
+
+  const category = catsLoaded ? categories.find((c) => c.slug === slug) : undefined
+  const subCategory = category ? category.subCategories.find((s) => s.slug === subSlug) : undefined
+
+  useEffect(() => {
+    if (subCategory) {
+      viewContent({
+        productId: subCategory.id,
+        productName: subCategory.name,
+        contentType: 'product_group'
+      })
+    }
+  }, [subCategory?.id])
 
   if (!slug || !subSlug) {
     return (
@@ -49,10 +63,9 @@ export default function SubCategoryPage({ params }: { params: any }) {
     )
   }
 
-  const category = categories.find((c) => c.slug === slug)
   if (!category) return notFound()
-  const subCategory = category.subCategories.find((s) => s.slug === subSlug)
   if (!subCategory) return notFound()
+
   const items = products.filter((p) => p.categorySlug === slug && p.subCategorySlug === subSlug)
 
   return (

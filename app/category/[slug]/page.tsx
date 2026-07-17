@@ -19,6 +19,7 @@ import { CategoryBannerSlider } from '@/components/category/category-banner-slid
 import type { CategoryBanner } from '@/lib/types';
 import { FloatingRotatingIcon } from '@/components/home/floating-rotating-icon';
 import { ProductSliderSkeleton } from '@/components/ui/skeletons/product-slider-skeleton';
+import { viewContent } from '@/lib/pixel';
 
 export default function CategoryPage(props: { params: any }) {
   const [slug, setSlug] = useState<string>('');
@@ -47,6 +48,13 @@ export default function CategoryPage(props: { params: any }) {
       setPageDataLoaded(true);
       return;
     }
+
+    // Fire Meta Pixel ViewContent event
+    viewContent({
+      productId: category.id,
+      productName: category.name,
+      contentType: 'product_group'
+    });
 
     let cancelled = false;
     const loadData = async () => {

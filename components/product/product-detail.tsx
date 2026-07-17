@@ -11,7 +11,7 @@ import { getProducts } from "@/src/api/productApi"
 import { getTrending } from "@/src/api/trendingApi"
 import { mapProduct } from "@/src/api/mainApi"
 import { notify } from "@/lib/notify"
-import { addToCart, initiateCheckout } from "@/lib/pixel"
+import { addToCart, initiateCheckout, viewContent } from "@/lib/pixel"
 import { ProductGallery } from "./detail/product-gallery"
 import { ProductInfo } from "./detail/product-info"
 import { FloatingRotatingIcon } from "@/components/home/floating-rotating-icon"
@@ -187,6 +187,13 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   }
 
   useEffect(() => {
+    // Fire Meta Pixel ViewContent event
+    viewContent({
+      productId: product.id,
+      productName: product.name,
+      value: product.price,
+    })
+
     let cancelled = false
 
     const loadSections = async () => {
