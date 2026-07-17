@@ -159,12 +159,7 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
   const handleBuy = () => {
     handleAdd(true)
     
-    initiateCheckout({
-      value: currentPrice * qty,
-      numItems: qty,
-    });
-
-    router.push("/cart")
+    router.push(`/cart?checkout=1&value=${currentPrice * qty}&numItems=${qty}`)
   }
 
   const handleShareCopy = async () => {

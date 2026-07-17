@@ -36,12 +36,7 @@ export function ProductCard({
       storage: selectedSize,
     });
 
-    initiateCheckout({
-      value: product.price,
-      numItems: 1,
-    });
-
-    router.push('/cart');
+    router.push(`/cart?checkout=1&value=${product.price}&numItems=1`);
   };
 
   const src =

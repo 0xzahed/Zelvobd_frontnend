@@ -7,7 +7,7 @@ import { CartSkeleton } from '@/components/ui/skeletons/cart-skeleton';
 import { useCart } from '@/contexts/cart-context';
 import { formatBDT } from '@/lib/format';
 import { notify } from '@/lib/notify';
-import { lead } from '@/lib/pixel';
+import { lead, initiateCheckout } from '@/lib/pixel';
 import type { Product } from '@/lib/types';
 import { mapProduct } from '@/src/api/mainApi';
 import { placeOrderAPI } from '@/src/api/orderApi';
@@ -30,8 +30,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 
 function colorToHex(name: string): string {
   const key = name.toLowerCase();
@@ -72,6 +72,25 @@ function colorToHex(name: string): string {
     if (key.includes(k)) return map[k];
   }
   return '#9CA3AF';
+}
+
+function CheckoutTracker() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams?.get('checkout') === '1') {
+      const value = Number(searchParams.get('value')) || 0;
+      const numItems = Number(searchParams.get('numItems')) || 1;
+      
+      initiateCheckout({ value, numItems });
+      
+      // Clean up URL so it doesn't fire again on refresh
+      router.replace('/cart', { scroll: false });
+    }
+  }, [searchParams, router]);
+
+  return null;
 }
 
 export default function CartPage() {
@@ -434,7 +453,10 @@ export default function CartPage() {
 
   return (
     <AppShell>
-      <div className='py-4 md:py-8'>
+      <Suspense fallback={null}>
+        <CheckoutTracker />
+      </Suspense>
+      <div className='min-h-screen bg-gray-50/50 pb-20 pt-4 md:pb-12'>
         <div className='mb-5 grid grid-cols-[40px_1fr_40px] items-center'>
           <button
             onClick={() => router.back()}
