@@ -25,6 +25,7 @@ const PAGE_TITLES: { match: string | RegExp; title: string }[] = [
   { match: '/admin/orders/pickup', title: 'Pickup Orders' },
   { match: '/admin/orders/delivered', title: 'Delivered Orders' },
   { match: '/admin/orders/cancelled', title: 'Cancelled Orders' },
+  { match: '/admin/orders/customer-cancelled', title: 'Customer Cancelled Orders' },
   { match: '/admin/customers', title: 'Customers' },
   // { match: '/admin/chat', title: 'Live Chat' },
   { match: '/admin/admins', title: 'Admins' },
@@ -109,7 +110,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
       {/* Main */}
       <main className='ml-0 min-h-[calc(100dvh-4rem)] p-4 md:ml-62.5 md:p-6'>
-        <div className='mx-auto max-w-[1600px]'>{children}</div>
+        <div className='mx-auto max-w-400'>{children}</div>
       </main>
     </div>
   );

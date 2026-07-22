@@ -19,7 +19,7 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   HOLD: "Hold",
   PICKUP: "Pickup",
   DELIVERED: "Delivered",
-  CUSTOMER_CANCELLED: "Cancelled",
+  CUSTOMER_CANCELLED: "Customer Cancelled",
   CANCELLED: "Cancelled",
   TRASH: "Trash",
 }
@@ -665,42 +665,37 @@ function EditOrderModal({ order, onClose }: { order: Order; onClose: () => void 
 const ROWS_PER_PAGE = 12
 
 export function OrderList({ status, title, subtitle, showSteadfast }: OrderListProps) {
-  const { data: ordersData, isLoading } = useOrders({})
+  const [q, setQ] = useState("")
+  const [page, setPage] = useState(1)
+  
+  const { data: ordersData, isLoading } = useOrders({ 
+    page, 
+    limit: ROWS_PER_PAGE, 
+    search: q.trim() || undefined, 
+    status: status || undefined 
+  })
+  
   const updateStatus = useUpdateOrderStatus()
   const deleteMutation = useDeleteOrder()
   const moveToTrashMutation = useMoveOrderToTrash()
   const restoreMutation = useRestoreOrder()
   const syncMutation = useSyncOrders()
   const confirm = useConfirm()
-  const [q, setQ] = useState("")
-  const [page, setPage] = useState(1)
   const [fraudPhone, setFraudPhone] = useState<string | null>(null)
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
 
   const isTrashMode = status === "TRASH"
 
   const orders: Order[] = useMemo(() => {
-    const list = (ordersData as any)?.orders || []
-    return list.filter((o: Order) => o.status === status)
-  }, [ordersData, status])
+    return (ordersData as any)?.orders || []
+  }, [ordersData])
 
-  const filtered = useMemo(() => {
-    const lc = q.toLowerCase().trim()
-    if (!lc) return orders
-    return orders.filter(
-      (o) =>
-        o.code?.toLowerCase().includes(lc) ||
-        o.customerName?.toLowerCase().includes(lc) ||
-        o.customerPhone?.includes(lc)
-    )
-  }, [orders, q])
+  const meta = useMemo(() => {
+    return (ordersData as any)?.meta || { total: 0, totalPage: 1 }
+  }, [ordersData])
 
-  const paginated = useMemo(() => {
-    const start = (page - 1) * ROWS_PER_PAGE
-    return filtered.slice(start, start + ROWS_PER_PAGE)
-  }, [filtered, page])
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE))
+  const totalPages = meta.totalPage || 1
+  const totalItems = meta.total || 0
 
   const firePurchaseOnce = (orderId: string, value: number) => {
     const key = `pixel_purchase_${orderId}`
@@ -800,18 +795,18 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
           {showSteadfast && (
             <button
               onClick={() => {
-                const orderIds = filtered.map((o) => o.id)
+                const orderIds = orders.map((o) => o.id)
                 if (orderIds.length > 0) {
                   syncMutation.mutate(orderIds, {
                     onSuccess: () => {
-                      filtered.forEach((o) => {
+                      orders.forEach((o) => {
                         firePurchaseOnce(o.code, Number(o.subtotal || o.total || 0))
                       })
                     },
                   })
                 }
               }}
-              disabled={syncMutation.isPending || filtered.length === 0}
+              disabled={syncMutation.isPending || orders.length === 0}
               className="inline-flex h-10 items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-4 text-sm font-semibold text-primary transition hover:bg-primary/10 disabled:opacity-50"
             >
               <Truck className="h-4 w-4" />
@@ -819,17 +814,17 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
             </button>
           )}
           <p className="text-xs text-muted-foreground whitespace-nowrap">
-            {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+            {totalItems} order{totalItems !== 1 ? "s" : ""}
           </p>
         </div>
       </DashPanel>
 
-      {filtered.length === 0 ? (
+      {orders.length === 0 ? (
         <DashEmptyState icon={Package} title="No orders found" description={`No ${title.toLowerCase()} at the moment.`} />
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {paginated.map((order) => (
+            {orders.map((order) => (
               <OrderCard
                 key={order.id}
                 order={order}
@@ -846,10 +841,10 @@ export function OrderList({ status, title, subtitle, showSteadfast }: OrderListP
             ))}
           </div>
 
-          {filtered.length > ROWS_PER_PAGE && (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/40 bg-card p-4">
+          {totalPages > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/40 bg-card p-4 mt-4">
               <p className="text-xs text-muted-foreground">
-                Showing {(page - 1) * ROWS_PER_PAGE + 1} to {Math.min(page * ROWS_PER_PAGE, filtered.length)} of {filtered.length}
+                Showing {(page - 1) * ROWS_PER_PAGE + 1} to {Math.min(page * ROWS_PER_PAGE, totalItems)} of {totalItems}
               </p>
               <div className="flex items-center gap-1">
                 <button
