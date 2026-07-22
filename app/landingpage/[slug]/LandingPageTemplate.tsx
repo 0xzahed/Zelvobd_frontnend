@@ -330,6 +330,29 @@ export default function LandingPageTemplate({ data }: { data: any }) {
           )}
 
           <div className='md:col-span-2 flex flex-col items-center md:items-start gap-2'>
+            {hero.regularPrice && (
+              <div className='flex items-baseline gap-2'>
+                <span className='opacity-70 line-through text-lg'>
+                  নিয়মিত মূল্য {bnDigits(hero.regularPrice)}৳
+                </span>
+              </div>
+            )}
+            {hero.offerPrice && (
+              <div className='flex items-baseline gap-2'>
+                <span
+                  className='text-2xl sm:text-3xl font-bold'
+                  style={{ color: 'var(--lp-info)' }}
+                >
+                  অফার মূল্য :
+                </span>
+                <span
+                  className='text-4xl sm:text-5xl font-extrabold'
+                  style={{ color: 'var(--lp-info)' }}
+                >
+                  {bnDigits(hero.offerPrice)}৳
+                </span>
+              </div>
+            )}
             {hero.regularPrice && hero.offerPrice && Number(hero.regularPrice) > Number(hero.offerPrice) && (
               <p className='text-sm font-semibold' style={{ color: 'var(--lp-success)' }}>
                 সাশ্রয় {bnDigits(Number(hero.regularPrice) - Number(hero.offerPrice))}৳ + ফ্রি ডেলিভারি
