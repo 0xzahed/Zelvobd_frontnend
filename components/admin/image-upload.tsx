@@ -2,7 +2,12 @@
 
 import { useState, useRef } from 'react';
 import { UploadCloud, X, Loader2 } from 'lucide-react';
+<<<<<<< HEAD
 import { adminFetch, BASE_URL, toAbsoluteUploadUrl } from '@/src/api/mainApi';
+=======
+import { adminFetch } from '@/src/api/_shared/adminFetch';
+import { BASE_URL } from '@/src/api/_shared/client';
+>>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
 import { notify } from '@/lib/notify';
 
 export function ImageUpload({ 
@@ -45,7 +50,11 @@ export function ImageUpload({
       {label && <label className="text-sm font-semibold">{label}</label>}
       {value ? (
         <div className="relative overflow-hidden rounded-md border w-full max-w-sm bg-black/5">
+<<<<<<< HEAD
            <img src={toAbsoluteUploadUrl(value)} alt="Uploaded" className="w-full h-auto object-contain max-h-48" />
+=======
+           <img src={value.startsWith('http') ? value : `http://localhost:5000${value}`} alt="Uploaded" className="w-full h-auto object-contain max-h-48" />
+>>>>>>> 7b9029f (feat: implement image upload component and integrate with landing page forms)
            <button
              type="button"
              onClick={() => onChange('')}
