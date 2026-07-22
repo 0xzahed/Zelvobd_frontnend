@@ -60,6 +60,7 @@ export type GetOrdersParams = {
 export const getOrders = async (params: GetOrdersParams) => {
   const url = new URL(`${BASE_URL}/orders`)
   if (params.page) url.searchParams.append("page", params.page.toString())
+  if (params.limit) url.searchParams.append("limit", params.limit.toString())
   if (params.search) url.searchParams.append("search", params.search)
   if (params.status) url.searchParams.append("status", params.status)
 
