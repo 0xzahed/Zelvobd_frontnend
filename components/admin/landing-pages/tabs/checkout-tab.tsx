@@ -1,8 +1,9 @@
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Plus } from 'lucide-react';
+import { ImageUpload } from '../../image-upload';
 
 export default function CheckoutTab({ register, control }: { register: any, control: any }) {
   const { fields: tableRows, append: addTableRow, remove: removeTableRow } = useFieldArray({ control, name: 'tableSection.tableData' });
@@ -54,6 +55,20 @@ export default function CheckoutTab({ register, control }: { register: any, cont
           <div><Label>Title</Label><Input {...register('checkoutSection.title')} /></div>
           <div><Label>Subtitle</Label><Input {...register('checkoutSection.subtitle')} /></div>
           
+          <div className="md:col-span-3">
+            <Controller
+              name="checkoutSection.productImage"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  label="Product Image"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </div>
+
           <div><Label>Product Name (shown on form)</Label><Input {...register('checkoutSection.productName')} /></div>
           <div><Label>Product SubName</Label><Input {...register('checkoutSection.subName')} /></div>
           <div><Label>Price (shown on form)</Label><Input {...register('checkoutSection.price')} /></div>

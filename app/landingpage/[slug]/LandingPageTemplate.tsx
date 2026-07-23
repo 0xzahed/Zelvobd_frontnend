@@ -675,16 +675,27 @@ export default function LandingPageTemplate({ data }: { data: any }) {
               className='mb-5 flex items-center justify-between gap-3 rounded-xl border p-3'
               style={{ borderColor: 'var(--lp-border)' }}
             >
-              <div className='min-w-0'>
-                <div
-                  className='font-semibold text-sm sm:text-base truncate'
-                  style={{ color: 'var(--lp-navy)' }}
-                >
-                  {checkout.productName || 'Your Product'}
-                </div>
-                {checkout.subName && (
-                  <div className='text-xs sm:text-sm opacity-70'>{checkout.subName}</div>
+              <div className='flex items-center gap-3 min-w-0'>
+                {checkout.productImage && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={toAbsoluteUploadUrl(checkout.productImage)}
+                    alt={checkout.productName || 'Product'}
+                    className='h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-lg border object-cover shadow-sm'
+                    style={{ borderColor: 'var(--lp-border)' }}
+                  />
                 )}
+                <div className='min-w-0'>
+                  <div
+                    className='font-semibold text-sm sm:text-base truncate'
+                    style={{ color: 'var(--lp-navy)' }}
+                  >
+                    {checkout.productName || 'Your Product'}
+                  </div>
+                  {checkout.subName && (
+                    <div className='text-xs sm:text-sm opacity-70 truncate'>{checkout.subName}</div>
+                  )}
+                </div>
               </div>
               {checkout.price && (
                 <div
