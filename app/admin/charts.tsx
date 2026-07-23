@@ -49,10 +49,10 @@ export function BestSellingPie({ data }: { data: PieData }) {
   return (
     <DashPanel>
       <DashSectionTitle title="Best Selling Products" />
-      <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height={256}>
+      <div className="h-56 w-full sm:h-80 lg:h-96">
+        <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} fill="#8884d8" label={({ name }) => name}>
+            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} fill="#8884d8" label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} labelLine={{ stroke: '#9CA3AF', strokeWidth: 1 }} className="text-[8px] sm:!text-xs lg:!text-sm">
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}

@@ -177,18 +177,14 @@ export default function DashboardFooterPage() {
         {/* Brand + Contact Info */}
         <DashPanel>
           <h3 className="mb-4 text-sm font-bold text-foreground">Brand & Contact</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">Brand Name</label>
-              <input value={form.brandName} onChange={(e) => update({ brandName: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
-            </div>
+          <div className="grid gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-foreground">Brand Tagline</label>
               <input value={form.brandTagline} onChange={(e) => update({ brandTagline: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10" />
             </div>
           </div>
 
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground"><Mail className="h-3.5 w-3.5 text-primary" /> Support Email</label>
               <input value={form.supportEmail} onChange={(e) => update({ supportEmail: e.target.value })} className="h-10 w-full rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
@@ -215,15 +211,15 @@ export default function DashboardFooterPage() {
             {form.navGroups.map((group, gi) => (
               <div key={gi} className="rounded-lg border border-border/40 bg-muted/10 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <input value={group.title} onChange={(e) => updateNavGroup(gi, { title: e.target.value })} placeholder="Group title" className="h-9 flex-1 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
+                  <input value={group.title} onChange={(e) => updateNavGroup(gi, { title: e.target.value })} placeholder="Group title" className="h-9 min-w-0 flex-1 rounded-lg border border-border/60 bg-surface px-3 text-sm outline-none transition focus:border-primary/40" />
                   <button onClick={() => removeNavGroup(gi)} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
                 </div>
                 <div className="space-y-2">
                   {group.links.map((link, li) => (
-                    <div key={li} className="flex items-center gap-2">
-                      <input value={link.label} onChange={(e) => updateNavLink(gi, li, { label: e.target.value })} placeholder="Label" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                      <input value={link.href} onChange={(e) => updateNavLink(gi, li, { href: e.target.value })} placeholder="/path" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                      <button onClick={() => removeNavLink(gi, li)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <div key={li} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <input value={link.label} onChange={(e) => updateNavLink(gi, li, { label: e.target.value })} placeholder="Label" className="h-8 w-full rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40 sm:flex-1" />
+                      <input value={link.href} onChange={(e) => updateNavLink(gi, li, { href: e.target.value })} placeholder="/path" className="h-8 w-full rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40 sm:flex-1" />
+                      <button onClick={() => removeNavLink(gi, li)} className="grid h-7 w-7 shrink-0 self-end place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500 sm:self-auto"><Trash2 className="h-3.5 w-3.5" /></button>
                     </div>
                   ))}
                   <button onClick={() => addNavLink(gi)} className="text-xs font-semibold text-primary hover:text-primary/80">+ Add Link</button>
@@ -255,9 +251,8 @@ export default function DashboardFooterPage() {
                       <span className="text-xs font-bold">{social.label?.trim()?.[0] || "S"}</span>
                     )}
                   </div>
-                  <input value={social.label} onChange={(e) => updateSocial(i, { label: e.target.value })} placeholder="Label" className="h-8 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                  <input value={social.href} onChange={(e) => updateSocial(i, { href: e.target.value })} placeholder="https://..." className="h-8 flex-[2] rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
-                  <input value={social.icon || ""} onChange={(e) => updateSocial(i, { icon: e.target.value })} placeholder="icon name" className="h-8 w-28 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                  <input value={social.label} onChange={(e) => updateSocial(i, { label: e.target.value })} placeholder="Label" className="h-8 min-w-0 flex-1 rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
+                  <input value={social.href} onChange={(e) => updateSocial(i, { href: e.target.value })} placeholder="https://..." className="h-8 min-w-0 flex-[2] rounded-md border border-border/50 bg-surface px-2.5 text-xs outline-none focus:border-primary/40" />
                   <button onClick={() => removeSocial(i)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-red-50 hover:text-red-500"><Trash2 className="h-3.5 w-3.5" /></button>
                 </div>
               )

@@ -41,15 +41,8 @@ export default function CheckoutTab({ register, control }: { register: any, cont
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t pt-4">
-          <div><Label>Total Items Row (Key)</Label><Input {...register('tableSection.totalItemsKey')} placeholder="e.g. মোট আইটেম" /></div>
-          <div><Label>Total Items Row (Value)</Label><Input {...register('tableSection.totalItemsValue')} placeholder="e.g. ৯টি" /></div>
-          
-          <div><Label>Offer Price Row (Key)</Label><Input {...register('tableSection.offerPriceKey')} placeholder="e.g. আপনার অফার প্রাইস" /></div>
-          <div><Label>Offer Price Row (Value)</Label><Input {...register('tableSection.offerPriceValue')} placeholder="e.g. ৬,৪০০৳" /></div>
-        </div>
-
-        <div className="mt-4 border-t pt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <div><Label>Bottom Rows Text</Label><Input {...register('tableSection.bottomRows')} placeholder="e.g. 100% Authentic" /></div>
           <div><Label>Button Text</Label><Input {...register('tableSection.buttonText')} placeholder="Order Now" /></div>
         </div>
       </div>
