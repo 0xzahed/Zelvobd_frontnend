@@ -2,7 +2,7 @@
 
 import { CategoriesSection } from '@/components/home/categories-section';
 import { FreeDeliveryBanner } from '@/components/home/free-delivery-banner';
-import { NewProductsSection } from '@/components/home/new-products-section';
+import { TrendingSection } from '@/components/home/trending-section';
 import { AppShell } from '@/components/layout/app-shell';
 import { SliderBannerSkeleton } from '@/components/ui/skeletons/slider-banner-skeleton';
 import { useSliders } from '@/lib/use-store-data';
@@ -46,8 +46,7 @@ export default function HomePage() {
         <CategoriesSection />
         {/* <FlashSaleSection /> */}
         <FreeDeliveryBanner />
-        {/* <TrendingSection /> */}
-        <NewProductsSection />
+        <TrendingSection />
         <CategoryProductsSections />
         <YoutubeVideoSection />
       </div>

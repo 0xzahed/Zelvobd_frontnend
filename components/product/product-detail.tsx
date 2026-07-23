@@ -333,7 +333,9 @@ export function ProductDetail({ product, initialVariantId }: ProductDetailProps)
 
       {relatedProducts.length > 0 && (
         <section className="mt-8 space-y-3">
-          <h2 className="text-base font-medium text-foreground md:text-xl">Related Products</h2>
+          <h2 className="text-base font-semibold text-foreground md:text-xl">
+          Related <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(45deg, #052F84, #7BA4F7)" }}>Products</span>
+        </h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
             {relatedProducts.map((p) => (
               <div key={p.id}>
