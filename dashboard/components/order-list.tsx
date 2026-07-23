@@ -12,6 +12,7 @@ import { useConfirm } from "@/components/ui/confirm-dialog"
 import { DashPage, DashHeader, DashPanel, DashStatusBadge, DashLoading, DashEmptyState } from "./dash-ui"
 import { notify } from "@/lib/notify"
 import { purchase } from "@/lib/pixel"
+import { toAbsoluteUploadUrl } from "@/src/api/mainApi"
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "Pending",
@@ -160,6 +161,16 @@ function OrderCard({
             <ul className="space-y-1.5">
               {order.items.map((item, idx) => (
                 <li key={item.id || idx} className="flex items-center gap-2 rounded-md bg-muted/20 p-2 text-xs">
+                  {item.productImage && (
+                    <div className="shrink-0 h-10 w-10 overflow-hidden rounded-md border border-border/50 bg-background">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={toAbsoluteUploadUrl(item.productImage)} 
+                        alt={item.productName}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground line-clamp-1">{item.productName}</p>
                     <p className="text-muted-foreground mt-0.5">

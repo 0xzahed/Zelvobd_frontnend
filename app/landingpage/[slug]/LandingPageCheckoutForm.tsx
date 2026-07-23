@@ -137,7 +137,7 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
           <button
             type='button'
             aria-label='কমান'
-            onClick={() => setForm({ ...form, qty: Math.max(1, form.qty - 1) })}
+            onClick={() => setForm(prev => ({ ...prev, qty: Math.max(1, prev.qty - 1) }))}
             className='w-10 h-10 rounded-full border text-xl font-bold grid place-items-center hover:bg-black/5'
             style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-navy)' }}
           >
@@ -152,7 +152,7 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
           <button
             type='button'
             aria-label='বাড়ান'
-            onClick={() => setForm({ ...form, qty: Math.min(99, form.qty + 1) })}
+            onClick={() => setForm(prev => ({ ...prev, qty: Math.min(99, prev.qty + 1) }))}
             className='w-10 h-10 rounded-full border text-xl font-bold grid place-items-center hover:bg-black/5'
             style={{ borderColor: 'var(--lp-border)', color: 'var(--lp-navy)' }}
           >
@@ -226,13 +226,20 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
         </div>
       )}
 
+      <div className='flex justify-between items-center px-2 py-3 border-t mt-2' style={{ borderColor: 'var(--lp-border)' }}>
+        <span className='font-bold' style={{ color: 'var(--lp-navy)' }}>সর্বমোট মূল্য:</span>
+        <span className='text-xl font-extrabold tabular-nums' style={{ color: 'var(--lp-info)' }}>
+          {bnDigits(subtotal)}৳
+        </span>
+      </div>
+
       <div className='flex justify-center mt-2'>
         <button type='submit' disabled={loading} className='btn-cta shiny-button w-full'>
           {loading ? (
             'Processing...'
           ) : (
             <>
-              {checkoutData.buttonText || 'অর্ডার কনফার্ম করুন'} <ArrowRight size={20} />
+              {checkoutData.buttonText || 'অর্ডার কনফার্ম করুন'} - {bnDigits(subtotal)}৳ <ArrowRight size={20} />
             </>
           )}
         </button>
