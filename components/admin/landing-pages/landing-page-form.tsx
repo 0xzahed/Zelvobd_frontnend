@@ -76,18 +76,7 @@ export default function LandingPageForm({
     },
   });
 
-  const generateSlug = (text: string) => {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .replace(/[\s\W-]+/g, '-') // replace spaces and non-word chars with -
-      .replace(/^-+|-+$/g, ''); // remove leading/trailing -
-  };
 
-  const handleSlugGen = (e: any) => {
-    setValue('slug', generateSlug(e.target.value));
-  };
 
   const [activeTab, setActiveTab] = useState('general');
 
@@ -107,7 +96,18 @@ export default function LandingPageForm({
         <Input
           {...register('slug', { required: true })}
           placeholder='e.g. kiam-black-diamond'
-          onChange={handleSlugGen}
+          onChange={(e) => {
+            const rawVal = e.target.value;
+            const formatted = rawVal
+              .toLowerCase()
+              .replace(/[\s\W]+/g, '-')
+              .replace(/-+/g, '-');
+            
+            // Set value natively and trigger RHF update
+            e.target.value = formatted;
+            register('slug').onChange(e);
+            setValue('slug', formatted, { shouldValidate: true, shouldDirty: true });
+          }}
         />
         {errors.slug && <span className='text-xs text-red-500'>Slug is required</span>}
         <p className='text-xs text-muted-foreground mt-1'>
