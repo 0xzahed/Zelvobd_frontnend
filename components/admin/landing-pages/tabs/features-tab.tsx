@@ -20,7 +20,7 @@ export default function FeaturesTab({ register, control }: { register: any, cont
       {/* 4 Feature Cards */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b pb-2">
-          <h3 className="text-lg font-semibold">Mini Feature Cards (e.g. Free Delivery, 7 Days Return)</h3>
+          <h3 className="text-lg font-semibold">Mini Feature Cards</h3>
           <button type="button" onClick={() => addCard({ icon: 'check', title: '' })} className="text-sm text-primary flex items-center gap-1 hover:underline">
             <Plus className="h-4 w-4" /> Add Card
           </button>
