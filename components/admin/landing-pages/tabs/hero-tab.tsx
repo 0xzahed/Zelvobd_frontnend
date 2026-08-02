@@ -45,25 +45,19 @@ export default function HeroTab({ register, control }: { register: any, control:
           <div>
             <Label>Regular Price (e.g. "8500")</Label>
             <Input 
-              {...register('heroSection.regularPrice', {
-                onChange: (e: any) => {
-                  e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                }
-              })} 
+              {...register('heroSection.regularPrice')} 
               placeholder="8500" 
-              inputMode="numeric"
+              type="number"
+              min="0"
             />
           </div>
           <div>
             <Label>Offer Price (e.g. "6400")</Label>
             <Input 
-              {...register('heroSection.offerPrice', {
-                onChange: (e: any) => {
-                  e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                }
-              })} 
+              {...register('heroSection.offerPrice')} 
               placeholder="6400" 
-              inputMode="numeric"
+              type="number"
+              min="0"
             />
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { AdminPrimaryButton } from '@/components/admin/admin-ui';
@@ -77,6 +77,19 @@ export default function LandingPageForm({
   });
 
 
+  const offerPrice = watch('heroSection.offerPrice');
+
+  useEffect(() => {
+    if (offerPrice) {
+      // Auto-fill checkout price
+      setValue('checkoutSection.price', offerPrice, { shouldDirty: true });
+      
+      // Auto-fill table offer price with Bengali digits and format
+      const formatted = Number(offerPrice).toLocaleString('en-IN');
+      const bnDigits = String(formatted).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[Number(d)]);
+      setValue('tableSection.offerPriceValue', `${bnDigits}টাকা`, { shouldDirty: true });
+    }
+  }, [offerPrice, setValue]);
 
   const [activeTab, setActiveTab] = useState('general');
 
