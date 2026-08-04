@@ -59,6 +59,13 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
 
     setLoading(true);
     try {
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
       const res = await fetch(`${BASE_URL}/orders/checkout-landing-page`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -70,6 +77,8 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
           district: form.area === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka',
           quantity: form.qty,
           price: UNIT_PRICE,
+          fbp: getCookie('_fbp') || undefined,
+          fbc: getCookie('_fbc') || undefined,
         }),
       });
 

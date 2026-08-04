@@ -35,10 +35,30 @@ export type CheckoutPayload = {
 }
 
 export const placeOrderAPI = async (payload: CheckoutPayload) => {
+  let fbp = undefined;
+  let fbc = undefined;
+
+  if (typeof document !== 'undefined') {
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+    fbp = getCookie('_fbp') || undefined;
+    fbc = getCookie('_fbc') || undefined;
+  }
+
+  const payloadWithTracking = {
+    ...payload,
+    fbp,
+    fbc
+  };
+
   const response = await fetch(`${BASE_URL}/orders/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payloadWithTracking),
   })
 
   const data = await response.json().catch(() => null)
