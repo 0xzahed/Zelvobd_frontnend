@@ -88,7 +88,7 @@ export default function LandingPageCheckoutForm({ landingPage }: { landingPage: 
       }
 
       // Manually fire the Lead event only on success
-      lead({ value: subtotal, orderId: payload.data?.code });
+      lead({ value: subtotal, orderId: payload.data?.code, phone: englishPhone });
       
       const orderCode = payload.data?.code;
       if (orderCode) {

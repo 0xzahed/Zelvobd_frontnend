@@ -72,8 +72,15 @@ export const initiateCheckout = (params: { value: number; numItems: number }) =>
   }
 }
 
-export const lead = (params?: { value?: number; currency?: string; orderId?: string }) => {
+export const lead = (params?: { value?: number; currency?: string; orderId?: string; phone?: string }) => {
   if (typeof window !== "undefined" && window.fbq) {
+    if (params?.phone) {
+      let cleanPhone = params.phone.replace(/\D/g, '');
+      if (cleanPhone.length === 11 && cleanPhone.startsWith('01')) {
+        cleanPhone = '88' + cleanPhone;
+      }
+      window.fbq('init', FB_PIXEL_ID, { ph: cleanPhone });
+    }
     window.fbq("track", "Lead", {
       value: params?.value,
       currency: params?.currency ?? "BDT",
